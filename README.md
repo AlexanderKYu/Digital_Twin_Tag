@@ -29,6 +29,24 @@ Expand analytics platform through development of task recognition algorithms usi
 
 ## Architecture
 
+The architecture of this project is comprised of four different structures.
+
+Eliko System:
+
+The Eliko system is responsible for the real time location tracking of the different tags. There are physical anchors within the facility placed to capture many tags within the designated zone.
+
+Real Time System:
+
+The real time system is responsible for the real time visualization of that tags. The user interface will support the display of the list of tags, graphing for tag movement and a real time camera feed of the designated zone.
+
+Cloud System (Aggregator):
+
+The cloud system is responsible for pulling data from the Eliko system and to push the information into the cloud.
+
+Cloud Service:
+
+The cloud service is responsible for storing past data. It will pull and push data.
+
 ## Risks
 
 ## Legal and Social Issues
