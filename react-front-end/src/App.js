@@ -1,12 +1,19 @@
 import "./App.css";
+import WIP from "./components/WIP";
+import Nav from "./components/Nav";
 import { io } from "socket.io-client";
+
 import { useEffect, useState } from "react";
+import { ChakraProvider } from '@chakra-ui/react'
+import chakraTheme from '@chakra-ui/theme'
 
 let socket;
 
 function App() {
   const [connected, setConnected] = useState(false);
   const [data, setData] = useState("");
+
+  const testString = "WIP TEST";
 
   const handleClick = () => {
     if (connected === false) {
@@ -40,11 +47,15 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <h1>Digital Twin Tag</h1>
-      <button onClick={handleClick}>Click To Call API</button>
-      <p>{data}</p>
+    <ChakraProvider>
+      <div className="App">
+        {/* <h1>Digital Twin Tag</h1>
+        <button onClick={handleClick}>Click To Call API</button>
+        <p>{data}</p> */}
+        <Nav></Nav>
+        <WIP></WIP>
     </div>
+    </ChakraProvider>
   );
 }
 
