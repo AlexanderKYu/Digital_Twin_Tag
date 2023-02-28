@@ -2,9 +2,9 @@ import "./App.css";
 import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 
+let socket;
+
 function App() {
-  const [socketInstance, setSocketInstance] = useState("");
-  const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
   const [data, setData] = useState("");
 
@@ -14,37 +14,30 @@ function App() {
     } else {
       setConnected(false);
     }
+    const aliasData = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tag: '0x003464', wip: 'test' })
+  };
+    fetch('/link-wip', aliasData).then(res => res.json()).then(data => {
+      setData(data.data);
+    });
   };
 
   useEffect(() => {
-    if (connected === true) {
-      fetch('/http-call').then(res => res.json()).then(data => {
-        setData(data.data);
-      });
-      const socket = io("localhost:5000/", {
-        transports: ["websocket"],
-        cors: {
-          origin: "http://localhost:3000/",
-        },
-      });
+      // create websocket/connect
+      socket = io();
 
-      setSocketInstance(socket);
-
-      socket.on("connect", (data) => {
+      socket.on("data", (data) => {
+        // when we recieve a chat, add it into our messages array in state
         console.log(data);
-      });
+      })
 
-      setLoading(false);
-
-      socket.on("disconnect", (data) => {
-        console.log(data);
-      });
-
-      return function cleanup() {
-        socket.disconnect();
-      };
-    }
-  }, [connected]);
+      // when component unmounts, disconnect
+      return (() => {
+          socket.disconnect()
+      })
+  }, []);
 
   return (
     <div className="App">

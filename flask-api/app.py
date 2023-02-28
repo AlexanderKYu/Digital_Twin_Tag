@@ -1,17 +1,48 @@
 from flask import Flask, request,jsonify
 from flask_socketio import SocketIO,emit
 from flask_cors import CORS
+from os import environ
+import socket
+import sys
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 CORS(app,resources={r"/*":{"origins":"*"}})
-socketio = SocketIO(app,cors_allowed_origins="*")
+socketio = SocketIO(cors_allowed_origins="*")
 
-@app.route("/http-call")
-def http_call():
-    """return JSON with string data as the value"""
-    data = {'data':'This text was fetched using an HTTP call to server on render'}
-    return jsonify(data)
+socketio.init_app(app)
+
+@app.route("/link-wip", methods=['POST'])
+def link_wip():
+    """set WIP number as alias for tag and return confirmation"""
+    data = request.get_json()
+
+    """
+    #call eliko api
+    #connected through router
+    TCP_IP = environ.get('TCP_IP')
+    TCP_PORT = int(environ.get('TCP_PORT'))
+    BUFFER_SIZE = 1
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((TCP_IP, TCP_PORT))
+    str ='$PEKIO,GET_TAGS,'
+    #str ='$PEKIO,SET_TAG_ALIAS,'+ data['tag'] + data['wip']
+    tmp=str.encode()
+    print(type(tmp.decode()))
+    s.send(str.encode())
+    print("message sent")
+
+    #break point. It looks like the message isnt properly received by the server
+    data = s.recv(BUFFER_SIZE)
+    print("message received")
+    s.close()
+    print ("received data:", data)
+    """
+
+    #return confirmation
+    resString = 'Tag ' + data['tag'] + ' set to Alias ' + data['wip']
+    response = {'data':resString}
+    return jsonify(response)
 
 @socketio.on("connect")
 def connected():
@@ -21,7 +52,7 @@ def connected():
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
 @socketio.on('data')
-def handle_message(data):
+def handle_data(data):
     """event listener when client types a message"""
     print("data from the front end: ",str(data))
     emit("data",{'data':data,'id':request.sid},broadcast=True)
