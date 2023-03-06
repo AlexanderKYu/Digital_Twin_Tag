@@ -5,3 +5,4 @@ venv
 package-lock.json
 *.pyc
 unix_timestamp.txt
+*.pkl
