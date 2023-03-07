@@ -8,6 +8,8 @@
     "@chakra-ui/react": "^2.5.1",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@fontsource/antonio": "^4.5.10",
+    "@fontsource/open-sans": "^4.5.14",
     "@mui/material": "^5.11.10",
     "@nikolovlazar/chakra-ui-prose": "^1.2.1",
     "@testing-library/jest-dom": "^5.16.5",

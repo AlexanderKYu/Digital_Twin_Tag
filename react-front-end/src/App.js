@@ -1,11 +1,14 @@
 import "./App.css";
 import WIP from "./components/WIP";
 import Nav from "./components/Nav";
+import Sample  from "./components/Sample";
 import { io } from "socket.io-client";
 
 import { useEffect, useState } from "react";
 import { ChakraProvider } from '@chakra-ui/react'
 import chakraTheme from '@chakra-ui/theme'
+import '@fontsource/antonio/500.css'
+import theme from "./components/Theme"
 
 let socket;
 
@@ -47,12 +50,12 @@ function App() {
   }, []);
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <div className="App">
         {/* <h1>Digital Twin Tag</h1>
         <button onClick={handleClick}>Click To Call API</button>
         <p>{data}</p> */}
-        <Nav></Nav>
+        <Nav_Sample></Nav_Sample>
         <WIP></WIP>
     </div>
     </ChakraProvider>
