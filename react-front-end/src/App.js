@@ -56,13 +56,13 @@ function App() {
   return (
     <ChakraProvider theme={theme}>
       <div className="App">
-        <Nav />
-        <h1>Welcome to this React Application</h1>
+        {/* <Nav />
+        <h1>Welcome to this React Application</h1> */}
         {/* <h1>Digital Twin Tag</h1>
         <button onClick={handleClick}>Click To Call API</button>
         <p>{data}</p> */}
-        {/* <Nav></Nav>
-        <WIP></WIP> */}
+        <Nav></Nav>
+        <WIP></WIP>
     </div>
     </ChakraProvider>
   );
