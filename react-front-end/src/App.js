@@ -55,7 +55,7 @@ function App() {
         {/* <h1>Digital Twin Tag</h1>
         <button onClick={handleClick}>Click To Call API</button>
         <p>{data}</p> */}
-        <Nav_Sample></Nav_Sample>
+        <Nav></Nav>
         <WIP></WIP>
     </div>
     </ChakraProvider>

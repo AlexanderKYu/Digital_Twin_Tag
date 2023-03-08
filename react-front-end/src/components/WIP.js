@@ -84,6 +84,7 @@ export default function WIP_Sample() {
                 value={tag}
                 onChange={tagChange}
                 name="tagNumber"
+                color= "black"
                 autoFocus
               />
               <Text fontSize="3xl">SCAN WIP</Text>
@@ -97,6 +98,7 @@ export default function WIP_Sample() {
                 mt={2}
                 value={wip}
                 onChange={wipChange}
+                color="black"
                 name="wipNumber"
               />
             </Box>
