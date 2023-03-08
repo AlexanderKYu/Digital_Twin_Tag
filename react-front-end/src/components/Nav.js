@@ -19,14 +19,12 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
-import React from "react";
-import { Link } from "react-router-dom";
 
 export default function Nav() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <div className="navigation">
+    <>
       <HStack bg="black" spacing="5px" px={5} h="3em">
         <Box>
           <Menu>
@@ -62,13 +60,6 @@ export default function Nav() {
           </AspectRatio>
         </Box>
       </HStack>
-      <li>
-        <Link to="/">Login/Signup</Link>
-      </li>
-      <li>
-        <Link to="/wip">Dashboard</Link>
-      </li>
-      <button>Login</button>
-    </div>
+    </>
   );
 }
