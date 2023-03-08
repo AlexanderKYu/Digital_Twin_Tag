@@ -13,6 +13,24 @@ function App() {
 
   const testString = "WIP TEST";
 
+  const [data, setData] = useState("");
+
+  const handleClick = () => {
+    var jsonData = { 
+      "tagNumber": "tagNumber",
+      "wipNumber": "wipNumber",
+  }
+
+  const aliasData = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(jsonData)
+  };
+
+  fetch('/link-wip', aliasData).then(res => res.json()).then(data => {
+      setData(data.data);
+    });
+  }
 
   useEffect(() => {
       // create websocket/connect
@@ -36,6 +54,8 @@ function App() {
         <button onClick={handleClick}>Click To Call API</button>
         <p>{data}</p> */}
         <Nav></Nav>
+        <button onClick={handleClick}> Send Tag</button>
+        {data}
         <WIP></WIP>
     </div>
     </ChakraProvider>
