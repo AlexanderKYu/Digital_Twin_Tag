@@ -3,18 +3,18 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import {Auth0Provider} from '@auth0/auth0-react';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import WIP from "./components/WIP";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Auth0Provider
-    domain='digtwintag.us.auth0.com'
-    clientId='EPm05WAt6qVa8fmvmwi2nvAPEbY7ULaJ'
-    redirectUri={window.location.origin}
-    >
-      <App />
-    </Auth0Provider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="wip" element={<WIP />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );
 

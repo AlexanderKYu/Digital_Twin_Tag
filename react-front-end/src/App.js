@@ -53,26 +53,13 @@ function App() {
   return (
     <ChakraProvider>
       <div className="App">
+        <Nav />
+        <h1>Welcome to this React Application</h1>
         {/* <h1>Digital Twin Tag</h1>
         <button onClick={handleClick}>Click To Call API</button>
         <p>{data}</p> */}
-        <Nav></Nav>
-        <WIP></WIP>
-        <ul>
-          <li>
-            <button onClick={loginWithPopup}>Login with Popup</button>
-          </li>
-          <li>
-            <button onClick={loginWithRedirect}>Login with Redirect</button>
-          </li>
-          <li>
-            <button onClick={logout}>Logout</button>
-          </li>
-        </ul>
-        <h3>User is { isAuthenticated ? "Logged In" : "Not logged in"}</h3>
-        { isAuthenticated && (
-        <pre style={{textAlign: 'start'}}>{JSON.stringify(user, null, 2)}</pre>
-        )}
+        {/* <Nav></Nav>
+        <WIP></WIP> */}
     </div>
     </ChakraProvider>
   );
