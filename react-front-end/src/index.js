@@ -5,14 +5,36 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import WIP from "./components/WIP";
+import { Auth0Provider } from "@auth0/auth0-react";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="wip" element={<WIP />} />
+        <Route 
+        path="/" 
+        element={
+          <Auth0Provider
+          domain="digtwintag.us.auth0.com"
+          clientId="EPm05WAt6qVa8fmvmwi2nvAPEbY7ULaJ"
+          redirectUri={window.location.origin}
+        >
+          <App />
+        </Auth0Provider>
+        } 
+      />
+        <Route path="wip" 
+        element={
+          <Auth0Provider
+          domain="digtwintag.us.auth0.com"
+          clientId="EPm05WAt6qVa8fmvmwi2nvAPEbY7ULaJ"
+          redirectUri={window.location.origin}
+        >
+          <WIP />
+        </Auth0Provider>
+        } 
+      />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

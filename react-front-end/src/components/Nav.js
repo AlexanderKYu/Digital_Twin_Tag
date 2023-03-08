@@ -19,12 +19,19 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+import React from "react";
+import { Link } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react"
+
 
 export default function Nav() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  
+
   return (
-    <>
+    <div className="navigation">
       <HStack bg="black" spacing="5px" px={5} h="3em">
         <Box>
           <Menu>
@@ -60,6 +67,30 @@ export default function Nav() {
           </AspectRatio>
         </Box>
       </HStack>
-    </>
+      <li>
+        <Link to="/">Login/Signup</Link>
+      </li>
+      <li>
+        <Link to="/dashboard">Dashboard</Link>
+      </li>
+      {isAuthenticated ? (
+  <button
+    onClick={() => {
+      logout();
+    }}
+  >
+    Logout
+  </button>
+) : (
+  <button
+    onClick={() => {
+      loginWithRedirect();
+    }}
+  >
+    Login
+  </button>
+)}
+    </div>
   );
+  
 }
