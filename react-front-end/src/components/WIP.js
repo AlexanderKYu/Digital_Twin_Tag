@@ -47,11 +47,10 @@ export default function WIP() {
                 body: JSON.stringify(jsonData)
             };
 
-            // fetch('/link-wip', aliasData).then(res => res.json()).then(data => {
-            //     setData("Test String");
-            //   });
+            fetch('/link-wip', aliasData).then(res => res.json()).then(data => {
+                setData(data.data);
+              });
 
-            const data = 'test string'
             console.log(data);
             setConfirmation(data);
         }

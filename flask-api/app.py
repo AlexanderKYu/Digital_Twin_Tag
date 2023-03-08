@@ -26,7 +26,7 @@ def link_wip():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((TCP_IP, TCP_PORT))
     str ='$PEKIO,GET_TAGS,'
-    #str ='$PEKIO,SET_TAG_ALIAS,'+ data['tag'] + data['wip']
+    #str ='$PEKIO,SET_TAG_ALIAS,'+ data['tagNumber'] + data['wipNumber']
     tmp=str.encode()
     print(type(tmp.decode()))
     s.send(str.encode())
@@ -40,7 +40,7 @@ def link_wip():
     """
 
     #return confirmation
-    resString = 'Tag ' + data['tag'] + ' set to Alias ' + data['wip']
+    resString = 'Tag ' + data['tagNumber'] + ' set to Alias ' + data['wipNumber']
     response = {'data':resString}
     return jsonify(response)
 

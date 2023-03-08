@@ -10,26 +10,9 @@ import chakraTheme from '@chakra-ui/theme'
 let socket;
 
 function App() {
-  const [connected, setConnected] = useState(false);
-  const [data, setData] = useState("");
 
   const testString = "WIP TEST";
 
-  const handleClick = () => {
-    if (connected === false) {
-      setConnected(true);
-    } else {
-      setConnected(false);
-    }
-    const aliasData = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tag: '0x003464', wip: 'test' })
-  };
-    fetch('/link-wip', aliasData).then(res => res.json()).then(data => {
-      setData(data.data);
-    });
-  };
 
   useEffect(() => {
       // create websocket/connect
