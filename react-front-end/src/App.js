@@ -17,8 +17,8 @@ function App() {
 
   const handleClick = () => {
     var jsonData = { 
-      "tagNumber": "tagNumber",
-      "wipNumber": "wipNumber",
+      "tagNumber": "0x001038",
+      "wipNumber": "111111",
   }
 
   const aliasData = {
