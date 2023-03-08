@@ -2,6 +2,7 @@ import "./App.css";
 import WIP from "./components/WIP";
 import Nav from "./components/Nav";
 import { io } from "socket.io-client";
+import { useAuth0 } from "@auth0/auth0-react";
 
 import { useEffect, useState } from "react";
 import { ChakraProvider } from '@chakra-ui/react'
@@ -10,6 +11,9 @@ import chakraTheme from '@chakra-ui/theme'
 let socket;
 
 function App() {
+
+  const {loginWithPopup, loginWithRedirect, logout, user, isAuthenticated} = useAuth0()
+
   const [connected, setConnected] = useState(false);
   const [data, setData] = useState("");
 
@@ -54,6 +58,21 @@ function App() {
         <p>{data}</p> */}
         <Nav></Nav>
         <WIP></WIP>
+        <ul>
+          <li>
+            <button onClick={loginWithPopup}>Login with Popup</button>
+          </li>
+          <li>
+            <button onClick={loginWithRedirect}>Login with Redirect</button>
+          </li>
+          <li>
+            <button onClick={logout}>Logout</button>
+          </li>
+        </ul>
+        <h3>User is { isAuthenticated ? "Logged In" : "Not logged in"}</h3>
+        { isAuthenticated && (
+        <pre style={{textAlign: 'start'}}>{JSON.stringify(user, null, 2)}</pre>
+        )}
     </div>
     </ChakraProvider>
   );
