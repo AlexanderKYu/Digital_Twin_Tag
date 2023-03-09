@@ -7,3 +7,4 @@ package-lock.json
 unix_timestamp.txt
 *.pkl
 5AMSample.txt
+*.log
