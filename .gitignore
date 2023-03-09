@@ -6,3 +6,4 @@ package-lock.json
 *.pyc
 unix_timestamp.txt
 *.pkl
+5AMSample.txt
