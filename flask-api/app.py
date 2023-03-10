@@ -25,9 +25,9 @@ def link_wip():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((TCP_IP, TCP_PORT))
     #str ='$PEKIO,GET_TAGS,'
-    str ='$PEKIO,SET_TAG_ALIAS,'+ data['tagNumber'] + "," + data['wipNumber']
-    str = str + "\r\n"
-    s.send(str.encode())
+    eCall ='$PEKIO,SET_TAG_ALIAS,'+ data['tagNumber'] + "," + data['wipNumber']
+    eCall = eCall + "\r\n"
+    s.send(eCall.encode())
 
     #break point. It looks like the message isnt properly received by the server
     res = s.recv(BUFFER_SIZE)
