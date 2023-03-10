@@ -17,30 +17,25 @@ def link_wip():
     """set WIP number as alias for tag and return confirmation"""
     data = request.get_json()
 
-    """
     #call eliko api
     #connected through router
     TCP_IP = environ.get('TCP_IP')
     TCP_PORT = int(environ.get('TCP_PORT'))
-    BUFFER_SIZE = 1
+    BUFFER_SIZE = 100
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((TCP_IP, TCP_PORT))
-    str ='$PEKIO,GET_TAGS,'
-    #str ='$PEKIO,SET_TAG_ALIAS,'+ data['tag'] + data['wip']
-    tmp=str.encode()
-    print(type(tmp.decode()))
-    s.send(str.encode())
-    print("message sent")
+    #str ='$PEKIO,GET_TAGS,'
+    eCall ='$PEKIO,SET_TAG_ALIAS,'+ data['tagNumber'] + "," + data['wipNumber']
+    eCall = eCall + "\r\n"
+    s.send(eCall.encode())
 
     #break point. It looks like the message isnt properly received by the server
-    data = s.recv(BUFFER_SIZE)
-    print("message received")
+    res = s.recv(BUFFER_SIZE)
     s.close()
-    print ("received data:", data)
-    """
+    print ("received data:", res)
 
     #return confirmation
-    resString = 'Tag ' + data['tag'] + ' set to Alias ' + data['wip']
+    resString = 'Tag ' + data['tagNumber'] + ' set to Alias ' + data['wipNumber']
     response = {'data':resString}
     return jsonify(response)
 

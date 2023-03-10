@@ -22,21 +22,24 @@ function App() {
 
   const testString = "WIP TEST";
 
+  const [data, setData] = useState("");
+
   const handleClick = () => {
-    if (connected === false) {
-      setConnected(true);
-    } else {
-      setConnected(false);
-    }
-    const aliasData = {
+    var jsonData = { 
+      "tagNumber": "0x001038",
+      "wipNumber": "111111",
+  }
+
+  const aliasData = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tag: '0x003464', wip: 'test' })
+      body: JSON.stringify(jsonData)
   };
-    fetch('/link-wip', aliasData).then(res => res.json()).then(data => {
+
+  fetch('/link-wip', aliasData).then(res => res.json()).then(data => {
       setData(data.data);
     });
-  };
+  }
 
   useEffect(() => {
       // create websocket/connect
@@ -62,6 +65,8 @@ function App() {
         <button onClick={handleClick}>Click To Call API</button>
         <p>{data}</p> */}
         <Nav></Nav>
+        <button onClick={handleClick}> Send Tag</button>
+        {data}
         <WIP></WIP>
     </div>
     </ChakraProvider>
