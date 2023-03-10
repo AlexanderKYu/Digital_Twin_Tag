@@ -5,7 +5,7 @@ import datetime
 import json
 import pickle
 
-REGEX_COORD_FILTER = "COORD.+"
+REGEX_PAT = "[0-9a-fA-F]x[0-9a-fA-F]{6}.+\n"
 REGEX_ID_PAT = "[0-9a-fA-F]x[0-9a-fA-F]{6}"
 REGEX_COORD_AND_TIME_PAT = "\d+\.\d{2}"
 
@@ -13,20 +13,16 @@ DEBUG = False
 
 sleep_mode = False
 presentDate = datetime.datetime.now()
-curr_unix_timestamp = datetime.datetime.timestamp(presentDate)*1000
+curr_unix_timestamp = datetime.datetime.timestamp(presentDate)
 
 def dict_to_json(dictionary):
     json_object = json.dumps(dictionary, indent = 4)
     print(json_object)
 
-def compare_mean_values(past, curr):
+def compare_data_values(past, curr):
     if (len(past) == 0):
         # first entry
         return True
-    print("Past: ")
-    dict_to_json(past)
-    print("Curr: ")
-    dict_to_json(curr)
     diff = {}
     for tag, values in curr.items():
         if tag not in past:
@@ -37,8 +33,6 @@ def compare_mean_values(past, curr):
         for value in values:
             diff[tag].append(value - past[tag][index])
             index += 1
-    print("diff: ")
-    dict_to_json(diff)
     for tag, values in diff.items():
         for value in values:
             if value > 1.5:
@@ -48,101 +42,94 @@ def compare_mean_values(past, curr):
 
 def pullData():
     lines = []
-    with open("5AMSample.txt", "r") as file:
+    with open("sampleSets/Get_Tags.log", "r") as file:
         lines = file.readlines()
     
-    tag_hist = {}
-    tags = []
+    tag_data = {}
 
     for line in lines:
-        coord_lines = re.findall(REGEX_COORD_FILTER, line)
-        for line in coord_lines:
-            tag_id = re.findall(REGEX_ID_PAT, line)
-            if len(tag_id) == 0:
-                break
-            else:
-                tag_id = tag_id[0]
-            coords = re.findall(REGEX_COORD_AND_TIME_PAT, line)
-            coord_lst = []
-            for coord in coords:
-                coord_lst.append(float(coord))
-            if tag_id not in tags:
-                tag_hist[tag_id] = []
-                tags.append(tag_id)
-            tag_hist[tag_id].append(coord_lst)
+        data_lines = re.findall(REGEX_PAT, line)
+        for data in data_lines:
+            data = data[:-1]
+            data = data.split(",")
+            tag = data[0]
+            x_coord = float(data[6])
+            y_coord = float(data[7])
+            z_coord = float(data[8])
+            unix_time = float(data[5])
+            tag_data[tag] = [x_coord, y_coord, z_coord, unix_time]
 
-    return tag_hist
-
-def calculate_mean(tag_hist):
-    tag_hist_avg = {}
-    for tag, values in tag_hist.items():
-        tag_hist_avg[tag] = []
-        x = []
-        y = []
-        z = []
-        for value in values:
-            x.append(value[0])
-            y.append(value[1])
-            z.append(value[2])
-
-        x_avg = sum(x) / len(x)
-        y_avg = sum(y) / len(y)
-        z_avg = sum(z) / len(z)
-
-        tag_hist_avg[tag].append(float("{:.2f}".format(x_avg)))
-        tag_hist_avg[tag].append(float("{:.2f}".format(y_avg)))
-        tag_hist_avg[tag].append(float("{:.2f}".format(z_avg)))
-    return tag_hist_avg
-
+    return tag_data
 
 
 def main(unix_file, pickle_file):
 
     past_unix_timestamp = ""
     sleep_mode = False
-    existing_txt_file = os.path.isfile(unix_file)
-    existing_pkl_file = os.path.isfile(pickle_file)
+    past_sleep_mode = False
+    first_sleep_mode = ""
+    existing_txt_file = os.path.isfile("sampleSets/"+unix_file)
+    existing_pkl_file = os.path.isfile("sampleSets/"+pickle_file)
     if (not existing_txt_file):
-        file = open(unix_file, "x")
+        file = open("sampleSets/"+unix_file, "x")
         file.close()
     if (not existing_pkl_file):
-        file = open(pickle_file, "x")
+        file = open("sampleSets/"+pickle_file, "x")
         file.close()
-        with open(pickle_file, "wb") as file:
+        with open("sampleSets/"+pickle_file, "wb") as file:
             temp = {}
             pickle.dump(temp, file)
     
-    with open(unix_file, "r") as file:
+    with open("sampleSets/"+unix_file, "r") as file:
         lines = file.readlines()
         if (len(lines) != 0):
             past_unix_timestamp = lines[0]
-            sleep_mode = lines[1]
+            sleep_mode_data = lines[1].split(",")
+            past_sleep_mode = bool(sleep_mode_data[0])
+            first_sleep_mode = sleep_mode_data[1]
     
-    past_mean_values = {}
+    past_tag_values = {}
     
-    with open(pickle_file, "rb") as file:
-        past_mean_values = pickle.load(file)
+    with open("sampleSets/"+pickle_file, "rb") as file:
+        past_tag_values = pickle.load(file)
 
     if (past_unix_timestamp == ""):
-        with open(unix_file, "w+") as file:
+        with open("sampleSets/"+unix_file, "w+") as file:
             file.writelines(str(curr_unix_timestamp))
             past_unix_timestamp = curr_unix_timestamp - 5 * 60
-            file.writelines(str(sleep_mode))
+            file.writelines(str(sleep_mode) + "," + str(curr_unix_timestamp))
         
     else:
         past_unix_timestamp = float(past_unix_timestamp)
+        first_sleep_mode = float(first_sleep_mode)
 
-    tag_hist = pullData()
-    mean_values = calculate_mean(tag_hist)
-    new_push = compare_mean_values(past_mean_values, mean_values)
-    print(new_push)
+    tag_values = pullData()
+    new_push = compare_data_values(past_tag_values, tag_values)
 
-    with open(unix_file, "w+") as file:
-        file.writelines(str(curr_unix_timestamp)+"\n")
-        file.writelines(str(sleep_mode))
+    if (past_sleep_mode and not new_push):
+        if (curr_unix_timestamp >= (first_sleep_mode + 1 * 60 * 60)):
+            # hourly push
+            first_sleep_mode = curr_unix_timestamp
+            print("Pushing hourly data")
+            sleep_mode = True
+
     
-    with open(pickle_file, "wb") as file:
-        pickle.dump(mean_values, file)
+    if (new_push):
+        print("Pushing data to db")
+        sleep_mode = False
+    else:
+        sleep_mode = True
+
+    with open("sampleSets/"+unix_file, "w+") as file:
+        file.writelines(str(curr_unix_timestamp)+"\n")
+        if (not sleep_mode):
+            file.writelines(str(sleep_mode)+","+str(curr_unix_timestamp))
+        else:
+            file.writelines(str(sleep_mode) + "," + str(first_sleep_mode))
+        
+    
+    with open("sampleSets/"+pickle_file, "wb") as file:
+        pickle.dump(tag_values, file)
 
 if __name__ == "__main__":
     if (("-h" in sys.argv) or ("--help" in sys.argv)):
