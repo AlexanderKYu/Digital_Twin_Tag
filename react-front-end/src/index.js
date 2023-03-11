@@ -11,6 +11,22 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
+    <Auth0Provider
+      domain="digtwintag.us.auth0.com"
+      clientId="EPm05WAt6qVa8fmvmwi2nvAPEbY7ULaJ"
+      redirectUri={window.location.origin}
+    >
+      <App />
+    </Auth0Provider>
+    </BrowserRouter>
+  </React.StrictMode>
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+// Alternative below
+{/* <BrowserRouter>
       <Routes>
         <Route 
         path="/" 
@@ -36,11 +52,5 @@ root.render(
         } 
       />
       </Routes>
-    </BrowserRouter>
-  </React.StrictMode>
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+    </BrowserRouter> */}
 reportWebVitals();

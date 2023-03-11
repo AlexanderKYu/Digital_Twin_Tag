@@ -16,12 +16,14 @@ import {
   MenuOptionGroup,
   MenuDivider,
   IconButton,
+  Button,
   HStack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react"
+import AuthNav from './auth-nav';
 
 
 export default function Nav() {
@@ -65,9 +67,12 @@ export default function Nav() {
               alt="Bauer Logo"
             />  
           </AspectRatio>
+          <Box pos="absolute" right={5}>
+              <AuthNav />
+        </Box>
         </Box>
       </HStack>
-      <li>
+      {/* <li>
         <Link to="/">Login/Signup</Link>
       </li>
       <li>
@@ -89,8 +94,10 @@ export default function Nav() {
   >
     Login
   </button>
-)}
+)} */}
     </div>
+
+
   );
-  
-}
+
+ }

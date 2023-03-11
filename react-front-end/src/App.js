@@ -1,9 +1,9 @@
 import "./App.css";
 import WIP from "./components/WIP";
 import Nav from "./components/Nav";
+import Welcome  from "./components/Welcome";
 import Sample  from "./components/Sample";
 import { io } from "socket.io-client";
-import { useAuth0 } from "@auth0/auth0-react";
 
 import { useEffect, useState } from "react";
 import { ChakraProvider } from '@chakra-ui/react'
@@ -15,7 +15,6 @@ let socket;
 
 function App() {
 
-  const {loginWithPopup, loginWithRedirect, logout, user, isAuthenticated} = useAuth0()
 
   const [connected, setConnected] = useState(false);
   const [data, setData] = useState("");
@@ -57,7 +56,7 @@ function App() {
     <ChakraProvider theme={theme}>
       <div className="App">
         <Nav />
-        <h1>Welcome to this React Application</h1>
+        <Welcome />
         {/* <h1>Digital Twin Tag</h1>
         <button onClick={handleClick}>Click To Call API</button>
         <p>{data}</p> */}
