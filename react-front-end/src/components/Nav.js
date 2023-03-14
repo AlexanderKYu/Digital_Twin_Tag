@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react"
 import AuthNav from './auth-nav';
 
@@ -29,7 +29,19 @@ import AuthNav from './auth-nav';
 export default function Nav() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  const navigate = useNavigate();
+
+  function handleDashClick (){
+
+    navigate("/dashboard")
+
+  }
+
+  function handleWipClick (){
+
+    navigate("/wip")
+
+  }
   
 
   return (
@@ -49,10 +61,10 @@ export default function Nav() {
                 </MenuButton>
 
                 <MenuList>
-                  <MenuItem>New Tab</MenuItem>
-                  <MenuItem>New Window</MenuItem>
-                  <MenuItem>Open Closed Tab</MenuItem>
-                  <MenuItem>Open File...</MenuItem>
+                  <MenuItem onClick={handleDashClick}>Dashboard</MenuItem>
+                  <MenuItem onClick={handleWipClick}> WIP Tag Search</MenuItem>
+                  <MenuItem>Menu Item 3</MenuItem>
+                  <MenuItem>Menu Item 4</MenuItem>
                 </MenuList>
               </>
             )}

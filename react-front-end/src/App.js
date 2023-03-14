@@ -10,12 +10,15 @@ import { ChakraProvider } from '@chakra-ui/react'
 import chakraTheme from '@chakra-ui/theme'
 import '@fontsource/antonio/500.css'
 import theme from "./components/Theme"
+import { useAuth0 } from "@auth0/auth0-react";
+import Dashboard from "./components/Dashboard";
+import { Route, Routes } from "react-router-dom";
 
 let socket;
 
 function App() {
 
-
+  const { isAuthenticated, user } = useAuth0();
   const [connected, setConnected] = useState(false);
   const [data, setData] = useState("");
 
@@ -56,12 +59,22 @@ function App() {
     <ChakraProvider theme={theme}>
       <div className="App">
         <Nav />
-        <Welcome />
+        <Routes>
+          <Route path="/" element={<Welcome />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/wip" element={<WIP />} />
+        </Routes>
         {/* <h1>Digital Twin Tag</h1>
         <button onClick={handleClick}>Click To Call API</button>
         <p>{data}</p> */}
         {/* <Nav></Nav>
         <WIP></WIP> */}
+        {/* { !isAuthenticated && (
+          <Welcome />
+        )}
+        { isAuthenticated && (
+          <Dashboard />
+        )} */}
     </div>
     </ChakraProvider>
   );
