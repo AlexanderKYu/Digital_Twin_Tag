@@ -35,12 +35,13 @@ def link_wip():
         #break point. It looks like the message isnt properly received by the server
         res = s.recv(BUFFER_SIZE)
         s.close()
+        res = str(res)
         print ("received data:", res)
-        if res[7:0] == "OK":
+        if res[9:11] == 'OK':
             resString = 'Tag ' + data['tagNumber'] + ' set to Alias ' + data['wipNumber']
             success = True
         else:
-            resString = 'Tag' + data['tagNumber'] + ' not found'
+            resString = 'Tag ' + data['tagNumber'] + ' not found'
     except:
         print("Eliko Socket Timed Out")
         resString = 'Unable to connect to Eliko API'
