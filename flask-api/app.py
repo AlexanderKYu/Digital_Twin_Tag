@@ -16,7 +16,7 @@ socketio.init_app(app)
 def link_wip():
     """set WIP number as alias for tag and return confirmation"""
     data = request.get_json()
-
+    '''
     #call eliko api
     #connected through router
     TCP_IP = environ.get('TCP_IP')
@@ -33,7 +33,7 @@ def link_wip():
     res = s.recv(BUFFER_SIZE)
     s.close()
     print ("received data:", res)
-
+    '''
     #return confirmation
     resString = 'Tag ' + data['tagNumber'] + ' set to Alias ' + data['wipNumber']
     response = {'data':resString}
