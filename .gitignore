@@ -8,3 +8,4 @@ unix_timestamp.txt
 *.pkl
 5AMSample.txt
 *.log
+config.py
