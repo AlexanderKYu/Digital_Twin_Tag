@@ -22,13 +22,11 @@ export default function WIP() {
 
   
   const tagChange = (e) => {
-    if (e.target.value.length <= 8) {
+    if (e.target.value.length <= 6) {
       setTag(e.target.value);
     }
-    if (e.target.value.length >= 8) {
+    if (e.target.value.length >= 6) {
       const nextField = document.querySelector("[name=wipNumber]");
-      console.log(e.target.value);
-      console.log(nextField);
       if (nextField !== null) {
         nextField.focus();
       }
@@ -56,7 +54,7 @@ export default function WIP() {
     if (wip.length >= 5) {
 
       var jsonData = {
-        tagNumber: tag,
+        tagNumber: '0x'+tag,
         wipNumber: wip,
       };
 
