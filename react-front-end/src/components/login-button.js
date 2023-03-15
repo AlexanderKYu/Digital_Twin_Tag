@@ -5,7 +5,11 @@ import { Button } from '@chakra-ui/react'
 const LoginButton = () => {
   const { loginWithRedirect } = useAuth0();
   return (
-    <Button colorScheme='gray' size={'sm'}
+    <Button bg="none" color="white" borderRadius={40} pl={5} pr={5} height={9}
+    borderColor="white"
+    borderWidth={3}
+    fontSize="sm"
+    _hover={{ bg: "teal.600", color: "white" }}
       onClick={() => loginWithRedirect()}
     >
       Log In/Sign Up

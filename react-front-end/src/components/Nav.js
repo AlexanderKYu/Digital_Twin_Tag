@@ -79,9 +79,9 @@ export default function Nav() {
               alt="Bauer Logo"
             />  
           </AspectRatio>
-          <Box pos="absolute" right={5}>
+        <Box pos="absolute" top={2} right={10}>
               <AuthNav />
-        </Box>
+          </Box>
         </Box>
       </HStack>
       {/* <li>
