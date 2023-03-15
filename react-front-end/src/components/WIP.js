@@ -7,24 +7,34 @@ import {
   InputGroup,
   Alert,
   Button,
-  TableContainer,
-  Table,
-  TableCaption,
-  Thead,
-  Tr,
-  Th,
-  Tbody,
-  Td,
-  Tfoot,
+  Spacer,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
+import TagData from "./TagData.js";
 
-export default function WIP_Sample() {
+export default function WIP() {
   const [tag, setTag] = useState("");
   const [data, setData] = useState("");
   const [wip, setWip] = useState("");
   const [confirmation, setConfirmation] = useState("");
 
+  const connectedTags = [
+    {
+      number: "0x003464",
+      alias: "Peter’s",
+      voltage: 4087,
+      status: 70,
+      timestamp: 1212343243,
+    },
+    {
+      number: "0x003464",
+      alias: "Peter’s",
+      voltage: 4087,
+      status: 70,
+      timestamp: 1212343243,
+    },
+  ];
+  
   const tagChange = (e) => {
     if (e.target.value.length <= 8) {
       setTag(e.target.value);
@@ -122,7 +132,7 @@ export default function WIP_Sample() {
                 color="black"
                 mt={2}
                 mb={5}
-                focusBorderColor="#00FFFF"
+                focusBorderColor="teal.600"
                 borderColor="white"
                 borderWidth={3}
                 fontFamily="arial"
@@ -141,7 +151,7 @@ export default function WIP_Sample() {
                 size="lg"
                 color="black"
                 mt={2}
-                focusBorderColor="#00FFFF"
+                focusBorderColor="teal.600"
                 borderColor="white"
                 borderWidth={3}
                 fontFamily="arial"
@@ -195,7 +205,8 @@ export default function WIP_Sample() {
                   size="lg"
                   color="black"
                   mt={2}
-                  focusBorderColor="#00FFFF"
+                  mb={4}
+                  focusBorderColor="teal.600"
                   borderColor="white"
                   borderWidth={3}
                   fontFamily="arial"
@@ -203,7 +214,9 @@ export default function WIP_Sample() {
                   fontSize="2xl"
                 />
               </InputGroup>
-
+                {connectedTags.map((tagValue)=>
+                    <TagData data={tagValue} ></TagData>
+                )}
               
             </Box>
           </Flex>
