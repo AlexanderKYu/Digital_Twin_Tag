@@ -46,7 +46,7 @@ export default function TagData(props) {
               pl={4}
               pr={4}
             >
-              <Text>{props.data.alias}</Text>
+              <Text>{props.data.number}</Text>
             </Box>
             <Spacer />
             <Box
@@ -58,7 +58,7 @@ export default function TagData(props) {
               pl={4}
               pr={4}
             >
-              <Text>WIP: {props.data.number}</Text>
+              <Text>WIP: {props.data.alias}</Text>
             </Box>
             <Box
               flex="0.5"
