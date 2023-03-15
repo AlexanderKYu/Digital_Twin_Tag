@@ -16,27 +16,38 @@ socketio.init_app(app)
 def link_wip():
     """set WIP number as alias for tag and return confirmation"""
     data = request.get_json()
-
+    resString = ""
+    success = False
     #call eliko api
     #connected through router
     TCP_IP = environ.get('TCP_IP')
     TCP_PORT = int(environ.get('TCP_PORT'))
     BUFFER_SIZE = 100
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((TCP_IP, TCP_PORT))
-    #str ='$PEKIO,GET_TAGS,'
-    eCall ='$PEKIO,SET_TAG_ALIAS,'+ data['tagNumber'] + "," + data['wipNumber']
-    eCall = eCall + "\r\n"
-    s.send(eCall.encode())
+    s.settimeout(5)
+    try:
+        s.connect((TCP_IP, TCP_PORT))
+        #str ='$PEKIO,GET_TAGS,'
+        eCall ='$PEKIO,SET_TAG_ALIAS,'+ data['tagNumber'] + "," + data['wipNumber']
+        eCall = eCall + "\r\n"
+        s.send(eCall.encode())
 
-    #break point. It looks like the message isnt properly received by the server
-    res = s.recv(BUFFER_SIZE)
-    s.close()
-    print ("received data:", res)
+        #break point. It looks like the message isnt properly received by the server
+        res = s.recv(BUFFER_SIZE)
+        s.close()
+        res = str(res)
+        print ("received data:", res)
+        if res[9:11] == 'OK':
+            resString = 'Tag ' + data['tagNumber'] + ' set to Alias ' + data['wipNumber']
+            success = True
+        else:
+            resString = 'Tag ' + data['tagNumber'] + ' not found'
+    except:
+        print("Eliko Socket Timed Out")
+        resString = 'Unable to connect to Eliko API'
 
     #return confirmation
-    resString = 'Tag ' + data['tagNumber'] + ' set to Alias ' + data['wipNumber']
-    response = {'data':resString}
+    response = {'data':resString, 'success':success}
     return jsonify(response)
 
 @socketio.on("connect")
@@ -57,6 +68,7 @@ def disconnected():
     """event listener when client disconnects to the server"""
     print("user disconnected")
     emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True,port=5000)

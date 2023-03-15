@@ -34,7 +34,7 @@ export default function WIP() {
       timestamp: 1212343243,
     },
   ];
-
+  
   const tagChange = (e) => {
     if (e.target.value.length <= 8) {
       setTag(e.target.value);
@@ -221,8 +221,7 @@ export default function WIP() {
             </Box>
           </Flex>
         </Box>
-        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black">
-        </Box>
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box>
       </Flex>
     </>
   );
