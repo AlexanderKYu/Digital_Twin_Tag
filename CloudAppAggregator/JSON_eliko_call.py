@@ -23,12 +23,9 @@ def getBattery(socket):
     msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
 
     try:
-        s.send(msg.encode("ascii"))
-        #time.sleep(1)
-        data=read(s)
-        json_data='[ {"number":'+ data[2]+',"alias":'+ data[]\
-        \
-        '
+        socket.send(msg.encode("ascii"))
+        data=read(socket)
+        json_data='[ {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}]'
 
 
     except socket.error:
@@ -36,8 +33,8 @@ def getBattery(socket):
 
    
 def getHistory(socket):
-     
-def getTags(socket):
+     return socket
+#def getTags(socket):
 
 
 try:
