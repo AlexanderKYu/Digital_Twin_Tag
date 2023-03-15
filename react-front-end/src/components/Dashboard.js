@@ -1,9 +1,8 @@
 import React from "react";
+import { Text } from '@chakra-ui/react'
 const Dashboard = () => {
   return (
-    <div>
-      <h1>This is where the full view of all functionailites will be.</h1>
-    </div>
+    <Text fontSize='3xl'>This is where the full view of all functionailites will be.</Text>
   );
 };
 export default Dashboard;

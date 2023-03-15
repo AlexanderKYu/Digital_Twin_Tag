@@ -2,7 +2,7 @@ import "./App.css";
 import WIP from "./components/WIP";
 import Nav from "./components/Nav";
 import Welcome  from "./components/Welcome";
-import Sample  from "./components/Sample";
+import { PageLoader } from "./components/page-loader";
 import { io } from "socket.io-client";
 
 import { useEffect, useState } from "react";
@@ -13,6 +13,7 @@ import theme from "./components/Theme"
 import { useAuth0 } from "@auth0/auth0-react";
 import Dashboard from "./components/Dashboard";
 import { Route, Routes } from "react-router-dom";
+import { AuthenticationGuard } from "./components/authentication-guard";
 
 let socket;
 
@@ -21,6 +22,7 @@ function App() {
   const { isAuthenticated, user } = useAuth0();
   const [connected, setConnected] = useState(false);
   const [data, setData] = useState("");
+
 
   const testString = "WIP TEST";
 
@@ -55,14 +57,24 @@ function App() {
       })
   }, []);
 
+  // const { isLoading } = useAuth0();
+
+  // if (isLoading) {
+  //   return (
+  //     <div className="page-layout">
+  //       <PageLoader />
+  //     </div>
+  //   );
+  // }
+
   return (
     <ChakraProvider theme={theme}>
       <div className="App">
         <Nav />
         <Routes>
           <Route path="/" element={<Welcome />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/wip" element={<WIP />} />
+          <Route path="/dashboard" element={<AuthenticationGuard component={Dashboard} />} />
+          <Route path="/wip" element={<AuthenticationGuard component={WIP} />} />
         </Routes>
         {/* <h1>Digital Twin Tag</h1>
         <button onClick={handleClick}>Click To Call API</button>
