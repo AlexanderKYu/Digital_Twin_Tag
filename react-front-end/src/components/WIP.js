@@ -1,34 +1,34 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   Box,
-  Container,
-  useDisclosure,
-  useColorModeValue,
-  Image,
-  AspectRatio,
   Input,
-  VStack,
-  HStack,
   Flex,
-  Spacer,
-  Center,
   Text,
-  Square,
   InputGroup,
-  InputLeftElement,
+  Alert,
+  Button,
+  TableContainer,
+  Table,
+  TableCaption,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+  Tfoot,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon, SearchIcon } from "@chakra-ui/icons";
+import { ArrowForwardIcon } from "@chakra-ui/icons";
 
-export default function WIP_Sample() {
+export default function WIP() {
   const [tag, setTag] = useState("");
   const [data, setData] = useState("");
   const [wip, setWip] = useState("");
   const [confirmation, setConfirmation] = useState("");
 
   const tagChange = (e) => {
-    setTag(e.target.value);
-
-    if (e.target.value.length >= 8) {
+    if (e.target.value.length <= 8) {
+      setTag(e.target.value);
+    } else if (e.target.value.length >= 8) {
       const nextField = document.querySelector("[name=wipNumber]");
       console.log(e.target.value);
       console.log(nextField);
@@ -39,10 +39,25 @@ export default function WIP_Sample() {
   };
 
   const wipChange = (e) => {
-    setWip(e.target.value);
+    if (e.target.value.length <= 5) {
+      setWip(e.target.value);
+    }
+  };
 
-    if (e.target.value.length >= 5) {
-      console.log(e.target.value);
+  const clear = (e) => {
+    setTag("");
+    setWip("");
+    setConfirmation("");
+
+    const nextSelect = document.querySelector("[name=tagNumber]");
+    if (nextSelect !== null) {
+      nextSelect.focus();
+    }
+  };
+
+  useEffect(() => {
+    if (wip.length >= 5) {
+      console.log(wip);
 
       var jsonData = {
         tagNumber: tag,
@@ -55,70 +70,145 @@ export default function WIP_Sample() {
         body: JSON.stringify(jsonData),
       };
 
-            fetch('/link-wip', aliasData).then(res => res.json()).then(data => {
-                setData(data.data);
-              });
+      fetch("/link-wip", aliasData)
+        .then((res) => res.json())
+        .then((data) => {
+          setData(data.data);
+          console.log(data.data);
+          setConfirmation(data.data);
+        });
 
-            console.log(data);
-            setConfirmation(data);
-        }
-        };
+      const nextSelect = document.querySelector("[name=scanBtn]");
+      if (nextSelect !== null) {
+        nextSelect.focus();
+      }
+    }
+  }, [wip]);
 
   return (
     <>
+      {confirmation && (
+        <Alert
+          status="success"
+          variant="solid"
+          fontFamily="Arial"
+          bg="teal.600"
+        >
+          {confirmation}
+        </Alert>
+      )}
       <Flex align="center" mt={0} bg="black" color="white">
-        <Box flex="1" flexGrow="0.5" minH="100vh" mt={20} bg="black"></Box>
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box>
         <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="black">
-          <Flex align="center" mt={0} bg="pink" color="white">
-            <Box flex="1" flexGrow="0.5" minH="100vh" p={10} bg="black" borderRight="solid" border-color="white" border-width="4px">
-              <Text fontSize="3xl">SCAN TAG</Text>
+          <Flex align="center" mt={0} bg="black" color="white">
+            <Box
+              flex="1"
+              flexGrow="0.5"
+              minH="100vh"
+              pt={10}
+              pb={10}
+              pl={20}
+              pr={20}
+              bg="black"
+              borderRight="solid"
+              border-color="white"
+              border-width="4px"
+            >
+              <Text fontSize="5xl">TAG</Text>
               <Input
-                focusBorderColor="red"
                 bg="white"
                 borderRadius={150}
-                placeholder="Eliko Tag"
-                size="md"
+                size="lg"
+                color="black"
                 mt={2}
                 mb={5}
+                focusBorderColor="teal.600"
+                borderColor="white"
+                borderWidth={3}
+                fontFamily="arial"
+                textAlign="center"
+                fontSize="2xl"
                 value={tag}
                 onChange={tagChange}
                 name="tagNumber"
-                color= "black"
                 autoFocus
               />
-              <Text fontSize="3xl">SCAN WIP</Text>
+              <Text fontSize="5xl">WIP</Text>
 
               <Input
-                focusBorderColor="gray.900"
                 bg="white"
                 borderRadius={150}
-                placeholder="WIP Number"
-                size="md"
+                size="lg"
+                color="black"
                 mt={2}
+                focusBorderColor="teal.600"
+                borderColor="white"
+                borderWidth={3}
+                fontFamily="arial"
+                textAlign="center"
+                fontSize="2xl"
                 value={wip}
                 onChange={wipChange}
-                color="black"
                 name="wipNumber"
+                mb={5}
               />
-            </Box>
-            <Box flex="1" flexGrow="0.5" minH="100vh" p={10} bg="black">
-              <Text fontSize="3xl" mb={2}>SEARCH</Text>
-              <InputGroup>
-                <InputLeftElement
-                  pointerEvents="none"
-                  children={<SearchIcon color="gray.900" />}
-                />
-                <Input type="" placeholder="" 
-                focusBorderColor="gray.900"
+
+              <Button
+                onClick={clear}
                 bg="white"
+                color="black"
                 borderRadius={150}
-                size="md"
+                size="lg"
+                mt={6}
+                fontSize="xl"
+                name="scanBtn"
+                borderColor="white"
+                borderWidth={3}
+                _focus={{
+                  borderColor: "teal.600",
+                  borderWidth: 3,
+                  bg: "teal.600",
+                  color: "white",
+                }}
+                _hover={{ bg: "teal.600", color: "white" }}
+              >
+                <ArrowForwardIcon></ArrowForwardIcon>
+              </Button>
+            </Box>
+            <Box
+              flex="1"
+              flexGrow="0.5"
+              minH="100vh"
+              pt={10}
+              pb={10}
+              pl={20}
+              pr={20}
+              bg="black"
+            >
+              <Text fontSize="5xl">SEARCH / RECHERCHE</Text>
+              <InputGroup>
+                <Input
+                  type=""
+                  placeholder=""
+                  bg="white"
+                  borderRadius={150}
+                  size="lg"
+                  color="black"
+                  mt={2}
+                  focusBorderColor="teal.600"
+                  borderColor="white"
+                  borderWidth={3}
+                  fontFamily="arial"
+                  textAlign="center"
+                  fontSize="2xl"
                 />
               </InputGroup>
+
+
             </Box>
           </Flex>
         </Box>
-        <Box flex="1" flexGrow="0.5" minH="100vh" mt={20} bg="black"></Box>
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box>
       </Flex>
     </>
   );
