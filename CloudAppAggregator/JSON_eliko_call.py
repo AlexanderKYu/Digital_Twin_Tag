@@ -1,5 +1,7 @@
 import socket
 import sys
+import json
+
 def read(socket):
     try:
         #time.sleep(1)
@@ -8,22 +10,25 @@ def read(socket):
         while(loop):
             tmp = s.recv(1024)
             data=data+tmp.decode('ascii')
-            if '$PEKIO,EOF' in tmp:
+            #if data received is only a bit of that string there might be problem or if a tag name contains EOF
+            if 'EOF' in tmp:
                 loop=False
-        return data
+        dataArr=data.split(",")
+        return dataArr
     except socket.error:
         print('Failed to send data')
 
 def getBattery(socket):
-    
-    #start-time:1623855300 end-time:1623855330
-    msg = "$PEKIO,TAG_BATTERY"+ "1623855300" + "," + "1623855330"
+    msg = "PEKIO,GET_BATTERIES"
     msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
 
     try:
         s.send(msg.encode("ascii"))
         #time.sleep(1)
         data=read(s)
+        json_data='[ {"number":'+ data[2]+',"alias":'+ data[]\
+        \
+        '
 
 
     except socket.error:
