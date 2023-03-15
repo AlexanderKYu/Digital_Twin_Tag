@@ -24,7 +24,7 @@ def link_wip():
     TCP_PORT = int(environ.get('TCP_PORT'))
     BUFFER_SIZE = 100
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(5)
+    s.settimeout(3)
     try:
         s.connect((TCP_IP, TCP_PORT))
         #str ='$PEKIO,GET_TAGS,'
@@ -47,7 +47,17 @@ def link_wip():
         resString = 'Unable to connect to Eliko API'
 
     #return confirmation
-    response = {'data':resString, 'success':success}
+    response = {
+                    'data':resString, 
+                    'success':success, 
+                    'tagData': {
+                        'number': data['tagNumber'],
+                        'alias': data['wipNumber'],
+                        'voltage': 4087,
+                        'status': 80,
+                        'timestamp': 1212343243,
+                    } 
+                }
     return jsonify(response)
 
 @socketio.on("connect")

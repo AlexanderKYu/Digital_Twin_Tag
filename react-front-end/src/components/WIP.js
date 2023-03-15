@@ -17,28 +17,15 @@ export default function WIP() {
   const [data, setData] = useState("");
   const [wip, setWip] = useState("");
   const [confirmation, setConfirmation] = useState("");
+  const [connectedTags, setConnectedTags] = useState([]);
 
-  const connectedTags = [
-    {
-      number: "0x003464",
-      alias: "Peter’s",
-      voltage: 4087,
-      status: 70,
-      timestamp: 1212343243,
-    },
-    {
-      number: "0x003464",
-      alias: "Peter’s",
-      voltage: 4087,
-      status: 70,
-      timestamp: 1212343243,
-    },
-  ];
+
   
   const tagChange = (e) => {
     if (e.target.value.length <= 8) {
       setTag(e.target.value);
-    } else if (e.target.value.length >= 8) {
+    }
+    if (e.target.value.length >= 8) {
       const nextField = document.querySelector("[name=wipNumber]");
       console.log(e.target.value);
       console.log(nextField);
@@ -67,7 +54,6 @@ export default function WIP() {
 
   useEffect(() => {
     if (wip.length >= 5) {
-      console.log(wip);
 
       var jsonData = {
         tagNumber: tag,
@@ -84,7 +70,12 @@ export default function WIP() {
         .then((res) => res.json())
         .then((data) => {
           setData(data.data);
-          console.log(data.data);
+          if(data.success){
+            let temp = connectedTags;
+            temp.push(data.tagData);
+            setConnectedTags(temp);
+          }
+          console.log(data.tagData);
           setConfirmation(data.data);
         });
 
@@ -215,7 +206,7 @@ export default function WIP() {
                 />
               </InputGroup>
                 {connectedTags.map((tagValue)=>
-                    <TagData data={tagValue} ></TagData>
+                    <TagData key={tagValue.number} data={tagValue} ></TagData>
                 )}
               
             </Box>
