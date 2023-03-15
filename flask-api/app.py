@@ -25,7 +25,6 @@ def link_wip():
     BUFFER_SIZE = 100
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(3)
-    print(data)
     try:
         s.connect((TCP_IP, TCP_PORT))
         #str ='$PEKIO,GET_TAGS,'
