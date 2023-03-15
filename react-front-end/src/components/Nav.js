@@ -62,9 +62,7 @@ export default function Nav() {
 
                 <MenuList>
                   <MenuItem onClick={handleDashClick}>Dashboard</MenuItem>
-                  <MenuItem onClick={handleWipClick}> WIP Tag Search</MenuItem>
-                  <MenuItem>Menu Item 3</MenuItem>
-                  <MenuItem>Menu Item 4</MenuItem>
+                  <MenuItem onClick={handleWipClick}>Manufacturing View</MenuItem>
                 </MenuList>
               </>
             )}
