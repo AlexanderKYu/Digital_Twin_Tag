@@ -24,7 +24,8 @@ export default function WIP() {
   const tagChange = (e) => {
     if (e.target.value.length <= 8) {
       setTag(e.target.value);
-    } else if (e.target.value.length >= 8) {
+    }
+    if (e.target.value.length >= 8) {
       const nextField = document.querySelector("[name=wipNumber]");
       console.log(e.target.value);
       console.log(nextField);
