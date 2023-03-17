@@ -75,7 +75,7 @@ getBattery(s)
 s.close()
 sys.exit()
 
-
+#
 
 #GET_Battery example
 # {
