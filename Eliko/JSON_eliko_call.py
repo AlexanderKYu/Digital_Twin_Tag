@@ -14,11 +14,12 @@ def read(socket):
         #time.sleep(1)
         loop=True
         parsed=True
+        data=""
         while(loop):
             tmp = s.recv(1024)
             data=data+tmp.decode('ascii')
             #if data received is only a bit of that string there might be problem or if a tag name contains EOF
-            if 'EOF' in tmp:
+            if b'EOF' in tmp:
                 loop=False
         dataArr=data.split("$")
         return dataArr
@@ -26,17 +27,20 @@ def read(socket):
         print('Failed to send data')
 
 def getBattery(socket):
-    msg = "PEKIO,GET_BATTERIES"
+    msg = "$PEKIO,GET_BATTERIES"
     msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
 
     try:
         socket.send(msg.encode("ascii"))
         rawData=read(socket)
         json_data="["
+        count=-1
         for i in rawData:
-            data=rawData[i].split(",")
-            tmp='"'+data[2]+'"'+': {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}]'
-            json_data=json_data+tmp
+            count=count+1
+            data=rawData[count].split(",")
+            if len(data)>5:
+                tmp='"'+data[2]+'"'+': {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}]'
+                json_data=json_data+tmp
         json_data=json_data+"]"
 
 
