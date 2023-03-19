@@ -32,7 +32,7 @@ def getBattery(socket):
     try:
         socket.send(msg.encode("ascii"))
         data=read(socket)
-        json_data='[ {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}]'
+        json_data='['+data ': {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}]'
 
 
     except socket.error:

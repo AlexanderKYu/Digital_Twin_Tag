@@ -32,15 +32,18 @@ def getBattery(socket):
     try:
         socket.send(msg.encode("ascii"))
         rawData=read(socket)
-        for(i in rawData):
+        json_data="["
+        for i in rawData:
             data=rawData[i].split(",")
-            tmp='[ {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}]'
+            tmp='"'+data[2]+'"'+': {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}]'
             json_data=json_data+tmp
-        
+        json_data=json_data+"]"
 
 
     except socket.error:
         print('Failed to send data')
+    return json_data
+    
 
    
 def getHistory(socket,start,end):
@@ -50,7 +53,7 @@ def getHistory(socket,start,end):
     try:
         socket.send(msg.encode("ascii"))
         data=read(socket)
-        json_data='[ {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}]'
+        json_data='[ {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}'
 
 
     except socket.error:
@@ -65,14 +68,14 @@ except socket.error:
         print('Failed to create socket')
         sys.exit()
 
-TCP_IP = '76.64.190.151'
+TCP_IP = '10.8.4.1'
 TCP_PORT = 25025
 BUFFER_SIZE = 1024
 
 s.settimeout(3) # 3 second timeout
 s.connect((TCP_IP, TCP_PORT))
 
-getBattery(s)
+print(toString(getBattery(s)))
 
 
 
