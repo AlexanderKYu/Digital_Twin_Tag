@@ -34,7 +34,11 @@ export default function WIP() {
   };
 
   const wipChange = (e) => {
-    if (e.target.value.length <= 5) {
+    if (e.target.value.length > 6) {
+      if(e.target.value.slice(0,5) === "00000"){
+        setWip(e.target.value.slice(5,11));
+      }
+    } else if (e.target.value.length <= 6) {
       setWip(e.target.value);
     }
   };
@@ -51,7 +55,8 @@ export default function WIP() {
   };
 
   useEffect(() => {
-    if (wip.length >= 5) {
+    if (wip.length >= 6) {
+      console.log(wip);
 
       var jsonData = {
         tagNumber: '0x'+tag,
