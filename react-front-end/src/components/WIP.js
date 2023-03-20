@@ -56,7 +56,6 @@ export default function WIP() {
 
   useEffect(() => {
     if (wip.length >= 6) {
-      console.log(wip);
 
       var jsonData = {
         tagNumber: '0x'+tag,
