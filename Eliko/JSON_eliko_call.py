@@ -23,6 +23,7 @@ def read(socket):
                 loop=False
         dataArr=data.split("$")
         return dataArr
+#error seems bugged
     except socket.error:
         print('Failed to send data')
 
@@ -63,7 +64,27 @@ def getHistory(socket,start,end):
     except socket.error:
         print('Failed to send data')
     
-#def getTags(socket):
+def getTags(socket):
+    msg = "$PEKIO,GET_TAGS"
+    msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
+
+    try:
+        socket.send(msg.encode("ascii"))
+        rawData=read(socket)
+        json_data="["
+        count=-1
+        for i in rawData:
+            count=count+1
+            data=rawData[count].split(",")
+            if len(data)>9:
+                tmp='"'+data[2]+'"'+': {"number":'+ data[2]+',"alias":'+ data[3]+',"mode":'+ data[4]+',"height":'+ data[5]+',"hz":'+ data[6]+',"timestamp":'+ data[7]+',"x":'+ data[8]+',"y":'+ data[9]+',"z":'+ data[10]+'}]'
+                json_data=json_data+tmp
+        json_data=json_data+"]"
+
+
+    except socket.error:
+        print('Failed to send data')
+    return json_data
 
 
 try:
@@ -79,7 +100,7 @@ BUFFER_SIZE = 1024
 s.settimeout(3) # 3 second timeout
 s.connect((TCP_IP, TCP_PORT))
 
-print(toString(getBattery(s)))
+print(toString(getTags(s)))
 
 
 
