@@ -14,7 +14,7 @@ import TagData from "./TagData.js";
 
 export default function WIP() {
   const [tag, setTag] = useState("");
-  const [data, setData] = useState("");
+  const [send, setSend] = useState(false);
   const [wip, setWip] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [connectedTags, setConnectedTags] = useState([]);
@@ -34,59 +34,72 @@ export default function WIP() {
   };
 
   const wipChange = (e) => {
-    if (e.target.value.length > 6) {
+    if (e.target.value.length >= 12) {
       if(e.target.value.slice(0,5) === "00000"){
-        setWip(e.target.value.slice(5,11));
+        setWip(e.target.value.slice(5,11)+ ".1");
+        setSend(true);
+      } else if(e.target.value.slice(0,4) === "0000"){
+        setWip(e.target.value.slice(4,10) + "." + e.target.value.slice(10,11));
+        setSend(true);
       }
-    } else if (e.target.value.length <= 6) {
+    } else {
       setWip(e.target.value);
     }
   };
 
-  const clear = (e) => {
-    setTag("");
-    setWip("");
-    setConfirmation("");
+  const sendAndClear = (e) => {
+    var jsonData = {
+      tagNumber: '0x'+tag,
+      wipNumber: wip,
+    };
+    console.log(jsonData);
+    const aliasData = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(jsonData),
+    };
 
-    const nextSelect = document.querySelector("[name=tagNumber]");
-    if (nextSelect !== null) {
-      nextSelect.focus();
-    }
+    fetch("/link-wip", aliasData)
+      .then((res) => res.json())
+      .then((data) => {
+        if(data.success){
+          let temp = connectedTags;
+          temp.push(data.tagData);
+          setConnectedTags(temp);
+          setTag("");
+          setWip("");
+
+          const nextSelect = document.querySelector("[name=tagNumber]");
+          if (nextSelect !== null) {
+            nextSelect.focus();
+          }
+        }
+        setConfirmation(data.data);
+      });
+
+    
   };
 
   useEffect(() => {
-    if (wip.length >= 6) {
+    document.addEventListener('keydown', detectKeyDown, true)
+  }, [])
 
-      var jsonData = {
-        tagNumber: '0x'+tag,
-        wipNumber: wip,
-      };
-
-      const aliasData = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(jsonData),
-      };
-
-      fetch("/link-wip", aliasData)
-        .then((res) => res.json())
-        .then((data) => {
-          setData(data.data);
-          if(data.success){
-            let temp = connectedTags;
-            temp.push(data.tagData);
-            setConnectedTags(temp);
-          }
-          console.log(data.tagData);
-          setConfirmation(data.data);
-        });
-
-      const nextSelect = document.querySelector("[name=scanBtn]");
-      if (nextSelect !== null) {
-        nextSelect.focus();
-      }
+  const detectKeyDown = (e) => {
+    if (e.keyCode === 13) {
+        const nextSelect = document.querySelector("[name=scanBtn]");
+        
+        if (nextSelect !== null) {
+          nextSelect.focus();
+          console.log(nextSelect);
+        }
     }
-  }, [wip]);
+  }
+  useEffect(() => {
+    if (send) {
+        sendAndClear();
+        setSend(false);
+    }
+  }, [send]);
 
   return (
     <>
@@ -157,7 +170,7 @@ export default function WIP() {
               />
 
               <Button
-                onClick={clear}
+                onClick={sendAndClear}
                 bg="white"
                 color="black"
                 borderRadius={150}
