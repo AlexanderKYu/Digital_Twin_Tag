@@ -80,20 +80,26 @@ export default function WIP() {
     
   };
 
-  useEffect(() => {
-    document.addEventListener('keydown', detectKeyDown, true)
-  }, [])
-
-  const detectKeyDown = (e) => {
-    if (e.keyCode === 13) {
-        const nextSelect = document.querySelector("[name=scanBtn]");
-        
-        if (nextSelect !== null) {
-          nextSelect.focus();
-          console.log(nextSelect);
-        }
+  const tagKeyPress = (e) => {
+    if (e.key === "Enter") {
+      const nextSelect = document.querySelector("[name=wipNumber]");
+      if (nextSelect !== null) {
+        nextSelect.focus();
+      }
     }
   }
+
+  const wipKeyPress = (e) => {
+    if (e.key === "Enter" && wip !== "") {
+      let nextSelect = document.querySelector("[name=scanBtn]");
+      
+      if (nextSelect !== null) {
+        nextSelect.focus();
+        sendAndClear();
+      }
+    }
+  }
+
   useEffect(() => {
     if (send) {
         sendAndClear();
@@ -147,6 +153,7 @@ export default function WIP() {
                 value={tag}
                 onChange={tagChange}
                 name="tagNumber"
+                onKeyPress={tagKeyPress}
                 autoFocus
               />
               <Text fontSize="5xl">WIP</Text>
@@ -166,6 +173,7 @@ export default function WIP() {
                 value={wip}
                 onChange={wipChange}
                 name="wipNumber"
+                onKeyPress={wipKeyPress}
                 mb={5}
               />
 
