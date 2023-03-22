@@ -34,12 +34,13 @@ def getBattery(socket):
     try:
         socket.send(msg.encode("ascii"))
         rawData=read(socket)
+        json_data = {}
         count=-1
         for i in rawData:
             count=count+1
             data=rawData[count].split(",")
             if len(data)>5:
-                json_data[data[2]] = {"alias": data[3], "voltage": data[4], "status": data[5], "hz": data[6], "timestamp": data[6]}
+                json_data[data[2]] = {"alias": data[3], "voltage": data[4], "status": data[5], "timestamp": data[6]}
         json_data = json.dumps(json_data, indent=4)
 
 
