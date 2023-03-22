@@ -34,15 +34,14 @@ def getBattery(socket):
     try:
         socket.send(msg.encode("ascii"))
         rawData=read(socket)
-        json_data="["
         count=-1
         for i in rawData:
             count=count+1
             data=rawData[count].split(",")
             if len(data)>5:
-                tmp='"'+data[2]+'"'+': {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}]'
-                json_data=json_data+tmp
-        json_data=json_data+"]"
+                json_data[data[2]] = {"alias": data[3], "voltage": data[4], "status": data[5], "hz": data[6], "timestamp": data[6]}
+        json_data = json.dumps(json_data, indent=4)
+
 
 
     except socket.error:
@@ -59,7 +58,7 @@ def getHistory(socket,start,end):
         socket.send(msg.encode("ascii"))
         data=read(socket)
         json_data='[ {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}'
-
+        
 
     except socket.error:
         print('Failed to send data')
