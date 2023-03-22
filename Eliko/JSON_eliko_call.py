@@ -48,8 +48,8 @@ def getBattery(socket):
     except socket.error:
         print('Failed to send data')
     return json_data
-    
   
+
 def getTags(socket):
     msg = "$PEKIO,GET_TAGS"
     msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
