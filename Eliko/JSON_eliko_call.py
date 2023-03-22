@@ -50,18 +50,18 @@ def getBattery(socket):
     
 
    
-# def getHistory(socket,start,end):
-#     msg = "$PEKIO,GET_HISTORY_BY_UNIX_TIME,ALL,"+ start + "," + end
-#     msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
+def getHistory(socket,start,end):
+    msg = "$PEKIO,GET_HISTORY_BY_UNIX_TIME,ALL,"+ start + "," + end
+    msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
 
-#     try:
-#         socket.send(msg.encode("ascii"))
-#         data=read(socket)
-#         json_data='[ {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}'
+    try:
+        socket.send(msg.encode("ascii"))
+        data=read(socket)
+        json_data='[ {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}'
         
 
-#     except socket.error:
-#         print('Failed to send data')
+    except socket.error:
+        print('Failed to send data')
     
 def getTags(socket):
     msg = "$PEKIO,GET_TAGS"
