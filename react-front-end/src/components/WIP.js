@@ -36,7 +36,7 @@ export default function WIP() {
   const wipChange = (e) => {
     if (e.target.value.length >= 12) {
       if(e.target.value.slice(0,5) === "00000"){
-        setWip(e.target.value.slice(5,11)+ ".1");
+        setWip(e.target.value.slice(5,11)+ ".0");
         setSend(true);
       } else if(e.target.value.slice(0,4) === "0000"){
         setWip(e.target.value.slice(4,10) + "." + e.target.value.slice(10,11));
@@ -64,7 +64,7 @@ export default function WIP() {
       .then((data) => {
         if(data.success){
           let temp = connectedTags;
-          temp.push(data.tagData);
+          temp.unshift(data.tagData);
           setConnectedTags(temp);
           setTag("");
           setWip("");
