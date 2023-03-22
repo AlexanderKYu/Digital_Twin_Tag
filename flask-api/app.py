@@ -4,6 +4,11 @@ from flask_cors import CORS
 from os import environ
 import socket
 import sys
+import json
+
+sys.path.append('..')
+
+from Eliko import JSON_eliko_call
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -18,6 +23,7 @@ def link_wip():
     data = request.get_json()
     resString = ""
     success = False
+    status = -1
     #call eliko api
     #connected through router
     TCP_IP = environ.get('TCP_IP')
@@ -25,8 +31,16 @@ def link_wip():
     BUFFER_SIZE = 100
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(3)
+
     try:
         s.connect((TCP_IP, TCP_PORT))
+
+        #getting battery status of tag
+        print("testing battery")
+        batteryData = JSON_eliko_call.getBattery(s)
+        batteryData = json.loads(batteryData)
+        status = batteryData[data["tagNumber"]]["status"]
+        
         #str ='$PEKIO,GET_TAGS,'
         eCall ='$PEKIO,SET_TAG_ALIAS,'+ data['tagNumber'] + "," + data['wipNumber']
         eCall = eCall + "\r\n"
@@ -54,7 +68,7 @@ def link_wip():
                         'number': data['tagNumber'],
                         'alias': data['wipNumber'],
                         'voltage': 4087,
-                        'status': 80,
+                        'status': status,
                         'timestamp': 1212343243,
                     } 
                 }

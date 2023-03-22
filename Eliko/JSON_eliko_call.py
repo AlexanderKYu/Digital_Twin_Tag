@@ -2,13 +2,6 @@ import socket
 import sys
 import json
 
-def toString(jsonData):
-    json_string = json.dumps(jsonData)
-    return json_string
-def toJson(stringData):
-    jsonData=json.loads(stringData)
-    return jsonData
-
 def read(socket):
     try:
         #time.sleep(1)
@@ -16,7 +9,7 @@ def read(socket):
         parsed=True
         data=""
         while(loop):
-            tmp = s.recv(1024)
+            tmp = socket.recv(1024)
             data=data+tmp.decode('ascii')
             #if data received is only a bit of that string there might be problem or if a tag name contains EOF
             if b'EOF' in tmp:
@@ -30,6 +23,7 @@ def read(socket):
 def getBattery(socket):
     msg = "$PEKIO,GET_BATTERIES"
     msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
+    json_data = {}
 
     try:
         socket.send(msg.encode("ascii"))
@@ -85,26 +79,6 @@ def getTags(socket):
     except socket.error:
         print('Failed to send data')
     return json_data
-
-try:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-except socket.error:
-        print('Failed to create socket')
-        sys.exit()
-
-TCP_IP = '10.8.4.1'
-TCP_PORT = 25025
-BUFFER_SIZE = 1024
-
-s.settimeout(3) # 3 second timeout
-s.connect((TCP_IP, TCP_PORT))
-
-print(toString(getTags(s)))
-
-
-
-s.close()
-sys.exit()
 
 #
 
