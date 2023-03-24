@@ -1,7 +1,6 @@
 import "./App.css";
 import WIP from "./components/WIP";
 import Nav from "./components/Nav";
-import Sample  from "./components/Sample";
 import { io } from "socket.io-client";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -20,23 +19,6 @@ function App() {
   const [connected, setConnected] = useState(false);
   const [data, setData] = useState("");
 
-  const testString = "WIP TEST";
-
-  const handleClick = () => {
-    if (connected === false) {
-      setConnected(true);
-    } else {
-      setConnected(false);
-    }
-    const aliasData = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tag: '0x003464', wip: 'test' })
-  };
-    fetch('/link-wip', aliasData).then(res => res.json()).then(data => {
-      setData(data.data);
-    });
-  };
 
   useEffect(() => {
       // create websocket/connect
@@ -56,11 +38,6 @@ function App() {
   return (
     <ChakraProvider theme={theme}>
       <div className="App">
-        {/* <Nav />
-        <h1>Welcome to this React Application</h1> */}
-        {/* <h1>Digital Twin Tag</h1>
-        <button onClick={handleClick}>Click To Call API</button>
-        <p>{data}</p> */}
         <Nav></Nav>
         <WIP></WIP>
     </div>
