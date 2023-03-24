@@ -9,3 +9,5 @@ unix_timestamp.txt
 5AMSample.txt
 *.log
 config.py
+batch.txt
+pickle.pkl

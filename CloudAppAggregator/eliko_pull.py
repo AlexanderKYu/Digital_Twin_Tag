@@ -20,24 +20,58 @@ def dict_to_json(dictionary):
     print(json_object)
 
 def compare_data_values(past, curr):
-    if (len(past) == 0):
-        # first entry
-        return True
-    diff = {}
-    for tag, values in curr.items():
-        if tag not in past:
-            # new tag online
+    index = 0
+    past_vals = {}
+    past_three_mean = {}
+    overall_diff = {}
+    tags = []
+    for index in range(len(past)):
+        if(past[index] == {}):
+            past[index] = curr
             return True
-        diff[tag] = []
-        index = 0
+    
+    for tag_data in past:
+        for tag, values in tag_data.items():
+            if tag not in tags:
+                past_vals[tag] = []
+                tags.append(tag)
+            past_vals[tag].append(values)
+
+    for tag, values in past_vals.items():
+        x_coords = []
+        y_coords = []
+        z_coords = []
         for value in values:
-            diff[tag].append(value - past[tag][index])
-            index += 1
-    for tag, values in diff.items():
-        for value in values:
-            if value > 1.5:
-                return True
-    return False
+            x_coords.append(value[0])
+            y_coords.append(value[1])
+            z_coords.append(value[3])
+        x_mean = 0
+        y_mean = 0
+        z_mean = 0
+        for x_coord in x_coords:
+            x_mean += x_coord
+        for y_coord in y_coords:
+            y_mean += y_coord
+        for z_coord in z_coords:
+            z_mean += z_coord
+        
+        x_mean = x_mean / len(x_coords)
+        y_mean = y_mean / len(y_coords)
+        z_mean = z_mean / len(z_coords)
+        past_three_mean[tag] = [x_mean, y_mean, z_mean]
+    
+    for tag, values in curr.items():
+        if tag not in past_three_mean:
+            return True
+        else:
+            overall_x_coord = abs(past_three_mean[tag][0] - curr[tag][0])
+            overall_y_coord = abs(past_three_mean[tag][1] - curr[tag][1])
+            overall_z_coord = abs(past_three_mean[tag][2] - curr[tag][2])
+            overall_diff[tag] = [overall_x_coord, overall_y_coord, overall_z_coord]
+    
+    # determine threshold, if lower return false
+    
+    return True
         
 
 def pullData():
@@ -77,7 +111,7 @@ def main(unix_file, pickle_file):
         file = open("sampleSets/"+pickle_file, "x")
         file.close()
         with open("sampleSets/"+pickle_file, "wb") as file:
-            temp = {}
+            temp = [{}, {}, {}]
             pickle.dump(temp, file)
     
     with open("sampleSets/"+unix_file, "r") as file:
@@ -88,7 +122,7 @@ def main(unix_file, pickle_file):
             past_sleep_mode = bool(sleep_mode_data[0])
             first_sleep_mode = sleep_mode_data[1]
     
-    past_tag_values = {}
+    past_tag_values = []
     
     with open("sampleSets/"+pickle_file, "rb") as file:
         past_tag_values = pickle.load(file)
@@ -103,6 +137,7 @@ def main(unix_file, pickle_file):
         past_unix_timestamp = float(past_unix_timestamp)
         first_sleep_mode = float(first_sleep_mode)
 
+    print(past_tag_values)
     tag_values = pullData()
     new_push = compare_data_values(past_tag_values, tag_values)
 
@@ -129,13 +164,13 @@ def main(unix_file, pickle_file):
         
     
     with open("sampleSets/"+pickle_file, "wb") as file:
-        pickle.dump(tag_values, file)
+        pickle.dump(past_tag_values, file)
 
 if __name__ == "__main__":
     if (("-h" in sys.argv) or ("--help" in sys.argv)):
         print("Important: Please provide two files.")
-        print("One file must be a text file like \"unix_timestamp.txt\"")
-        print("One must be a pickle file like \"mean_values.pkl\"")
+        print("One file must be a text file like \"batch.txt\"")
+        print("One must be a pickle file like \"pickle.pkl\"")
         print("Flags:")
         print("-d \ --debug\tUsed to enable debug mode (disabled by default)")
         exit()
