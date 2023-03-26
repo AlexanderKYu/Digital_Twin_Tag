@@ -20,58 +20,53 @@ def dict_to_json(dictionary):
     print(json_object)
 
 def compare_data_values(past, curr):
+    curr = json.loads(curr)
     index = 0
-    past_vals = {}
-    past_three_mean = {}
-    overall_diff = {}
-    tags = []
-    for index in range(len(past)):
-        if(past[index] == {}):
-            past[index] = curr
-            return True
-    
-    for tag_data in past:
-        for tag, values in tag_data.items():
-            if tag not in tags:
-                past_vals[tag] = []
-                tags.append(tag)
-            past_vals[tag].append(values)
 
-    for tag, values in past_vals.items():
-        x_coords = []
-        y_coords = []
-        z_coords = []
-        for value in values:
-            x_coords.append(value[0])
-            y_coords.append(value[1])
-            z_coords.append(value[3])
-        x_mean = 0
-        y_mean = 0
-        z_mean = 0
-        for x_coord in x_coords:
-            x_mean += x_coord
-        for y_coord in y_coords:
-            y_mean += y_coord
-        for z_coord in z_coords:
-            z_mean += z_coord
-        
-        x_mean = x_mean / len(x_coords)
-        y_mean = y_mean / len(y_coords)
-        z_mean = z_mean / len(z_coords)
-        past_three_mean[tag] = [x_mean, y_mean, z_mean]
+    overall_diff = {}
+    for index in range(len(past)):
+        if (past[index] == {}):
+            return False
     
-    for tag, values in curr.items():
-        if tag not in past_three_mean:
-            return True
+    # get coord values
+    tag_coord = {}
+    tag_avgs = {}
+
+    for data in past:
+        data = json.loads(data)
+        for key, values in data.items():
+            if key not in tag_coord:
+                tag_coord[key] = {'x':[], 'y':[], 'z':[]}
+            tag_coord[key]['x'].append(float(values['x']))
+            tag_coord[key]['y'].append(float(values['y']))
+            tag_coord[key]['z'].append(float(values['z']))
+    
+    for data in tag_coord:
+        for key, values in tag_coord.items():
+            x_value = round(sum(tag_coord[key]['x']) / len(tag_coord[key]['x']), 2)
+            y_value = round(sum(tag_coord[key]['y']) / len(tag_coord[key]['y']), 2)
+            z_value = round(sum(tag_coord[key]['z']) / len(tag_coord[key]['z']), 2)
+            tag_avgs[key] = [x_value, y_value, z_value]
+
+    
+    for key, values in curr.items():
+        if key not in tag_avgs:
+            x_value = round(float(values['x']), 2)
+            y_value = round(float(values['y']), 2)
+            z_value = round(float(values['z']), 2)
+            overall_diff[key] = [x_value, y_value, z_value]
         else:
-            overall_x_coord = abs(past_three_mean[tag][0] - curr[tag][0])
-            overall_y_coord = abs(past_three_mean[tag][1] - curr[tag][1])
-            overall_z_coord = abs(past_three_mean[tag][2] - curr[tag][2])
-            overall_diff[tag] = [overall_x_coord, overall_y_coord, overall_z_coord]
+            x_value = round(abs(tag_avgs[key][0] - float(values['x'])), 2)
+            y_value = round(abs(tag_avgs[key][1] - float(values['y'])), 2)
+            z_value = round(abs(tag_avgs[key][2] - float(values['z'])), 2)
+            overall_diff[key] = [x_value, y_value, z_value]
+
+    for key, values in overall_diff.items():
+        for value in values:
+            if (value > 10):
+                return True
     
-    # determine threshold, if lower return false
-    
-    return True
+    return False
         
 
 def pullData():
@@ -137,23 +132,26 @@ def main(unix_file, pickle_file):
         past_unix_timestamp = float(past_unix_timestamp)
         first_sleep_mode = float(first_sleep_mode)
 
-    print(past_tag_values)
     tag_values = pullData()
     new_push = compare_data_values(past_tag_values, tag_values)
 
-    if (past_sleep_mode and not new_push):
-        if (curr_unix_timestamp >= (first_sleep_mode + 1 * 60 * 60)):
-            # hourly push
-            first_sleep_mode = curr_unix_timestamp
-            print("Pushing hourly data")
-            sleep_mode = True
+    past_tag_values[2] = past_tag_values[1]
+    past_tag_values[1] = past_tag_values[0]
+    past_tag_values[0] = tag_values
+
+    # if (past_sleep_mode and not new_push):
+    #     if (curr_unix_timestamp >= (first_sleep_mode + 1 * 60 * 60)):
+    #         # hourly push
+    #         first_sleep_mode = curr_unix_timestamp
+    #         print("Pushing hourly data")
+    #         sleep_mode = True
 
     
-    if (new_push):
-        print("Pushing data to db")
-        sleep_mode = False
-    else:
-        sleep_mode = True
+    # if (new_push):
+    #     print("Pushing data to db")
+    #     sleep_mode = False
+    # else:
+    #     sleep_mode = True
 
     with open("sampleSets/"+unix_file, "w+") as file:
         file.writelines(str(curr_unix_timestamp)+"\n")
@@ -181,4 +179,6 @@ if __name__ == "__main__":
     if (("-d" in sys.argv) or ("--debug" in sys.argv)):
         print("Debug mode: ON")
         DEBUG = True
+
+    db.db_init()
     main(sys.argv[1], sys.argv[2])

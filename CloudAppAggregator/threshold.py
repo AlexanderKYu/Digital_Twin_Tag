@@ -3,32 +3,33 @@ import os
 import pickle
 import psycopg2
 import boto3
-import config as db
 import socket
 import json
 import datetime
+
+from database import dbfuncs as db
 
 s = ""
 presentDateTime = datetime.datetime.now()
 
 
-def dbPush(overall_diff, currTime, batch):
-    conn = psycopg2.connect(
-        database=db.DATABASE,
-        user=db.USER,
-        password=db.PASSWORD,
-        host=db.HOST,
-        port=db.PORT,
-    )
+# def dbPush(overall_diff, currTime, batch):
+#     conn = psycopg2.connect(
+#         database=db.DATABASE,
+#         user=db.USER,
+#         password=db.PASSWORD,
+#         host=db.HOST,
+#         port=db.PORT,
+#     )
 
-    for key, values in overall_diff.items():
-        conn.autocommit = True
-        db_query = f"INSERT INTO tag_threshold VALUES ('{key}', {values[0]}, {values[1]}, {values[2]}, '{str(currTime)}', {batch});"
-        cursor = conn.cursor()
+#     for key, values in overall_diff.items():
+#         conn.autocommit = True
+#         db_query = f"INSERT INTO tag_threshold VALUES ('{key}', {values[0]}, {values[1]}, {values[2]}, '{str(currTime)}', {batch});"
+#         cursor = conn.cursor()
 
-        cursor.execute(db_query)
+#         cursor.execute(db_query)
     
-    conn.close()
+#     conn.close()
 
 def mean_diff(pklOut, curr):
     curr = json.loads(curr)
@@ -152,7 +153,7 @@ def main(batchFile, pickleFile):
     pklOut[0] = curr_json
 
     if (overall_diff != {}):
-        dbPush(overall_diff, presentDateTime, batchOut)
+        db.dbPush(overall_diff, presentDateTime, batchOut)
 
     with open(batchFile, "w+") as file:
         file.writelines(str(batchOut + 1))
