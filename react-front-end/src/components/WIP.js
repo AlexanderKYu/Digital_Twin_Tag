@@ -27,10 +27,33 @@ export default function WIP() {
     }
     if (e.target.value.length >= 6) {
       const nextField = document.querySelector("[name=wipNumber]");
+
+      var jsonData = {
+        tagNumber: '0x'+e.target.value,
+      };
+      const aliasData = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(jsonData),
+      };
+
+      fetch("/link-battery", aliasData)
+      .then((res) => res.json())
+      .then((data) => {
+
+        if (data.status <= 20) { 
+          //TO BE CONTINUED
+        }
+
+
+      });
+
       if (nextField !== null) {
         nextField.focus();
       }
     }
+
+    
   };
 
   const wipChange = (e) => {
@@ -65,6 +88,11 @@ export default function WIP() {
         if(data.success){
           let temp = connectedTags;
           temp.unshift(data.tagData);
+
+          if (setConnectedTags.length >= 5) {
+            temp.pop();
+          }
+
           setConnectedTags(temp);
           setTag("");
           setWip("");

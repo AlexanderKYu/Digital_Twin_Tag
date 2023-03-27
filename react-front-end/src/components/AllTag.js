@@ -68,7 +68,7 @@ export default function AllTag(props) {
                   pl={4}
                   pr={4}
                 >
-                  <Text>Last Seen Online</Text>
+                <Text>Last Seen Online</Text>
                 </Box>
                 <Box
                   flex="0.5"

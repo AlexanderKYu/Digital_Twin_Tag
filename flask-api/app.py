@@ -74,6 +74,39 @@ def link_wip():
                 }
     return jsonify(response)
 
+
+@app.route("/link-battery", methods=['POST'])
+def link_battery():
+    data = request.get_json()
+
+    #call eliko api
+    #connected through router
+    TCP_IP = environ.get('TCP_IP')
+    TCP_PORT = int(environ.get('TCP_PORT'))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(3)
+
+    try:
+        s.connect((TCP_IP, TCP_PORT))
+        
+        #getting battery status of tag
+        batteryData = JSON_eliko_call.getBattery(s)
+        batteryData = json.loads(batteryData)
+        status = batteryData[data["tagNumber"]]["status"]
+
+        s.close()
+    
+    except:
+        print("Eliko Socket Timed Out")
+        resString = 'Unable to connect to Eliko API'
+        
+    response = {
+        'status': status
+    }
+
+    return jsonify(response)
+
+
 @socketio.on("connect")
 def connected():
     """event listener when client connects to the server"""
