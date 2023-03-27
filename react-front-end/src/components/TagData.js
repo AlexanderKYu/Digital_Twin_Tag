@@ -69,7 +69,7 @@ export default function TagData(props) {
               pl={4}
               pr={4}
             >
-              <Text>{props.data.status}%</Text>
+              <Text>{props.data.status}</Text>
             </Box>
           </Flex>
     </>
