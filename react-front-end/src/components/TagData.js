@@ -40,7 +40,7 @@ export default function TagData(props) {
               flex="0.6"
               bg="gray.900"
               color="white"
-              borderRadius={10}
+              borderRadius={15}
               pt={1}
               pb={1}
               pl={4}

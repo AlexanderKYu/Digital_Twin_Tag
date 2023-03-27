@@ -146,7 +146,6 @@ export default function WIP() {
                 mb={5}
                 focusBorderColor="teal.600"
                 borderColor="white"
-                borderWidth={3}
                 fontFamily="arial"
                 textAlign="center"
                 fontSize="2xl"
