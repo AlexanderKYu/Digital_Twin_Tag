@@ -57,23 +57,23 @@ def db_init():
     conn.close()
 
 def delete_all():
-    conn, cursor = db_connection()
+   conn, cursor = db_connection()
 
-    db_query = "DROP TABLE position_table_prod"
+   db_query = "DROP TABLE position_table_prod"
 
-    cursor.execute(db_query)
+   cursor.execute(db_query)
 
-    db_query = "DROP TABLE position_table_arena"
+   db_query = "DROP TABLE position_table_arena"
 
-    cursor.execute(db_query)
-    
-    db_query = "DROP TABLE user_roles"
+   cursor.execute(db_query)
+   
+   db_query = "DROP TABLE user_roles"
 
-    cursor.execute(db_query)
+   cursor.execute(db_query)
 
-    conn.close()
+   conn.close()
 
-#def getActiveTimes():
+# def getActiveTimes():
 #    conn, cursor = db_connection()
 #    db_query = """SELECT loctime FROM tag_threshold
 #                  WHERE overallx > 9.8 OR overally > 9.8 OR overallz > 9.8;"""

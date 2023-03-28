@@ -63,7 +63,7 @@ def compare_data_values(past, curr):
 
     for key, values in overall_diff.items():
         for value in values:
-            if (value > 10):
+            if (value > 9.8):
                 return True
     
     return False
@@ -134,6 +134,9 @@ def main(unix_file, pickle_file):
 
     tag_values = pullData()
     new_push = compare_data_values(past_tag_values, tag_values)
+    
+    if(new_push):
+        pushData(tag_values)
 
     past_tag_values[2] = past_tag_values[1]
     past_tag_values[1] = past_tag_values[0]
