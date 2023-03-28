@@ -1,14 +1,31 @@
 import socket
-import sys
 import json
-import config as con
+from os import environ
 
-def read(s):
+def createSocket():
+    TCP_IP = environ.get('TCP_IP')
+    TCP_PORT = int(environ.get('TCP_PORT'))
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    soc.settimeout(3)
+    try:
+        soc.connect((TCP_IP, TCP_PORT))
+    except:
+        print('Failed to create socket')
+    return soc
+
+def closeSocket(soc):
+    try:
+        soc.close()
+        return True
+    except:
+        return False
+
+def read(soc):
     try:
         loop=True
         data=""
         while(loop):
-            tmp = s.recv(1024)
+            tmp = soc.recv(1024)
             data=data+tmp.decode('ascii')
             if b'EOF' in tmp:
                 loop=False
@@ -17,24 +34,15 @@ def read(s):
     except socket.error:
         print('Failed to send data')
 
-def getBattery():
-
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(3)
-        s.connect((con.TCP_IP, con.TCP_PORT))
-    except socket.error:
-            print('Failed to create socket')
-            sys.exit()
-
+def getBattery(soc):
 
     msg = "$PEKIO,GET_BATTERIES"
     msg = msg + "\r\n"
 
     json_data = {}
     try:
-        s.send(msg.encode("ascii"))
-        rawData=read(s)
+        soc.send(msg.encode("ascii"))
+        rawData=read(soc)
         count=-1
         for i in rawData:
             count=count+1
@@ -45,20 +53,10 @@ def getBattery():
 
     except socket.error:
         print('Failed to send data')
-
-    s.close()
     return json_data
   
 
-def getTags():
-
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(3)
-        s.connect((con.TCP_IP, con.TCP_PORT))
-    except socket.error:
-            print('Failed to create socket')
-            sys.exit()
+def getTags(soc):
 
     msg = "$PEKIO,GET_TAGS"
     msg = msg + "\r\n"
@@ -66,8 +64,8 @@ def getTags():
     json_data = {}
 
     try:
-        s.send(msg.encode("ascii"))
-        rawData=read(s)
+        soc.send(msg.encode("ascii"))
+        rawData=read(soc)
         count=-1
         for i in rawData:
             count=count+1
@@ -81,6 +79,4 @@ def getTags():
 
     except socket.error:
         print('Failed to send data')
-    
-    s.close()
     return json_data
