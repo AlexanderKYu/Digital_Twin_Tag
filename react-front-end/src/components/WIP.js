@@ -1,37 +1,32 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   Box,
-  Container,
-  useDisclosure,
-  useColorModeValue,
-  Image,
-  AspectRatio,
   Input,
-  VStack,
-  HStack,
   Flex,
-  Spacer,
-  Center,
   Text,
-  Square,
   InputGroup,
-  InputLeftElement,
+  Alert,
+  Button,
+  Spacer,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon, SearchIcon } from "@chakra-ui/icons";
+import { ArrowForwardIcon } from "@chakra-ui/icons";
+import TagData from "./TagData.js";
 
-export default function WIP_Sample() {
+export default function WIP() {
   const [tag, setTag] = useState("");
-  const [data, setData] = useState("");
+  const [send, setSend] = useState(false);
   const [wip, setWip] = useState("");
   const [confirmation, setConfirmation] = useState("");
+  const [connectedTags, setConnectedTags] = useState([]);
 
+
+  
   const tagChange = (e) => {
-    setTag(e.target.value);
-
-    if (e.target.value.length >= 8) {
+    if (e.target.value.length <= 6) {
+      setTag(e.target.value);
+    }
+    if (e.target.value.length >= 6) {
       const nextField = document.querySelector("[name=wipNumber]");
-      console.log(e.target.value);
-      console.log(nextField);
       if (nextField !== null) {
         nextField.focus();
       }
@@ -39,86 +34,208 @@ export default function WIP_Sample() {
   };
 
   const wipChange = (e) => {
-    setWip(e.target.value);
+    if (e.target.value.length >= 12) {
+      if(e.target.value.slice(0,5) === "00000"){
+        setWip(e.target.value.slice(5,11)+ ".0");
+        setSend(true);
+      } else if(e.target.value.slice(0,4) === "0000"){
+        setWip(e.target.value.slice(4,10) + "." + e.target.value.slice(10,11));
+        setSend(true);
+      }
+    } else {
+      setWip(e.target.value);
+    }
+  };
 
-    if (e.target.value.length >= 5) {
-      console.log(e.target.value);
+  const sendAndClear = (e) => {
+    var jsonData = {
+      tagNumber: '0x'+tag,
+      wipNumber: wip,
+    };
+    console.log(jsonData);
+    const aliasData = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(jsonData),
+    };
 
-      var jsonData = {
-        tagNumber: tag,
-        wipNumber: wip,
-      };
+    fetch("/link-wip", aliasData)
+      .then((res) => res.json())
+      .then((data) => {
+        if(data.success){
+          let temp = connectedTags;
+          temp.unshift(data.tagData);
+          setConnectedTags(temp);
+          setTag("");
+          setWip("");
 
-      const aliasData = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(jsonData),
-      };
-
-            fetch('/link-wip', aliasData).then(res => res.json()).then(data => {
-                setData(data.data);
-              });
-
-            console.log(data);
-            setConfirmation(data);
+          const nextSelect = document.querySelector("[name=tagNumber]");
+          if (nextSelect !== null) {
+            nextSelect.focus();
+          }
         }
-        };
+        setConfirmation(data.data);
+      });
+
+    
+  };
+
+  const tagKeyPress = (e) => {
+    if (e.key === "Enter") {
+      const nextSelect = document.querySelector("[name=wipNumber]");
+      if (nextSelect !== null) {
+        nextSelect.focus();
+      }
+    }
+  }
+
+  const wipKeyPress = (e) => {
+    if (e.key === "Enter" && wip !== "") {
+      let nextSelect = document.querySelector("[name=scanBtn]");
+      
+      if (nextSelect !== null) {
+        nextSelect.focus();
+        sendAndClear();
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (send) {
+        sendAndClear();
+        setSend(false);
+    }
+  }, [send]);
 
   return (
     <>
+      {confirmation && (
+        <Alert
+          status="success"
+          variant="solid"
+          fontFamily="Arial"
+          bg="teal.600"
+        >
+          {confirmation}
+        </Alert>
+      )}
       <Flex align="center" mt={0} bg="black" color="white">
-        <Box flex="1" flexGrow="0.5" minH="100vh" mt={20} bg="black"></Box>
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box>
         <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="black">
-          <Flex align="center" mt={0} bg="pink" color="white">
-            <Box flex="1" flexGrow="0.5" minH="100vh" p={10} bg="black" borderRight="solid" border-color="white" border-width="4px">
-              <Text fontSize="3xl">SCAN TAG</Text>
+          <Flex align="center" mt={0} bg="black" color="white">
+            <Box
+              flex="1"
+              flexGrow="0.5"
+              minH="100vh"
+              pt={10}
+              pb={10}
+              pl={20}
+              pr={20}
+              bg="black"
+              borderRight="solid"
+              border-color="white"
+              border-width="4px"
+            >
+              <Text fontSize="5xl">TAG</Text>
               <Input
-                focusBorderColor="red"
                 bg="white"
                 borderRadius={150}
-                placeholder="Eliko Tag"
-                size="md"
+                size="lg"
+                color="black"
                 mt={2}
                 mb={5}
+                focusBorderColor="teal.600"
+                borderColor="white"
+                borderWidth={3}
+                fontFamily="arial"
+                textAlign="center"
+                fontSize="2xl"
                 value={tag}
                 onChange={tagChange}
                 name="tagNumber"
-                color= "black"
+                onKeyPress={tagKeyPress}
                 autoFocus
               />
-              <Text fontSize="3xl">SCAN WIP</Text>
+              <Text fontSize="5xl">WIP</Text>
 
               <Input
-                focusBorderColor="gray.900"
                 bg="white"
                 borderRadius={150}
-                placeholder="WIP Number"
-                size="md"
+                size="lg"
+                color="black"
                 mt={2}
+                focusBorderColor="teal.600"
+                borderColor="white"
+                borderWidth={3}
+                fontFamily="arial"
+                textAlign="center"
+                fontSize="2xl"
                 value={wip}
                 onChange={wipChange}
-                color="black"
                 name="wipNumber"
+                onKeyPress={wipKeyPress}
+                mb={5}
               />
-            </Box>
-            <Box flex="1" flexGrow="0.5" minH="100vh" p={10} bg="black">
-              <Text fontSize="3xl" mb={2}>SEARCH</Text>
-              <InputGroup>
-                <InputLeftElement
-                  pointerEvents="none"
-                  children={<SearchIcon color="gray.900" />}
-                />
-                <Input type="" placeholder="" 
-                focusBorderColor="gray.900"
+
+              <Button
+                onClick={sendAndClear}
                 bg="white"
+                color="black"
                 borderRadius={150}
-                size="md"
+                size="lg"
+                mt={6}
+                fontSize="xl"
+                name="scanBtn"
+                borderColor="white"
+                borderWidth={3}
+                _focus={{
+                  borderColor: "teal.600",
+                  borderWidth: 3,
+                  bg: "teal.600",
+                  color: "white",
+                }}
+                _hover={{ bg: "teal.600", color: "white" }}
+              >
+                <ArrowForwardIcon></ArrowForwardIcon>
+              </Button>
+            </Box>
+            <Box
+              flex="1"
+              flexGrow="0.5"
+              minH="100vh"
+              pt={10}
+              pb={10}
+              pl={20}
+              pr={20}
+              bg="black"
+            >
+              <Text fontSize="5xl">SEARCH / RECHERCHE</Text>
+              <InputGroup>
+                <Input
+                  type=""
+                  placeholder=""
+                  bg="white"
+                  borderRadius={150}
+                  size="lg"
+                  color="black"
+                  mt={2}
+                  mb={4}
+                  focusBorderColor="teal.600"
+                  borderColor="white"
+                  borderWidth={3}
+                  fontFamily="arial"
+                  textAlign="center"
+                  fontSize="2xl"
                 />
               </InputGroup>
+                {connectedTags.map((tagValue)=>
+                    <TagData key={tagValue.number} data={tagValue} ></TagData>
+                )}
+              
             </Box>
           </Flex>
         </Box>
-        <Box flex="1" flexGrow="0.5" minH="100vh" mt={20} bg="black"></Box>
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box>
       </Flex>
     </>
   );
