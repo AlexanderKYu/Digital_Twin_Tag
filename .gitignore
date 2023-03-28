@@ -4,4 +4,3 @@ node_modules
 venv
 package-lock.json
 *.pyc
-config.py
