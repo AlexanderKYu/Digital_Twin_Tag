@@ -4,6 +4,8 @@ import os.path
 import datetime
 import json
 import pickle
+import Eliko.JSON_eliko_call as ecall
+import database.dbfuncs as dbcall
 
 REGEX_PAT = "[0-9a-fA-F]x[0-9a-fA-F]{6}.+\n"
 REGEX_ID_PAT = "[0-9a-fA-F]x[0-9a-fA-F]{6}"
@@ -18,6 +20,14 @@ curr_unix_timestamp = datetime.datetime.timestamp(presentDate)
 def dict_to_json(dictionary):
     json_object = json.dumps(dictionary, indent = 4)
     print(json_object)
+
+def dbTagsPush(tagsJson):
+    for key, values in tagsJson.items():
+        print(key, values)
+        # need to get parse the wip base and varient
+        # dbcall.dbPushPositionTableProd()
+        # dbPushPositionTableProd(tag_id, WIPbase, WIPvar, x_coord, y_coord, z_coord, unixtime)
+    return tagsJson
 
 def compare_data_values(past, curr):
     curr = json.loads(curr)
@@ -69,26 +79,26 @@ def compare_data_values(past, curr):
     return False
         
 
-def pullData():
-    lines = []
-    with open("sampleSets/Get_Tags.log", "r") as file:
-        lines = file.readlines()
-    
-    tag_data = {}
-
-    for line in lines:
-        data_lines = re.findall(REGEX_PAT, line)
-        for data in data_lines:
-            data = data[:-1]
-            data = data.split(",")
-            tag = data[0]
-            x_coord = float(data[6])
-            y_coord = float(data[7])
-            z_coord = float(data[8])
-            unix_time = float(data[5])
-            tag_data[tag] = [x_coord, y_coord, z_coord, unix_time]
-
-    return tag_data
+# def pullData():
+#     lines = []
+#     with open("sampleSets/Get_Tags.log", "r") as file:
+#         lines = file.readlines()
+#     
+#     tag_data = {}
+#
+#     for line in lines:
+#         data_lines = re.findall(REGEX_PAT, line)
+#         for data in data_lines:
+#             data = data[:-1]
+#             data = data.split(",")
+#             tag = data[0]
+#             x_coord = float(data[6])
+#             y_coord = float(data[7])
+#             z_coord = float(data[8])
+#             unix_time = float(data[5])
+#             tag_data[tag] = [x_coord, y_coord, z_coord, unix_time]
+#
+#     return tag_data
 
 
 def main(unix_file, pickle_file):
@@ -132,12 +142,9 @@ def main(unix_file, pickle_file):
         past_unix_timestamp = float(past_unix_timestamp)
         first_sleep_mode = float(first_sleep_mode)
 
-    tag_values = pullData()
+    tag_values = ecall.getTags()
     new_push = compare_data_values(past_tag_values, tag_values)
     
-    if(new_push):
-        pushData(tag_values)
-
     past_tag_values[2] = past_tag_values[1]
     past_tag_values[1] = past_tag_values[0]
     past_tag_values[0] = tag_values
@@ -150,11 +157,12 @@ def main(unix_file, pickle_file):
     #         sleep_mode = True
 
     
-    # if (new_push):
-    #     print("Pushing data to db")
-    #     sleep_mode = False
-    # else:
-    #     sleep_mode = True
+    if (new_push):
+        dbTagsPush(tag_values)
+    else:
+        # if past push was 30 mins ago and there was no active pushes within that time 
+        # enter sleep mode else push
+        sleep_mode = True
 
     with open("sampleSets/"+unix_file, "w+") as file:
         file.writelines(str(curr_unix_timestamp)+"\n")
@@ -183,5 +191,5 @@ if __name__ == "__main__":
         print("Debug mode: ON")
         DEBUG = True
 
-    db.db_init()
+    dbcall.db_init()
     main(sys.argv[1], sys.argv[2])
