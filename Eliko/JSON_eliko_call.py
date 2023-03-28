@@ -9,9 +9,10 @@ def createSocket():
     soc.settimeout(3)
     try:
         soc.connect((TCP_IP, TCP_PORT))
+        return soc, True
     except:
         print('Failed to create socket')
-    return soc
+        return soc, False
 
 def closeSocket(soc):
     try:
