@@ -11,6 +11,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import chakraTheme from '@chakra-ui/theme'
 import '@fontsource/antonio/500.css'
 import theme from "./components/Theme"
+import {Box} from "@chakra-ui/react"
 
 let socket;
 
@@ -42,8 +43,12 @@ function App() {
       <div className="App">
         <Nav></Nav>
         <WIP></WIP>
+        <Box
+        width ="700px">
+          <FloorMap></FloorMap>
+        </Box>
     </div>
-    <FloorMap></FloorMap>
+    
     </ChakraProvider>
   );
 }
