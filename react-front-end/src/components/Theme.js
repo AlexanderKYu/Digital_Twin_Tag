@@ -1,5 +1,6 @@
 import { extendTheme } from '@chakra-ui/react'
 import { menuTheme } from './MenuTheme'
+import { Button } from './ButtonTheme'
 
 const theme = extendTheme({
   fonts: {
@@ -9,6 +10,8 @@ const theme = extendTheme({
 
   components: {
     Menu: menuTheme,
+    Button,
+
   }
 })
 

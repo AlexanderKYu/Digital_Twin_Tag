@@ -10,6 +10,7 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
+import { theme } from "./Theme";
 import TagData from "./TagData.js";
 
 export default function WIP() {
@@ -18,9 +19,8 @@ export default function WIP() {
   const [wip, setWip] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [connectedTags, setConnectedTags] = useState([]);
+  const [lowBatt, setlowBatt] = useState("");
 
-
-  
   const tagChange = (e) => {
     if (e.target.value.length <= 6) {
       setTag(e.target.value);
@@ -29,7 +29,7 @@ export default function WIP() {
       const nextField = document.querySelector("[name=wipNumber]");
 
       var jsonData = {
-        tagNumber: '0x'+e.target.value,
+        tagNumber: "0x" + e.target.value,
       };
       const aliasData = {
         method: "POST",
@@ -38,31 +38,28 @@ export default function WIP() {
       };
 
       fetch("/link-battery", aliasData)
-      .then((res) => res.json())
-      .then((data) => {
-
-        if (data.status <= 20) { 
-          //TO BE CONTINUED
-        }
-
-
-      });
+        .then((res) => res.json())
+        .then((data) => {
+          if (parseInt(data.status.slice(0, -1)) <= 20) {
+            setlowBatt(data.status);
+          }
+        });
 
       if (nextField !== null) {
         nextField.focus();
       }
     }
-
-    
   };
 
   const wipChange = (e) => {
     if (e.target.value.length >= 12) {
-      if(e.target.value.slice(0,5) === "00000"){
-        setWip(e.target.value.slice(5,11)+ ".0");
+      if (e.target.value.slice(0, 5) === "00000") {
+        setWip(e.target.value.slice(5, 11) + ".0");
         setSend(true);
-      } else if(e.target.value.slice(0,4) === "0000"){
-        setWip(e.target.value.slice(4,10) + "." + e.target.value.slice(10,11));
+      } else if (e.target.value.slice(0, 4) === "0000") {
+        setWip(
+          e.target.value.slice(4, 10) + "." + e.target.value.slice(10, 11)
+        );
         setSend(true);
       }
     } else {
@@ -72,7 +69,7 @@ export default function WIP() {
 
   const sendAndClear = (e) => {
     var jsonData = {
-      tagNumber: '0x'+tag,
+      tagNumber: "0x" + tag,
       wipNumber: wip,
     };
     console.log(jsonData);
@@ -85,7 +82,7 @@ export default function WIP() {
     fetch("/link-wip", aliasData)
       .then((res) => res.json())
       .then((data) => {
-        if(data.success){
+        if (data.success) {
           let temp = connectedTags;
           temp.unshift(data.tagData);
 
@@ -104,8 +101,6 @@ export default function WIP() {
         }
         setConfirmation(data.data);
       });
-
-    
   };
 
   const tagKeyPress = (e) => {
@@ -115,23 +110,23 @@ export default function WIP() {
         nextSelect.focus();
       }
     }
-  }
+  };
 
   const wipKeyPress = (e) => {
     if (e.key === "Enter" && wip !== "") {
       let nextSelect = document.querySelector("[name=scanBtn]");
-      
+
       if (nextSelect !== null) {
         nextSelect.focus();
         sendAndClear();
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (send) {
-        sendAndClear();
-        setSend(false);
+      sendAndClear();
+      setSend(false);
     }
   }, [send]);
 
@@ -206,25 +201,24 @@ export default function WIP() {
 
               <Button
                 onClick={sendAndClear}
-                bg="white"
-                color="black"
-                borderRadius={150}
-                size="lg"
                 mt={6}
-                fontSize="xl"
                 name="scanBtn"
-                borderColor="white"
-                borderWidth={3}
-                _focus={{
-                  borderColor: "teal.600",
-                  borderWidth: 3,
-                  bg: "teal.600",
-                  color: "white",
-                }}
                 _hover={{ bg: "teal.600", color: "white" }}
               >
                 <ArrowForwardIcon></ArrowForwardIcon>
               </Button>
+              <Box>
+                {lowBatt && (
+                  <Alert
+                    status="info"
+                    variant="solid"
+                    fontFamily="Arial"
+                    bg="teal.600"
+                  >
+                    {lowBatt}
+                  </Alert>
+                )}
+              </Box>
             </Box>
             <Box
               flex="1"
@@ -255,10 +249,9 @@ export default function WIP() {
                   fontSize="2xl"
                 />
               </InputGroup>
-                {connectedTags.map((tagValue)=>
-                    <TagData key={tagValue.number} data={tagValue} ></TagData>
-                )}
-              
+              {connectedTags.map((tagValue) => (
+                <TagData key={tagValue.number} data={tagValue}></TagData>
+              ))}
             </Box>
           </Flex>
         </Box>

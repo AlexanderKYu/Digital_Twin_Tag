@@ -14,6 +14,7 @@ import {
   Center,
   Text,
   Square,
+  Button,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 
@@ -91,27 +92,24 @@ export default function AllTag(props) {
                 direction="column"
                 bg="white"
                 borderRadius={30}
-                height={60}
                 color="black"
                 borderColor="white"
                 borderWidth={3}
                 fontFamily="arial"
-                textAlign="center"
-                fontSize="md"
+                textAlign="left"
+                fontSize="sm"
                 p={2}
                 mb={4}
               >
                 <Box
                   flex="1"
-                  bg="red"
-                  pl={4}
-                  pr={4}
+                  bg="white"
+                  p={4}
                 >
                   <Flex height="auto">
                     <Box
-                      bg="green"
+                      bg="white"
                       borderRadius={10}
-                      height={20}
                       width={20}
                       pl={4}
                       pr={4}
@@ -126,16 +124,18 @@ export default function AllTag(props) {
                     </Box>
                     <Spacer/>
                     <Box
-                      bg="pink"
+                      bg="white"
                       borderRadius={10}
-                      height={20}
-                      width={20}
+                      width={40}
                       ml={10}
                       pl={4}
                       pr={4}
                     >
                       <Text>
-                        Current Coordinates
+                        Current Coordinates: <br/>
+                        x 11111 <br/>
+                        y 11111 <br/>
+                        z 11111
                       </Text>
                     </Box>
                   </Flex>
@@ -144,47 +144,58 @@ export default function AllTag(props) {
 
                 <Box
                   flex="1"
-                  bg="purple"
-                  pl={4}
-                  pr={4}
+                  bg="white"
+                  p={4}
                 >
                   <Flex>
                     <Box
                       flex="1"
-                      bg="pink"
+                      bg="white"
                       pl={4}
                       pr={4}
-                    ></Box>
+                    >
+                      <Input bg="white">
+                      
+                      </Input>
+                      <Input bg="white">
+                      
+                      </Input>
+
+                    </Box>
                     <Box
                       flex="1"
-                      bg="red"
+                      bg="white"
                       pl={4}
                       pr={4}
-                    ></Box>
+                    >PLACEHOLDER</Box>
                   </Flex>
                 </Box>
 
                 <Box
                   flex="1"
-                  bg="green"
-                  pl={4}
-                  pr={4}
+                  bg="white"
+                  p={4}
                 >
                   <Flex
                     height="auto"
                   >
                     <Box
                       flex="1"
-                      bg="pink"
+                      bg="white"
                       pl={4}
                       pr={4}
-                    ></Box>
+                    >
+                      <Button>
+                        Show on map
+                      </Button>
+
+                    </Box>
                     <Box
                       flex="1"
-                      bg="red"
+                      bg="white"
                       pl={4}
                       pr={4}
-                    ></Box>
+                    >PLACEHOLDER</Box>
                   </Flex>
                 </Box>
               </Flex>
