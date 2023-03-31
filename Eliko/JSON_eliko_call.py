@@ -1,70 +1,72 @@
 import socket
-import sys
 import json
+from os import environ
 
-def read(socket):
+def createSocket():
+    TCP_IP = environ.get('TCP_IP')
+    TCP_PORT = int(environ.get('TCP_PORT'))
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    soc.settimeout(3)
     try:
-        #time.sleep(1)
+        soc.connect((TCP_IP, TCP_PORT))
+        return soc, True
+    except:
+        print('Failed to create socket')
+        return soc, False
+
+def closeSocket(soc):
+    try:
+        soc.close()
+        return True
+    except:
+        return False
+
+def read(soc):
+    try:
         loop=True
-        parsed=True
         data=""
         while(loop):
-            tmp = socket.recv(1024)
+            tmp = soc.recv(1024)
             data=data+tmp.decode('ascii')
-            #if data received is only a bit of that string there might be problem or if a tag name contains EOF
             if b'EOF' in tmp:
                 loop=False
         dataArr=data.split("$")
         return dataArr
-#error seems bugged
     except socket.error:
         print('Failed to send data')
 
-def getBattery(socket):
-    msg = "$PEKIO,GET_BATTERIES"
-    msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
-    json_data = {}
+def getBattery(soc):
 
+    msg = "$PEKIO,GET_BATTERIES"
+    msg = msg + "\r\n"
+
+    json_data = {}
     try:
-        socket.send(msg.encode("ascii"))
-        rawData=read(socket)
+        soc.send(msg.encode("ascii"))
+        rawData=read(soc)
         count=-1
         for i in rawData:
             count=count+1
             data=rawData[count].split(",")
             if len(data)>5:
-                json_data[data[2]] = {"alias": data[3], "voltage": data[4], "status": data[5], "hz": data[6], "timestamp": data[6]}
+                json_data[data[2]] = {"alias": data[3], "voltage": data[4], "status": data[5], "timestamp": data[6].replace("\r\n","")}
         json_data = json.dumps(json_data, indent=4)
-
-
 
     except socket.error:
         print('Failed to send data')
     return json_data
-    
+  
 
-   
-def getHistory(socket,start,end):
-    msg = "$PEKIO,GET_HISTORY_BY_UNIX_TIME,ALL,"+ start + "," + end
-    msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
+def getTags(soc):
 
-    try:
-        socket.send(msg.encode("ascii"))
-        data=read(socket)
-        json_data='[ {"number":'+ data[2]+',"alias":'+ data[3]+',"voltage":'+ data[4]+',"status":'+ data[5]+',"timestamp":'+ data[6]+'}'
-        
-
-    except socket.error:
-        print('Failed to send data')
-    
-def getTags(socket):
     msg = "$PEKIO,GET_TAGS"
-    msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
+    msg = msg + "\r\n"
+
+    json_data = {}
 
     try:
-        socket.send(msg.encode("ascii"))
-        rawData=read(socket)
-        json_data = {}
+        soc.send(msg.encode("ascii"))
+        rawData=read(soc)
         count=-1
         for i in rawData:
             count=count+1
@@ -80,35 +82,3 @@ def getTags(socket):
         print('Failed to send data')
     return json_data
 
-#
-
-#GET_Battery example
-# {
-#   "number": "0x003464",
-#   "alias": "Peter’s wristband",
-#   "voltage": 4087,
-#   "status": 70,
-#   "timestamp": 1212343243,
-# }
-
-#GET_History example
-# {
-#   "number": "0x003464",
-#   "alias": "Peter’s wristband",
-#   "voltage": 4087,
-#   "status": 70,
-#   "timestamp": 1212343243,
-# }
-
-# GET_TAGS example   
-# {
-#     "number": "0x003464",
-#     "alias":"Peter’s wristband",
-#     "mode":"2D",
-#     "height":1.82,
-#     "hz":2.5,
-#     "timestamp":1512343243,
-#     "x":0.00,
-#     "y": -9.20,
-#     "z": 1.10,
-# }
