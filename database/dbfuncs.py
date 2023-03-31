@@ -1,17 +1,20 @@
 import psycopg2
-import boto3
-import config as db
+from os import environ, path
+from dotenv import load_dotenv
+
+basedir = path.abspath(path.dirname(path.dirname(__file__)))
+load_dotenv(path.join(basedir, '.env'))
 
 def db_connection():
     conn = ""
     cursor = ""
     try:
         conn = psycopg2.connect(
-            database=db.DATABASE,
-            user=db.USER,
-            password=db.PASSWORD,
-            host=db.HOST,
-            port=db.PORT,
+            database=environ.get('DATABASE'),
+            user=environ.get('DBUSER'),
+            password=environ.get('PASSWORD'),
+            host=environ.get('HOST'),
+            port=environ.get('PORT'),
             connect_timeout=3,
         )
         cursor = conn.cursor()
@@ -220,15 +223,15 @@ def dbPushTblRawLocations(WIP, QTY, tagID, timestamp, x, y, zoneID):
     cursor.execute()
     conn.close()
 
-# def getActiveTimes():
-#    conn, cursor = db_connection()
-#    db_query = """SELECT loctime FROM tag_threshold
-#                  WHERE overallx > 9.8 OR overally > 9.8 OR overallz > 9.8;"""
-#    cursor.execute(db_query)
-#
-#    data = cursor.fetchall()
-#    print(data)
-#    conn.close()
+def getActiveTimes():
+   conn, cursor = db_connection()
+   db_query = """SELECT loctime FROM tag_threshold
+                 WHERE overallx > 9.8 OR overally > 9.8 OR overallz > 9.8;"""
+   cursor.execute(db_query)
+
+   data = cursor.fetchall()
+   print(data)
+   conn.close()
 
 #def dbPush(overall_diff, currTime, batch):
 #    conn, cursor = db_connection()
@@ -238,3 +241,4 @@ def dbPushTblRawLocations(WIP, QTY, tagID, timestamp, x, y, zoneID):
 #        cursor.execute(db_query)
 #    
 #    conn.close()
+
