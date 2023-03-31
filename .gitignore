@@ -4,10 +4,5 @@ node_modules
 venv
 package-lock.json
 *.pyc
-unix_timestamp.txt
-*.pkl
-5AMSample.txt
 *.log
-config.py
-batch.txt
-pickle.pkl
+*.pkl
