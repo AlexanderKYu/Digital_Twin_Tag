@@ -98,6 +98,7 @@ def link_battery():
     
     except:
         print("Eliko Socket Timed Out")
+        status = "Couldn't retrieve battery"
         resString = 'Unable to connect to Eliko API'
         
     response = {

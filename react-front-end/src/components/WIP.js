@@ -8,14 +8,16 @@ import {
   Alert,
   Button,
   Spacer,
+  InputRightAddon,
+  InputRightElement,
+  Icon,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
-import { theme } from "./Theme";
 import TagData from "./TagData.js";
+import { color } from "framer-motion";
 
 export default function WIP() {
   const [tag, setTag] = useState("");
-  const [send, setSend] = useState(false);
   const [wip, setWip] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [connectedTags, setConnectedTags] = useState([]);
@@ -55,12 +57,12 @@ export default function WIP() {
     if (e.target.value.length >= 12) {
       if (e.target.value.slice(0, 5) === "00000") {
         setWip(e.target.value.slice(5, 11) + ".0");
-        setSend(true);
       } else if (e.target.value.slice(0, 4) === "0000") {
         setWip(
           e.target.value.slice(4, 10) + "." + e.target.value.slice(10, 11)
         );
-        setSend(true);
+      } else if (e.target.value.slice(0, 3) === "000") {
+        setWip(e.target.value.slice(3, 9) + "." + e.target.value.slice(9, 11));
       }
     } else {
       setWip(e.target.value);
@@ -86,7 +88,7 @@ export default function WIP() {
           let temp = connectedTags;
           temp.unshift(data.tagData);
 
-          if (setConnectedTags.length >= 5) {
+          if (connectedTags.length >= 5) {
             temp.pop();
           }
 
@@ -123,13 +125,6 @@ export default function WIP() {
     }
   };
 
-  useEffect(() => {
-    if (send) {
-      sendAndClear();
-      setSend(false);
-    }
-  }, [send]);
-
   return (
     <>
       {confirmation && (
@@ -160,65 +155,91 @@ export default function WIP() {
               border-width="4px"
             >
               <Text fontSize="5xl">TAG</Text>
-              <Input
-                bg="white"
-                borderRadius={150}
-                size="lg"
-                color="black"
-                mt={2}
-                mb={5}
-                focusBorderColor="teal.600"
-                borderColor="white"
-                fontFamily="arial"
-                textAlign="center"
-                fontSize="2xl"
-                value={tag}
-                onChange={tagChange}
-                name="tagNumber"
-                onKeyPress={tagKeyPress}
-                autoFocus
-              />
+
+              <InputGroup>
+                <Input
+                  bg="white"
+                  color="black"
+                  size="lg"
+                  fontFamily="arial"
+                  fontSize="2xl"
+                  textAlign="center"
+                  borderRadius={150}
+                  borderStyle="none"
+                  mt={2}
+                  mb={8}
+                  _focus={{
+                    borderStyle: "none",
+                    borderColor: "white",
+                    outlineColor: "teal.600",
+                    outlineWidth: 3,
+                    outlineOffset: 2,
+                  }}
+                  value={tag}
+                  onChange={tagChange}
+                  name="tagNumber"
+                  onKeyPress={tagKeyPress}
+                  autoFocus
+                />
+
+                {lowBatt && (
+                  <InputRightElement
+                    bg="black"
+                    color="white"
+                    width="20"
+                    mt={3}
+                    mr={2}
+                    borderRadius="150"
+                  >
+                    <Text> {lowBatt}</Text>
+                  </InputRightElement>
+                )}
+              </InputGroup>
               <Text fontSize="5xl">WIP</Text>
 
               <Input
                 bg="white"
-                borderRadius={150}
-                size="lg"
                 color="black"
-                mt={2}
-                focusBorderColor="teal.600"
-                borderColor="white"
-                borderWidth={3}
+                size="lg"
                 fontFamily="arial"
-                textAlign="center"
                 fontSize="2xl"
+                textAlign="center"
+                borderRadius={150}
+                borderStyle="none"
+                mt={2}
+                mb={8}
+                _focus={{
+                  borderStyle: "none",
+                  borderColor: "white",
+                  outlineColor: "teal.600",
+                  outlineWidth: 3,
+                  outlineOffset: 2,
+                }}
                 value={wip}
                 onChange={wipChange}
                 name="wipNumber"
                 onKeyPress={wipKeyPress}
-                mb={5}
               />
 
               <Button
+                mt={2}
                 onClick={sendAndClear}
-                mt={6}
                 name="scanBtn"
-                _hover={{ bg: "teal.600", color: "white" }}
+                _hover={{
+                  bg: "teal.600",
+                  outlineColor: "white",
+                  outlineOffset: 2,
+                  color: "white",
+                }}
+                _focus={{
+                  bg: "teal.600",
+                  outlineColor: "white",
+                  outlineOffset: 2,
+                  color: "white",
+                }}
               >
                 <ArrowForwardIcon></ArrowForwardIcon>
               </Button>
-              <Box>
-                {lowBatt && (
-                  <Alert
-                    status="info"
-                    variant="solid"
-                    fontFamily="Arial"
-                    bg="teal.600"
-                  >
-                    {lowBatt}
-                  </Alert>
-                )}
-              </Box>
             </Box>
             <Box
               flex="1"
