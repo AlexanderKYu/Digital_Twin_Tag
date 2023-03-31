@@ -2,7 +2,6 @@ import "./App.css";
 import WIP from "./components/WIP";
 import Nav from "./components/Nav";
 import Welcome  from "./components/Welcome";
-import { PageLoader } from "./components/page-loader";
 import { io } from "socket.io-client";
 
 import { useEffect, useState } from "react";
