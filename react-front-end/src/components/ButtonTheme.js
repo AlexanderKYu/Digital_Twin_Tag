@@ -25,10 +25,6 @@ export const Button = defineStyleConfig({
       }
     },
 
-    
-
-
-
   // Two sizes: sm and md
   sizes: {
     sm: {

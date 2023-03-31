@@ -28,6 +28,10 @@ export default function Nav() {
                   aria-label="Options"
                   color="white"
                   colorScheme="black"
+                  bg="none"
+                  _hover={{
+                    bg: "none",
+                  }}
                 >
                   {isOpen ? <CloseIcon /> : <HamburgerIcon />}
                 </MenuButton>

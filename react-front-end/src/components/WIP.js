@@ -207,7 +207,7 @@ export default function WIP() {
                 borderRadius={150}
                 borderStyle="none"
                 mt={2}
-                mb={8}
+                mb={10}
                 _focus={{
                   borderStyle: "none",
                   borderColor: "white",
