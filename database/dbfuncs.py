@@ -72,7 +72,8 @@ def db_init():
     x_lower FLOAT NOT NULL,
     x_upper FLOAT NOT NULL,
     y_lower FLOAT NOT NULL,
-    y_upper FLOAT NOT NULL
+    y_upper FLOAT NOT NULL,
+    ActiveZone BOOLEAN NOT NULL
     );"""
 
     cursor.execute(db_query)
@@ -80,98 +81,103 @@ def db_init():
 
 def define_hard_zones():
     conn, cursor = db_connection()
+
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('No Zone', 0, 0, 0 , 0,True);"""
+
+    cursor.execute(db_query)
     
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Repairs', 0, 24, 69, 100);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Repairs', 0, 24, 69, 100, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Missing Components', 1, 21, 34, 56);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Missing Components', 1, 21, 34, 56, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Color Quarter Re-Order', 11, 32, 16, 26);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Color Quarter Re-Order', 11, 32, 16, 26, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Special Assembly', 23, 44, 77, 100);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Special Assembly', 23, 44, 77, 100, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Special Assembly Stitching', 44.5, 59, 77, 100);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Special Assembly Stitching', 44.5, 59, 77, 100, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Assembly', 23, 44, 64, 77);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Assembly', 23, 44, 64, 77, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Final Assembly', 44, 59, 64, 77);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Final Assembly', 44, 59, 64, 77, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('On the Line 2', 25, 44, 26, 63);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('On the Line 2', 25, 44, 26, 63, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Cleaning 2', 21, 34, 26, 37);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Cleaning 2', 21, 34, 26, 37, True);"""
     
     cursor.execute(db_query)
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Runners', 31, 59, 0, 16);"""
-    
-    cursor.execute(db_query)
-
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Lasting', 60, 76, 70, 85);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Runners', 31, 59, 0, 16, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Tacking', 60, 76, 85, 100);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Lasting', 60, 76, 85, 100, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Outsole', 77, 89, 63, 100);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Tacking', 60, 76, 70, 85, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Liner', 60, 77, 49, 70);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Outsole', 77, 89, 63, 100, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Blade', 76, 89, 51, 63);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Liner', 60, 77, 49, 70, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Tongue Assembly', 59, 75, 28, 49);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Blade', 76, 89, 51, 63, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Cleaning 1', 76, 89, 40, 50);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Tongue Assembly', 59, 75, 28, 49, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Inspection', 76, 89, 29, 40);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Cleaning 1', 76, 89, 40, 50, True);"""
     
     cursor.execute(db_query)
 
-    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper)
-    VALUES ('Pacing', 60, 89, 17, 28);"""
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Inspection', 76, 89, 29, 40, True);"""
+    
+    cursor.execute(db_query)
+
+    db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
+    VALUES ('Pacing', 60, 89, 17, 28, True);"""
     
     cursor.execute(db_query)
     conn.close()
@@ -230,12 +236,16 @@ def getActiveTimes():
 
    data = cursor.fetchall()
    conn.close()
+   return data
 
-#def dbPush(overall_diff, currTime, batch):
-#    conn, cursor = db_connection()
-#
-#    for key, values in overall_diff.items():
-#        db_query = f"INSERT INTO tag_threshold VALUES ('{key}', {values[0]}, {values[1]}, {values[2]}, '{str(currTime)}', {batch});"
-#        cursor.execute(db_query)
-#    
-#    conn.close()
+def getActiveZones():
+    conn, cursor = db_connection()
+
+    db_query = """SELECT * FROM tblzonedef WHERE activezone = true;"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+    conn.close()
+
+    return data
