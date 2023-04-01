@@ -8,6 +8,7 @@ import pickle
 sys.path.append('..')
 
 from Eliko import JSON_eliko_call
+from database import dbfuncs
 
 DEBUG = False
 
@@ -20,11 +21,20 @@ def dict_to_json(dictionary):
 
 def dbTagsPush(tagsJson):
     tagsJson = json.loads(tagsJson)
-    # for key, values in tagsJson.items():
-    #     print(key, values)
-    #     # need to get parse the wip base and varient
-    #     # dbcall.dbPushPositionTableProd()
-    #     # dbPushPositionTableProd(tag_id, WIPbase, WIPvar, x_coord, y_coord, z_coord, unixtime)
+
+    for key, values in tagsJson.items():
+        parsed_alias = values['alias'].split(".")
+        wip = parsed_alias[0]
+        qty = 0 
+        if len(parsed_alias) == 2:
+            qty = parsed_alias[1]
+        tagID = key.replace("0x", "")
+        timestamp = values['timestamp']
+        x = values['x']
+        y = values['y']
+        zoneID = 1 # will need to be configured later
+        dbfuncs.dbPushTblRawLocations(wip, qty, tagID, timestamp, x, y, zoneID)
+        
     return tagsJson
 
 def compare_data_values(past, curr):
@@ -139,8 +149,6 @@ def main(push_info_file, sample_file):
             last_sleep = curr_unix_timestamp
             hourly_push = True
         sleep_mode = True
-
-    dbTagsPush(tag_values)
     
     if (last_sleep_mode and sleep_mode):
         push_info['last_sleep'] = last_sleep
