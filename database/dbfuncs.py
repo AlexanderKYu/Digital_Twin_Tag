@@ -217,10 +217,9 @@ def dbPushTblPaths(WIP, QTY, tagID, zoneID, zoneName, time):
 
 def dbPushTblRawLocations(WIP, QTY, tagID, timestamp, x, y, zoneID):
     conn, cursor = db_connection()
-    db_query = f"""INSERT INTO tblRawLocations (
-    {WIP}, {QTY}, '{tagID}', {timestamp}, {x}, {y}, {zoneID}
-    );"""
-    cursor.execute()
+    db_query = f"""INSERT INTO tblRawLocations (WIP, QTY, tagID, timestamp, x, y, zoneID)
+    VALUES ({WIP}, {QTY}, '{tagID}', {timestamp}, {x}, {y}, {zoneID});"""
+    cursor.execute(db_query)
     conn.close()
 
 def getActiveTimes():
@@ -240,4 +239,3 @@ def getActiveTimes():
 #        cursor.execute(db_query)
 #    
 #    conn.close()
-
