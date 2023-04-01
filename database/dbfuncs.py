@@ -230,7 +230,6 @@ def getActiveTimes():
    cursor.execute(db_query)
 
    data = cursor.fetchall()
-   print(data)
    conn.close()
 
 #def dbPush(overall_diff, currTime, batch):
