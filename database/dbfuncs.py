@@ -23,8 +23,15 @@ def db_connection():
         print("Unable to connect to database.")
     return conn, cursor
 
-def db_init():
-    conn, cursor = db_connection()
+def closeDBConnection(conn):
+    try:
+        conn.close()
+    except:
+        print("Unable to close database connection.")
+        return False
+    return True
+
+def db_init(cursor):
     
     db_query = """CREATE TABLE IF NOT EXISTS tblOrders (
     WIP INT NOT NULL,
@@ -77,10 +84,8 @@ def db_init():
     );"""
 
     cursor.execute(db_query)
-    conn.close()
 
-def define_hard_zones():
-    conn, cursor = db_connection()
+def define_hard_zones(cursor):
 
     db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
     VALUES ('No Zone', 0, 0, 0 , 0,True);"""
@@ -180,10 +185,8 @@ def define_hard_zones():
     VALUES ('Pacing', 60, 89, 17, 28, True);"""
     
     cursor.execute(db_query)
-    conn.close()
 
-def delete_all():
-   conn, cursor = db_connection()
+def delete_all(cursor):
 
    db_query = "DROP TABLE IF EXISTS tblOrders"
 
@@ -201,57 +204,48 @@ def delete_all():
 
    cursor.execute(db_query)
 
-   conn.close()
+def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
 
-def dbPushTblOrders(WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
-    conn, cursor = db_connection()
     db_query = f"""INSERT INTO tblOrders (
     {WIP}, {QTY}, '{tagID},' {inProd}, {t_start}, {t_end}, {time_on_floor}, {build_time}, {lastZone}, {zoneName} 
     );"""
     cursor.execute(db_query)
-    conn.close()
 
-def dbPushTblPaths(WIP, QTY, tagID, zoneID, zoneName, time):
-    conn, cursor = db_connection()
+def dbPushTblPaths(cursor, WIP, QTY, tagID, zoneID, zoneName, time):
+
     db_query = f"""INSERT INTO tblPaths (
     {WIP}, {QTY}, '{tagID}', {zoneID}, '{zoneName}', {time}
     );"""
 
     cursor.execute(db_query)
-    conn.close()
 
 
-def dbPushTblRawLocations(WIP, QTY, tagID, timestamp, x, y, zoneID):
-    conn, cursor = db_connection()
+def dbPushTblRawLocations(cursor, WIP, QTY, tagID, timestamp, x, y, zoneID):
+
     db_query = f"""INSERT INTO tblRawLocations (WIP, QTY, tagID, timestamp, x, y, zoneID)
     VALUES ({WIP}, {QTY}, '{tagID}', {timestamp}, {x}, {y}, {zoneID});"""
     cursor.execute(db_query)
-    conn.close()
 
-def getActiveTimes():
-   conn, cursor = db_connection()
+def getActiveTimes(cursor):
    db_query = """SELECT loctime FROM tag_threshold
                  WHERE overallx > 9.8 OR overally > 9.8 OR overallz > 9.8;"""
    cursor.execute(db_query)
 
    data = cursor.fetchall()
-   conn.close()
    return data
 
-def getActiveZones():
-    conn, cursor = db_connection()
+def getActiveZones(cursor):
 
     db_query = """SELECT * FROM tblzonedef WHERE activezone = true;"""
 
     cursor.execute(db_query)
 
     data = cursor.fetchall()
-    conn.close()
     
     return data
 
-def getActiveTagZones(x, y):
-    conn, cursor = db_connection()
+def getActiveTagZones(cursor, x, y):
+
     db_query = f"""SELECT * FROM tblzonedef 
     WHERE activezone = true AND tblzonedef.x_lower <= {x} AND tblzonedef.x_upper >= {x} 
     AND tblzonedef.y_lower <= {y} AND tblzonedef.y_upper >= {y};"""
@@ -259,7 +253,6 @@ def getActiveTagZones(x, y):
     cursor.execute(db_query)
 
     data = cursor.fetchall()
-    conn.close()
     if len(data) == 1:
         return data[0]
     else:
