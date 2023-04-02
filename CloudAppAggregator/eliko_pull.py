@@ -182,5 +182,4 @@ if __name__ == "__main__":
         print("Debug mode: ON")
         DEBUG = True
 
-    # dbcall.db_init()
     main(sys.argv[1], sys.argv[2])
