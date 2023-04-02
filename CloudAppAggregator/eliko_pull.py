@@ -5,13 +5,13 @@ import datetime
 import json
 import pickle
 
-REGEX_PAT = "[0-9a-fA-F]x[0-9a-fA-F]{6}.+\n"
-REGEX_ID_PAT = "[0-9a-fA-F]x[0-9a-fA-F]{6}"
-REGEX_COORD_AND_TIME_PAT = "\d+\.\d{2}"
+sys.path.append('..')
+
+from Eliko import JSON_eliko_call
+from database import dbfuncs
 
 DEBUG = False
 
-sleep_mode = False
 presentDate = datetime.datetime.now()
 curr_unix_timestamp = datetime.datetime.timestamp(presentDate)
 
@@ -20,23 +20,32 @@ def dict_to_json(dictionary):
     print(json_object)
 
 def dbTagsPush(tagsJson):
+    tagsJson = json.loads(tagsJson)
+
     for key, values in tagsJson.items():
-        print(key, values)
-        # need to get parse the wip base and varient
-        # dbcall.dbPushPositionTableProd()
-        # dbPushPositionTableProd(tag_id, WIPbase, WIPvar, x_coord, y_coord, z_coord, unixtime)
+        parsed_alias = values['alias'].split(".")
+        wip = parsed_alias[0]
+        qty = 0 
+        if len(parsed_alias) == 2:
+            qty = parsed_alias[1]
+        tagID = key.replace("0x", "")
+        timestamp = values['timestamp']
+        x = values['x']
+        y = values['y']
+        zoneID = 1 # will need to be configured later
+        dbfuncs.dbPushTblRawLocations(wip, qty, tagID, timestamp, x, y, zoneID)
+        
     return tagsJson
 
 def compare_data_values(past, curr):
-    # curr = json.loads(curr)
+    curr = json.loads(curr)
     index = 0
 
     overall_diff = {}
     for index in range(len(past)):
         if (past[index] == {}):
-            return False
+            return True
     
-    # get coord values
     tag_coord = {}
     tag_avgs = {}
 
@@ -56,7 +65,6 @@ def compare_data_values(past, curr):
             z_value = round(sum(tag_coord[key]['z']) / len(tag_coord[key]['z']), 2)
             tag_avgs[key] = [x_value, y_value, z_value]
 
-    
     for key, values in curr.items():
         if key not in tag_avgs:
             x_value = round(float(values['x']), 2)
@@ -73,100 +81,90 @@ def compare_data_values(past, curr):
         for value in values:
             if (value > 9.8):
                 return True
-    
     return False
-        
-
-def pullData():
-    lines = []
-    with open("sampleSets/Get_Tags.log", "r") as file:
-        lines = file.readlines()
-    
-    tag_data = {}
-
-    for line in lines:
-        data_lines = re.findall(REGEX_PAT, line)
-        for data in data_lines:
-            data = data[:-1]
-            data = data.split(",")
-            tag = data[0]
-            x_coord = float(data[6])
-            y_coord = float(data[7])
-            z_coord = float(data[8])
-            unix_time = float(data[5])
-            tag_data[tag] = [x_coord, y_coord, z_coord, unix_time]
-
-    return tag_data
-
 
 def main(push_info_file, sample_file):
 
     last_active_dump = 0
     last_sleep = 0
+    last_sleep_mode = False
 
-    existing_txt_file = os.path.isfile("sampleSets/"+push_info_file)
-    existing_pkl_file = os.path.isfile("sampleSets/"+sample_file)
+    existing_txt_file = os.path.isfile(push_info_file)
+    existing_pkl_file = os.path.isfile(sample_file)
 
     if (not existing_txt_file):
-        file = open("sampleSets/"+push_info_file, "x")
+        file = open(push_info_file, "x")
         file.close()
-        with open("sampleSets/"+push_info_file, "wb") as file:
+        with open(push_info_file, "wb") as file:
             temp = {"last_active_dump":0.0, "last_sleep":0.0, "sleep_mode": False}
             pickle.dump(temp, file)
 
     if (not existing_pkl_file):
-        file = open("sampleSets/"+sample_file, "x")
+        file = open(sample_file, "x")
         file.close()
-        with open("sampleSets/"+sample_file, "wb") as file:
+        with open(sample_file, "wb") as file:
             temp = [{}, {}, {}]
             pickle.dump(temp, file)
     
     push_info = {}
-    with open("sampleSets/"+push_info_file, "rb") as file:
+    with open(push_info_file, "rb") as file:
         push_info = pickle.load(file)
+    
+    last_active_dump = push_info['last_active_dump']
+    last_sleep = push_info['last_sleep']
+    last_sleep_mode = push_info['sleep_mode']
 
     past_tag_values = {}
     
-    with open("sampleSets/"+sample_file, "rb") as file:
+    with open(sample_file, "rb") as file:
         past_tag_values = pickle.load(file)
-    
-    print(past_tag_values)
 
-    tag_values = pullData()
+    soc, status = JSON_eliko_call.createSocket()
+    if status:
+        tag_values = JSON_eliko_call.getTags(soc)
+    else:
+        sys.exit()
     new_push = compare_data_values(past_tag_values, tag_values)
     
     past_tag_values[2] = past_tag_values[1]
     past_tag_values[1] = past_tag_values[0]
     past_tag_values[0] = tag_values
 
-    # if (past_sleep_mode and not new_push):
-    #     if (curr_unix_timestamp >= (first_sleep_mode + 1 * 60 * 60)):
-    #         # hourly push
-    #         first_sleep_mode = curr_unix_timestamp
-    #         print("Pushing hourly data")
-    #         sleep_mode = True
+    hourly_push = False
 
+    if (new_push):
+        dbTagsPush(tag_values)
+        last_active_dump = curr_unix_timestamp
+        sleep_mode = False
+    else:
+        # if past push was 30 mins ago and there was no active pushes within that time 
+        # enter sleep mode else push
+        if(last_active_dump + (30 * 60) >= curr_unix_timestamp):
+            # we want to keep doing 5 min pushes after the last active dump so push as long as current time is smaller than
+            # last active dump
+            dbTagsPush(tag_values)
+        elif(last_sleep + (60 * 60) <= curr_unix_timestamp):
+            # we want to push after an hour to the previous last sleep time
+            dbTagsPush(tag_values)
+            last_sleep = curr_unix_timestamp
+            hourly_push = True
+        sleep_mode = True
     
-    # if (new_push):
-    #     dbTagsPush(tag_values)
-    #     last_active_dump = curr_unix_timestamp
-    #     sleep_mode = False
-    # else:
-    #     # if past push was 30 mins ago and there was no active pushes within that time 
-    #     # enter sleep mode else push
-    #     if(last_active_dump + 30 > curr_unix_timestamp):
-    #         dbTagsPush(tag_values)
-    #     sleep_mode = True
-
-    # with open("sampleSets/"+push_info_file, "wb") as file:
-    #     file.writelines(str(curr_unix_timestamp)+"\n")
-    #     if (not sleep_mode):
-    #         file.writelines(str(sleep_mode)+","+str(curr_unix_timestamp))
-    #     else:
-    #         file.writelines(str(sleep_mode) + "," + str(first_sleep_mode))
-        
+    if (last_sleep_mode and sleep_mode):
+        push_info['last_sleep'] = last_sleep
+    elif ((not (last_sleep_mode)) and sleep_mode):
+        push_info['last_sleep'] = curr_unix_timestamp
     
-    with open("sampleSets/"+sample_file, "wb") as file:
+    if hourly_push:
+        push_info['last_sleep'] = last_sleep
+    
+    push_info['last_active_dump'] = last_active_dump
+    push_info['sleep_mode'] = sleep_mode
+    
+    with open(push_info_file, "wb") as file:
+        pickle.dump(push_info, file)
+    
+    with open(sample_file, "wb") as file:
         pickle.dump(past_tag_values, file)
 
 if __name__ == "__main__":
@@ -184,5 +182,4 @@ if __name__ == "__main__":
         print("Debug mode: ON")
         DEBUG = True
 
-    # dbcall.db_init()
     main(sys.argv[1], sys.argv[2])
