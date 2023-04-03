@@ -1,10 +1,14 @@
-from flask import Flask, request,jsonify
+from flask import Flask, request,jsonify, current_app
 from flask_socketio import SocketIO,emit
 from flask_cors import CORS
 from os import environ
 import socket
 import sys
 import json
+import time
+import atexit
+
+from apscheduler.schedulers.background import BackgroundScheduler
 
 sys.path.append('..')
 
@@ -12,10 +16,16 @@ from Eliko import JSON_eliko_call
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
+
 CORS(app,resources={r"/*":{"origins":"*"}})
 socketio = SocketIO(cors_allowed_origins="*")
 
 socketio.init_app(app)
+
+def print_date_time():
+    with app.test_request_context('/'):
+        
+        socketio.emit("getTags",{'data':"test"},broadcast=True)
 
 @app.route("/link-wip", methods=['POST'])
 def link_wip():
@@ -79,6 +89,12 @@ def connected():
     """event listener when client connects to the server"""
     print(request.sid)
     print("client has connected")
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=print_date_time, trigger="interval", seconds=10)
+    scheduler.start()
+
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
 @socketio.on('data')
@@ -92,6 +108,8 @@ def disconnected():
     """event listener when client disconnects to the server"""
     print("user disconnected")
     emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
+
+
 
 
 if __name__ == '__main__':

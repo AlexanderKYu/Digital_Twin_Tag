@@ -32,6 +32,11 @@ function App() {
         console.log(data);
       })
 
+      socket.on("getTags", (data) => {
+        // when we recieve a chat, add it into our messages array in state
+        console.log(data);
+      })
+
       // when component unmounts, disconnect
       return (() => {
           socket.disconnect()
