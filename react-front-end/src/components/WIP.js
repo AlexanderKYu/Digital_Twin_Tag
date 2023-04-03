@@ -22,6 +22,7 @@ export default function WIP() {
   const [confirmation, setConfirmation] = useState("");
   const [connectedTags, setConnectedTags] = useState([]);
   const [lowBatt, setlowBatt] = useState("");
+  const [status, setStatus] = useState(false);
 
   const tagChange = (e) => {
     if (e.target.value.length <= 6) {
@@ -42,9 +43,7 @@ export default function WIP() {
       fetch("/link-battery", aliasData)
         .then((res) => res.json())
         .then((data) => {
-          if (parseInt(data.status.slice(0, -1)) <= 20) {
             setlowBatt(data.status);
-          }
         });
 
       if (nextField !== null) {
@@ -85,6 +84,7 @@ export default function WIP() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
+          setStatus(true);
           let temp = connectedTags;
           temp.unshift(data.tagData);
 
@@ -95,11 +95,14 @@ export default function WIP() {
           setConnectedTags(temp);
           setTag("");
           setWip("");
+          setlowBatt("");
 
           const nextSelect = document.querySelector("[name=tagNumber]");
           if (nextSelect !== null) {
             nextSelect.focus();
           }
+        } else {
+          setStatus(false);
         }
         setConfirmation(data.data);
       });
@@ -127,7 +130,17 @@ export default function WIP() {
 
   return (
     <>
-      {confirmation && (
+      {confirmation && !status && (
+        <Alert
+          status="success"
+          variant="solid"
+          fontFamily="Arial"
+          bg="#a3142e"
+        >
+          {confirmation}
+        </Alert>
+      )}
+      {confirmation && status && (
         <Alert
           status="success"
           variant="solid"
@@ -182,9 +195,22 @@ export default function WIP() {
                   autoFocus
                 />
 
-                {lowBatt && (
+                {lowBatt && (parseInt(lowBatt) > 20) && (
                   <InputRightElement
-                    bg="black"
+                    bg="teal.600"
+                    color="white"
+                    width="20"
+                    mt={3}
+                    mr={2}
+                    borderRadius="150"
+                  >
+                    <Text> {lowBatt}</Text>
+                  </InputRightElement>
+                )}
+
+                {lowBatt && (parseInt(lowBatt) < 20) && (
+                  <InputRightElement
+                    bg="#a3142e"
                     color="white"
                     width="20"
                     mt={3}

@@ -42,7 +42,6 @@ function App() {
       <div className="App">
         <Nav></Nav>
         <WIP></WIP>
-        <AllTag></AllTag>
     </div>
     </ChakraProvider>
   );
