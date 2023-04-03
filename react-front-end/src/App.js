@@ -1,8 +1,6 @@
 import "./App.css";
 import WIP from "./components/WIP";
 import Nav from "./components/Nav";
-import Sample from "./components/Sample";
-import AllTag from "./components/AllTag";
 import { io } from "socket.io-client";
 import { useAuth0 } from "@auth0/auth0-react";
 

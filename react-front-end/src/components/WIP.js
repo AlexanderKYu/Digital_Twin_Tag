@@ -88,7 +88,7 @@ export default function WIP() {
           let temp = connectedTags;
           temp.unshift(data.tagData);
 
-          if (connectedTags.length >= 5) {
+          if (connectedTags.length >= 10) {
             temp.pop();
           }
 
