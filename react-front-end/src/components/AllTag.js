@@ -17,6 +17,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+import { sampleData } from "./SampleData";
 
 export default function AllTag(props) {
   return (
