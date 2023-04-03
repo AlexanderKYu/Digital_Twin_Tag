@@ -1,20 +1,13 @@
 import { ReactNode } from "react";
 import {
   Box,
-  Container,
   useDisclosure,
-  useColorModeValue,
   Image,
   AspectRatio,
-  Input,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
-  MenuItemOption,
-  MenuGroup,
-  MenuOptionGroup,
-  MenuDivider,
   IconButton,
   HStack,
 } from "@chakra-ui/react";
@@ -35,6 +28,10 @@ export default function Nav() {
                   aria-label="Options"
                   color="white"
                   colorScheme="black"
+                  bg="none"
+                  _hover={{
+                    bg: "none",
+                  }}
                 >
                   {isOpen ? <CloseIcon /> : <HamburgerIcon />}
                 </MenuButton>

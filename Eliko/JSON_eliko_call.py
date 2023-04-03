@@ -81,3 +81,4 @@ def getTags(soc):
     except socket.error:
         print('Failed to send data')
     return json_data
+
