@@ -257,3 +257,43 @@ def getActiveTagZones(cursor, x, y):
         return data[0]
     else:
         return (1, 'No Zone', 0, 0, 0, 0)
+    
+
+def getThreshold(cursor):
+    db_query = """
+        SELECT * FROM tag_threshold;
+    """
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
+
+def getOrders(cursor):
+    db_query = """
+         SELECT * FROM tblorders;
+    """
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
+
+def getPaths(cursor):
+    db_query = """
+         SELECT * FROM tblpaths;
+    """
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
+def getLocations(cursor):
+    db_query = """
+         SELECT * FROM tblrawlocations;
+    """
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
+
+def getZones(cursor):
+    db_query = """
+         SELECT * FROM tblzonedef;
+    """
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
