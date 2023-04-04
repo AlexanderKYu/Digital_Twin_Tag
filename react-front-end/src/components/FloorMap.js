@@ -7,7 +7,6 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { sampleData } from './SampleData';
 import { useEffect, useState } from 'react';
 
 ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);

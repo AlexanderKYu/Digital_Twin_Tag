@@ -16,13 +16,17 @@ from Eliko import JSON_eliko_call
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
+clients = 0
 
 CORS(app,resources={r"/*":{"origins":"*"}})
 socketio = SocketIO(cors_allowed_origins="*")
 
 socketio.init_app(app)
 
-def print_date_time():
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
+
+def emit_tag_data():
     with app.test_request_context('/'):
         TCP_IP = environ.get('TCP_IP')
         TCP_PORT = int(environ.get('TCP_PORT'))
@@ -98,11 +102,11 @@ def link_wip():
 @socketio.on("connect")
 def connected():
     """event listener when client connects to the server"""
+    clients++
     print(request.sid)
     print("client has connected")
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=print_date_time, trigger="interval", seconds=10)
-    scheduler.start()
+    if(!scheduler.running):
+        scheduler.start()
 
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
@@ -117,6 +121,10 @@ def handle_data(data):
 @socketio.on("disconnect")
 def disconnected():
     """event listener when client disconnects to the server"""
+    clients--
+    if(clients == 0):
+        print("Last User Disconnected")
+        scheduler.shutdown()
     print("user disconnected")
     emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
 
