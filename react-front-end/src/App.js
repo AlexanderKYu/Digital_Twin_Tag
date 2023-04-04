@@ -21,6 +21,7 @@ function App() {
 
   const [connected, setConnected] = useState(false);
   const [data, setData] = useState("");
+  const [tagData, setTagData] = useState({});
 
 
   useEffect(() => {
@@ -35,6 +36,7 @@ function App() {
       socket.on("getTags", (data) => {
         // when we recieve a chat, add it into our messages array in state
         console.log(data);
+        setTagData(data);
       })
 
       // when component unmounts, disconnect
@@ -50,7 +52,7 @@ function App() {
         <WIP></WIP>
         <Box
         width ="700px">
-          <FloorMap></FloorMap>
+          <FloorMap tagData={tagData}></FloorMap>
         </Box>
     </div>
     

@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 
 ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-export default function FloorMap() {
+export default function FloorMap(props) {
 
   const [mapCoords, setMapCoords] = useState([]);
 
@@ -20,19 +20,19 @@ export default function FloorMap() {
   image.src = '/floorImg.png';
 
   useEffect(() => {
-    let allTags = Object.keys(sampleData);
+    let allTags = Object.keys(props.tagData);
     let tempCoords = []
     allTags.forEach((tag) => {
       let tempObject = {};
-      tempObject.x = sampleData[tag].x;
-      tempObject.y = sampleData[tag].y;
+      tempObject.x = props.tagData[tag].x;
+      tempObject.y = props.tagData[tag].y;
       tempObject.tag = tag;
       //setMapCoords( arr => [...arr, tempObject]);
       tempCoords.push(tempObject);
       
     });
     setMapCoords(tempCoords);
-  }, [sampleData]);
+  }, [props.tagData]);
   
 
   const data = {
