@@ -11,6 +11,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import chakraTheme from '@chakra-ui/theme'
 import '@fontsource/antonio/500.css'
 import theme from "./components/Theme"
+import TagRow from "./components/TagRow.js";
 
 let socket;
 
@@ -41,7 +42,7 @@ function App() {
     <ChakraProvider theme={theme}>
       <div className="App">
         <Nav></Nav>
-        <WIP></WIP>
+        <AllTag></AllTag>
     </div>
     </ChakraProvider>
   );
