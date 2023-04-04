@@ -14,17 +14,17 @@ sys.path.append('..')
 
 from Eliko import JSON_eliko_call
 
+clients = 0
+
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
-clients = 0
 
 CORS(app,resources={r"/*":{"origins":"*"}})
 socketio = SocketIO(cors_allowed_origins="*")
 
 socketio.init_app(app)
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
+
 
 def emit_tag_data():
     with app.test_request_context('/'):
@@ -42,6 +42,9 @@ def emit_tag_data():
         s.close()
 
         socketio.emit("getTags",tagJson,broadcast=True)
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
 
 @app.route("/link-wip", methods=['POST'])
 def link_wip():
@@ -102,10 +105,11 @@ def link_wip():
 @socketio.on("connect")
 def connected():
     """event listener when client connects to the server"""
-    clients++
+    global clients
+    clients+=1
     print(request.sid)
     print("client has connected")
-    if(!scheduler.running):
+    if(not(scheduler.running)):
         scheduler.start()
 
     # Shut down the scheduler when exiting the app
@@ -121,7 +125,8 @@ def handle_data(data):
 @socketio.on("disconnect")
 def disconnected():
     """event listener when client disconnects to the server"""
-    clients--
+    global clients
+    clients-=1
     if(clients == 0):
         print("Last User Disconnected")
         scheduler.shutdown()
