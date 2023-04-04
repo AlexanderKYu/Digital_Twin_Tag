@@ -53,7 +53,6 @@ export default function FloorMap() {
       if (image.complete) {
         const ctx = chart.ctx;
         const {top, left, width, height} = chart.chartArea;
-        console.log(chart.chartArea);
         //const x = left + width / 2 - image.width / 2;
         const x = left;
         //const y = top + height / 2 - image.height / 2;

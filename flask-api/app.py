@@ -24,8 +24,20 @@ socketio.init_app(app)
 
 def print_date_time():
     with app.test_request_context('/'):
-        
-        socketio.emit("getTags",{'data':"test"},broadcast=True)
+        TCP_IP = environ.get('TCP_IP')
+        TCP_PORT = int(environ.get('TCP_PORT'))
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(3)
+
+        s.connect((TCP_IP, TCP_PORT))
+
+        #getting battery status of tag
+        tagJson = JSON_eliko_call.getTags(s)
+        tagJson = json.loads(tagJson)
+
+        s.close()
+
+        socketio.emit("getTags",tagJson,broadcast=True)
 
 @app.route("/link-wip", methods=['POST'])
 def link_wip():
@@ -46,7 +58,6 @@ def link_wip():
         s.connect((TCP_IP, TCP_PORT))
 
         #getting battery status of tag
-        print("testing battery")
         batteryData = JSON_eliko_call.getBattery(s)
         batteryData = json.loads(batteryData)
         status = batteryData[data["tagNumber"]]["status"]
