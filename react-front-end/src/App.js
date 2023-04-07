@@ -9,6 +9,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import chakraTheme from '@chakra-ui/theme'
 import '@fontsource/antonio/500.css'
 import theme from "./components/Theme"
+import {Box} from "@chakra-ui/react"
 
 let socket;
 
@@ -18,6 +19,7 @@ function App() {
 
   const [connected, setConnected] = useState(false);
   const [data, setData] = useState("");
+  const [tagData, setTagData] = useState({});
 
 
   useEffect(() => {
@@ -27,6 +29,12 @@ function App() {
       socket.on("data", (data) => {
         // when we recieve a chat, add it into our messages array in state
         console.log(data);
+      })
+
+      socket.on("getTags", (data) => {
+        // when we recieve a chat, add it into our messages array in state
+        console.log(data);
+        setTagData(data);
       })
 
       // when component unmounts, disconnect
@@ -41,6 +49,7 @@ function App() {
         <Nav></Nav>
         <WIP></WIP>
     </div>
+    
     </ChakraProvider>
   );
 }

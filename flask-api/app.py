@@ -1,21 +1,50 @@
-from flask import Flask, request,jsonify
+from flask import Flask, request,jsonify, current_app
 from flask_socketio import SocketIO,emit
 from flask_cors import CORS
 from os import environ
 import socket
 import sys
 import json
+import time
+import atexit
+
+from apscheduler.schedulers.background import BackgroundScheduler
 
 sys.path.append('..')
 
 from Eliko import JSON_eliko_call
 
+clients = 0
+
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
+
 CORS(app,resources={r"/*":{"origins":"*"}})
 socketio = SocketIO(cors_allowed_origins="*")
 
 socketio.init_app(app)
+
+
+
+def emit_tag_data():
+    with app.test_request_context('/'):
+        TCP_IP = environ.get('TCP_IP')
+        TCP_PORT = int(environ.get('TCP_PORT'))
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(3)
+
+        s.connect((TCP_IP, TCP_PORT))
+
+        #getting battery status of tag
+        tagJson = JSON_eliko_call.getTags(s)
+        tagJson = json.loads(tagJson)
+
+        s.close()
+
+        socketio.emit("getTags",tagJson,broadcast=True)
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
 
 @app.route("/link-wip", methods=['POST'])
 def link_wip():
@@ -36,7 +65,6 @@ def link_wip():
         s.connect((TCP_IP, TCP_PORT))
 
         #getting battery status of tag
-        print("testing battery")
         batteryData = JSON_eliko_call.getBattery(s)
         batteryData = json.loads(batteryData)
         status = batteryData[data["tagNumber"]]["status"]
@@ -111,8 +139,15 @@ def link_battery():
 @socketio.on("connect")
 def connected():
     """event listener when client connects to the server"""
+    global clients
+    clients+=1
     print(request.sid)
     print("client has connected")
+    if(not(scheduler.running)):
+        scheduler.start()
+
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
 @socketio.on('data')
@@ -124,8 +159,15 @@ def handle_data(data):
 @socketio.on("disconnect")
 def disconnected():
     """event listener when client disconnects to the server"""
+    global clients
+    clients-=1
+    if(clients == 0):
+        print("Last User Disconnected")
+        scheduler.shutdown()
     print("user disconnected")
     emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
+
+
 
 
 if __name__ == '__main__':
