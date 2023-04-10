@@ -36,12 +36,7 @@ export default function Nav() {
                   {isOpen ? <CloseIcon /> : <HamburgerIcon />}
                 </MenuButton>
 
-                <MenuList>
-                  <MenuItem>New Tab</MenuItem>
-                  <MenuItem>New Window</MenuItem>
-                  <MenuItem>Open Closed Tab</MenuItem>
-                  <MenuItem>Open File...</MenuItem>
-                </MenuList>
+                <MenuList></MenuList>
               </>
             )}
           </Menu>
@@ -53,7 +48,7 @@ export default function Nav() {
               boxSize="150px"
               src="/bauerLogo.png"
               alt="Bauer Logo"
-            />  
+            />
           </AspectRatio>
         </Box>
       </HStack>

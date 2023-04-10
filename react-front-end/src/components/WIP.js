@@ -7,14 +7,10 @@ import {
   InputGroup,
   Alert,
   Button,
-  Spacer,
-  InputRightAddon,
   InputRightElement,
-  Icon,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
-import TagData from "./TagData.js";
-import { color } from "framer-motion";
+import TagData from "./WipRow.js";
 
 export default function WIP() {
   const [tag, setTag] = useState("");
@@ -43,7 +39,7 @@ export default function WIP() {
       fetch("/link-battery", aliasData)
         .then((res) => res.json())
         .then((data) => {
-            setlowBatt(data.status);
+          setlowBatt(data.status);
         });
 
       if (nextField !== null) {
@@ -131,22 +127,12 @@ export default function WIP() {
   return (
     <>
       {confirmation && !status && (
-        <Alert
-          status="success"
-          variant="solid"
-          fontFamily="Arial"
-          bg="#a3142e"
-        >
+        <Alert status="success" variant="solid" fontFamily="Arial" bg="#a3142e">
           {confirmation}
         </Alert>
       )}
       {confirmation && status && (
-        <Alert
-          status="success"
-          variant="solid"
-          fontFamily="Arial"
-          bg="teal.600"
-        >
+        <Alert status="success" variant="solid" fontFamily="Arial" bg="#009cd9">
           {confirmation}
         </Alert>
       )}
@@ -171,23 +157,7 @@ export default function WIP() {
 
               <InputGroup>
                 <Input
-                  bg="white"
-                  color="black"
-                  size="lg"
-                  fontFamily="arial"
-                  fontSize="2xl"
-                  textAlign="center"
-                  borderRadius={150}
-                  borderStyle="none"
-                  mt={2}
-                  mb={8}
-                  _focus={{
-                    borderStyle: "none",
-                    borderColor: "white",
-                    outlineColor: "teal.600",
-                    outlineWidth: 3,
-                    outlineOffset: 2,
-                  }}
+                  variant="wipInput"
                   value={tag}
                   onChange={tagChange}
                   name="tagNumber"
@@ -195,9 +165,9 @@ export default function WIP() {
                   autoFocus
                 />
 
-                {lowBatt && (parseInt(lowBatt) > 20) && (
+                {lowBatt && parseInt(lowBatt) > 20 && (
                   <InputRightElement
-                    bg="teal.600"
+                    bg="#009cd9"
                     color="white"
                     width="20"
                     mt={3}
@@ -208,7 +178,7 @@ export default function WIP() {
                   </InputRightElement>
                 )}
 
-                {lowBatt && (parseInt(lowBatt) < 20) && (
+                {lowBatt && parseInt(lowBatt) < 20 && (
                   <InputRightElement
                     bg="#a3142e"
                     color="white"
@@ -224,23 +194,7 @@ export default function WIP() {
               <Text fontSize="5xl">WIP</Text>
 
               <Input
-                bg="white"
-                color="black"
-                size="lg"
-                fontFamily="arial"
-                fontSize="2xl"
-                textAlign="center"
-                borderRadius={150}
-                borderStyle="none"
-                mt={2}
-                mb={10}
-                _focus={{
-                  borderStyle: "none",
-                  borderColor: "white",
-                  outlineColor: "teal.600",
-                  outlineWidth: 3,
-                  outlineOffset: 2,
-                }}
+                variant="wipInput"
                 value={wip}
                 onChange={wipChange}
                 name="wipNumber"
@@ -251,18 +205,7 @@ export default function WIP() {
                 mt={2}
                 onClick={sendAndClear}
                 name="scanBtn"
-                _hover={{
-                  bg: "teal.600",
-                  outlineColor: "white",
-                  outlineOffset: 2,
-                  color: "white",
-                }}
-                _focus={{
-                  bg: "teal.600",
-                  outlineColor: "white",
-                  outlineOffset: 2,
-                  color: "white",
-                }}
+                variant="wipBtn"
               >
                 <ArrowForwardIcon></ArrowForwardIcon>
               </Button>
@@ -279,22 +222,7 @@ export default function WIP() {
             >
               <Text fontSize="5xl">SEARCH / RECHERCHE</Text>
               <InputGroup>
-                <Input
-                  type=""
-                  placeholder=""
-                  bg="white"
-                  borderRadius={150}
-                  size="lg"
-                  color="black"
-                  mt={2}
-                  mb={4}
-                  focusBorderColor="teal.600"
-                  borderColor="white"
-                  borderWidth={3}
-                  fontFamily="arial"
-                  textAlign="center"
-                  fontSize="2xl"
-                />
+                <Input variant="wipInput" type="" placeholder="" />
               </InputGroup>
               {connectedTags.map((tagValue) => (
                 <TagData key={tagValue.number} data={tagValue}></TagData>
