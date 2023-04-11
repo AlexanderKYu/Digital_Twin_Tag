@@ -1,28 +1,12 @@
 import { ReactNode, useState } from "react";
 import {
   Box,
-  Container,
-  useDisclosure,
-  useColorModeValue,
-  Image,
-  AspectRatio,
-  Input,
-  VStack,
-  HStack,
   Flex,
-  Spacer,
-  Center,
   Text,
-  Square,
   Button,
-  RadioGroup,
-  Radio,
-  Stack,
-  Accordion,
   AccordionItem,
   AccordionButton,
   AccordionPanel,
-  AccordionIcon,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 

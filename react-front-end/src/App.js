@@ -8,8 +8,7 @@ import '@fontsource/antonio/500.css'
 import theme from "./components/theme/Theme"
 import Nav from "./components/Nav";
 import WIP from "./components/WIP";
-import AllTag from "./components/TagAll";
-import TagRow from "./components/TagRow.js";
+import Dashboard from "./components/Dashboard.js";
 
 let socket;
 
@@ -40,7 +39,8 @@ function App() {
     <ChakraProvider theme={theme}>
       <div className="App">
         <Nav></Nav>
-        <AllTag></AllTag>      
+        <Dashboard></Dashboard>  
+        <WIP></WIP>    
 
     </div>
     </ChakraProvider>

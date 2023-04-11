@@ -1,19 +1,9 @@
 import { ReactNode } from "react";
 import {
   Box,
-  Container,
-  useDisclosure,
-  useColorModeValue,
-  Image,
-  AspectRatio,
-  Input,
-  VStack,
-  HStack,
   Flex,
   Spacer,
-  Center,
   Text,
-  Square,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 
