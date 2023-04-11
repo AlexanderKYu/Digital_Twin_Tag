@@ -1,15 +1,15 @@
 import "./App.css";
-import WIP from "./components/WIP";
-import Nav from "./components/Nav";
 import { io } from "socket.io-client";
 import { useAuth0 } from "@auth0/auth0-react";
-
 import { useEffect, useState } from "react";
 import { ChakraProvider } from '@chakra-ui/react'
 import chakraTheme from '@chakra-ui/theme'
 import '@fontsource/antonio/500.css'
-import theme from "./components/Theme"
-import {Box} from "@chakra-ui/react"
+import theme from "./components/theme/Theme"
+import Nav from "./components/Nav";
+import WIP from "./components/WIP";
+import Dashboard from "./components/Dashboard.js";
+
 
 let socket;
 
@@ -47,7 +47,9 @@ function App() {
     <ChakraProvider theme={theme}>
       <div className="App">
         <Nav></Nav>
-        <WIP></WIP>
+        <Dashboard></Dashboard>  
+        <WIP></WIP>    
+
     </div>
     
     </ChakraProvider>
