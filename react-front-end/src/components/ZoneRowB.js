@@ -26,11 +26,9 @@ import {
   InputGroup,
 } from "@chakra-ui/react";
 
-export default function ZoneRow() {
+export default function ZoneRowB() {
   return (
     <>
-
-          {/* ZONE */}
           <Box
             flex="1"
             p={10}
@@ -38,7 +36,7 @@ export default function ZoneRow() {
             color="white"
           >
             <Text color="white" fontSize="5xl" text-align="left" mb={4}>
-              ZONE A
+              ZONE B
             </Text>
             <Flex>
               <Text fontSize="2xl" pt={2} pb={4} pl={5} pr={5}>
@@ -53,7 +51,7 @@ export default function ZoneRow() {
                 mb={4}
                 p={6}
               >
-                A
+                B
               </Box>
 
               <Text fontSize="2xl" pt={2} pb={4} pl={5} pr={5}>
@@ -241,6 +239,9 @@ export default function ZoneRow() {
               </Box>
             </Flex>
           </Box>
+
+          {/* ZONE */}
+
     </>
   );
 }

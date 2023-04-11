@@ -39,6 +39,7 @@ export default function FloorMap(props) {
       {
         label: "Tags",
         data: mapCoords,
+        color: "#FFFFFF",
         backgroundColor: 'rgba(50, 180, 100, 1)',
         pointRadius: 10,
         pointHoverRadius: 15,
@@ -56,7 +57,7 @@ export default function FloorMap(props) {
         const x = left;
         //const y = top + height / 2 - image.height / 2;
         const y = top;
-        ctx.drawImage(image, x, y);
+        ctx.drawImage(image, x, y, height, height);
       } else {
         image.onload = () => chart.draw();
       }
@@ -69,10 +70,17 @@ export default function FloorMap(props) {
     aspectRatio: 1,
     scales: {
       x: {
+        ticks: {
+          color: 'black'
+        },
         min: -10,
         max: 30,
       },
       y: {
+        ticks: {
+          color: 'black'
+        },
+        
         min: -10,
         max: 30,
       },

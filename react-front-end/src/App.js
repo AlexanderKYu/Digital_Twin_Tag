@@ -10,7 +10,6 @@ import Nav from "./components/Nav";
 import WIP from "./components/WIP";
 import Dashboard from "./components/Dashboard.js";
 
-
 let socket;
 
 function App() {
@@ -47,7 +46,7 @@ function App() {
     <ChakraProvider theme={theme}>
       <div className="App">
         <Nav></Nav>
-        <Dashboard></Dashboard>  
+        <Dashboard tagData={tagData}></Dashboard>  
         <WIP></WIP>    
 
     </div>
