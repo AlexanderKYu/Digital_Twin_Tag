@@ -10,6 +10,7 @@ import Nav from "./components/Nav";
 import WIP from "./components/WIP";
 import Dashboard from "./components/Dashboard.js";
 
+
 let socket;
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
 
   const [connected, setConnected] = useState(false);
   const [data, setData] = useState("");
+  const [tagData, setTagData] = useState({});
 
 
   useEffect(() => {
@@ -27,6 +29,12 @@ function App() {
       socket.on("data", (data) => {
         // when we recieve a chat, add it into our messages array in state
         console.log(data);
+      })
+
+      socket.on("getTags", (data) => {
+        // when we recieve a chat, add it into our messages array in state
+        console.log(data);
+        setTagData(data);
       })
 
       // when component unmounts, disconnect
@@ -43,6 +51,7 @@ function App() {
         <WIP></WIP>    
 
     </div>
+    
     </ChakraProvider>
   );
 }
