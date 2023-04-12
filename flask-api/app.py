@@ -7,14 +7,59 @@ import sys
 import json
 import time
 import atexit
+import array
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
 sys.path.append('..')
 
 from Eliko import JSON_eliko_call
+from database import dbfuncs
 
 clients = 0
+
+sampleData = [
+    {
+        "alias": "34343",
+        "mode": "2D",
+        "height": "1.00",
+        "hz": "0.000000",
+        "timestamp": "1676644837",
+        "x": 21.85,
+        "y": 16.13,
+        "z": "0.97"
+    },
+    {
+        "alias": "369825.2",
+        "mode": "2D",
+        "height": "1.00",
+        "hz": "2.000000",
+        "timestamp": "1679426402",
+        "x": 3.38,
+        "y": -0.49,
+        "z": "1.03"
+    },
+    {
+        "alias": "373777",
+        "mode": "2D",
+        "height": "1.00",
+        "hz": "2.000000",
+        "timestamp": "1679426402",
+        "x": 21.03,
+        "y": 1.99,
+        "z": "1.01"
+    },
+    {
+        "alias": "373777",
+        "mode": "2D",
+        "height": "1.00",
+        "hz": "2.000000",
+        "timestamp": "1679426402",
+        "x": 25,
+        "y": 85,
+        "z": "1.01"
+    }
+]
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -134,6 +179,15 @@ def link_battery():
     }
 
     return jsonify(response)
+
+@app.route("/zoning")
+def zonetag():
+    array = []
+    for i in sampleData:
+        array.append(dbfuncs.getActiveTagZones(i["x"], i["y"]))
+        array.append(i["alias"])
+    return {"zonetags": array}
+# also need to return both the zone form getActiveTagZones and the alias from the json so 
 
 
 @socketio.on("connect")

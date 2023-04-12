@@ -1,6 +1,7 @@
 import "./App.css";
 import WIP from "./components/WIP";
 import Nav from "./components/Nav";
+import ZoneTable from "./components/ZoneTable";
 import { io } from "socket.io-client";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -49,7 +50,7 @@ function App() {
         <Nav></Nav>
         <WIP></WIP>
     </div>
-    
+    <ZoneTable></ZoneTable>
     </ChakraProvider>
   );
 }

@@ -257,3 +257,14 @@ def getActiveTagZones(cursor, x, y):
         return data[0]
     else:
         return (1, 'No Zone', 0, 0, 0, 0)
+
+def getActiveTagZones(x, y):
+    conn, cursor = db_connection()
+    db_query = """SELECT tblzonedef.zoneid, tblzonedef.zonename FROM tblzonedef WHERE activezone = true AND tblzonedef.x_lower <= (%s) AND tblzonedef.x_upper >= (%s) AND tblzonedef.y_lower <= (%s) AND tblzonedef.y_upper >= (%s);"""
+    
+    cursor.execute(db_query, (x, x, y, y))
+
+    data = cursor.fetchall()
+    
+    return data
+    
