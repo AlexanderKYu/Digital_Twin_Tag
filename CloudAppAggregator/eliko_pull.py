@@ -15,6 +15,11 @@ DEBUG = False
 presentDate = datetime.datetime.now()
 curr_unix_timestamp = datetime.datetime.timestamp(presentDate)
 
+TIME_START = "7::00::00"
+TIME_LUNCH_START = "11::00::00"
+TIME_LUNCH_END = "13::00::00"
+TIME_END = "16::00::00"
+
 def dict_to_json(dictionary):
     json_object = json.dumps(dictionary, indent = 4)
     print(json_object)
@@ -32,10 +37,22 @@ def dbTagsPush(tagsJson):
         timestamp = values['timestamp']
         x = values['x']
         y = values['y']
-        zoneID = 1 # will need to be configured later
-        dbfuncs.dbPushTblRawLocations(wip, qty, tagID, timestamp, x, y, zoneID)
+        zoneID = dbfuncs.getActiveTagZones(x, y)[0]
+        dbfuncs.dbPushTblRawLocations(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
         
     return tagsJson
+
+def isWorkHours():
+    time_start = datetime.datetime.strptime(TIME_START, '%H::%M::%S').time()
+    time_lunch_start = datetime.datetime.strptime(TIME_LUNCH_START, '%H::%M::%S').time()
+    time_lunch_end = datetime.datetime.strptime(TIME_LUNCH_END, '%H::%M::%S').time() 
+    time_end = datetime.datetime.strptime(TIME_END, '%H::%M::%S').time()
+
+    currDatetime = presentDate.time()
+    if (currDatetime >= time_start and currDatetime <= time_lunch_start and currDatetime >= time_lunch_end and currDatetime <= time_end):
+        return True
+    else:
+        return False
 
 def compare_data_values(past, curr):
     curr = json.loads(curr)
@@ -45,6 +62,11 @@ def compare_data_values(past, curr):
     for index in range(len(past)):
         if (past[index] == {}):
             return True
+    
+    threshold_bias = 10
+
+    if isWorkHours():
+        threshold_bias = 9.5
     
     tag_coord = {}
     tag_avgs = {}
@@ -79,7 +101,7 @@ def compare_data_values(past, curr):
 
     for key, values in overall_diff.items():
         for value in values:
-            if (value > 9.8):
+            if (value > threshold_bias):
                 return True
     return False
 
@@ -181,5 +203,9 @@ if __name__ == "__main__":
     if (("-d" in sys.argv) or ("--debug" in sys.argv)):
         print("Debug mode: ON")
         DEBUG = True
+
+    conn, cursor = dbfuncs.db_connection()
+    dbfuncs.db_init(cursor)
+    dbfuncs.closeDBConnection(conn)
 
     main(sys.argv[1], sys.argv[2])
