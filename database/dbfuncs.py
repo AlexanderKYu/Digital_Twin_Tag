@@ -85,6 +85,19 @@ def db_init(cursor):
 
     cursor.execute(db_query)
 
+    db_query = """CREATE TABLE IF NOT EXISTS tblwipstatus (
+    WIP INT NOT NULL,
+    QTY INT NOT NULL,
+    TagID VARCHAR(6),
+    Timestamp FLOAT,
+    x FLOAT,
+    y FLOAT,
+    ZoneID INT,
+    CONSTRAINT COMP_NAME PRIMARY KEY (WIP, QTY)
+    )"""
+
+    cursor.execute(db_query)
+
 def define_hard_zones(cursor):
 
     db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
@@ -203,6 +216,10 @@ def delete_all(cursor):
    db_query = "DROP TABLE IF EXISTS tblZoneDef"
 
    cursor.execute(db_query)
+   
+   db_query = "DROP TABLE IF EXISTS tblwipstatus"
+
+   cursor.execute(db_query)
 
 def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
 
@@ -224,6 +241,13 @@ def dbPushTblRawLocations(cursor, WIP, QTY, tagID, timestamp, x, y, zoneID):
 
     db_query = f"""INSERT INTO tblRawLocations (WIP, QTY, tagID, timestamp, x, y, zoneID)
     VALUES ({WIP}, {QTY}, '{tagID}', {timestamp}, {x}, {y}, {zoneID});"""
+    cursor.execute(db_query)
+
+def dbUpdateWipStatus(cursor, WIP, QTY, tagID, timestamp, x, y, zoneID):
+
+    db_query = f"""INSERT INTO tblwipstatus (WIP, QTY, tagID, timestamp, x, y, zoneID)
+    VALUES ({WIP}, {QTY}, '{tagID}', {timestamp}, {x}, {y}, {zoneID}) ON CONFLICT (WIP, QTY) 
+    DO UPDATE SET tagID = '{tagID}', timestamp = {timestamp}, x = {x}, y = {y}, zoneID = {zoneID};"""
     cursor.execute(db_query)
 
 def getActiveTimes(cursor):

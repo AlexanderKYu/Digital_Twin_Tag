@@ -26,20 +26,29 @@ def dict_to_json(dictionary):
 
 def dbTagsPush(tagsJson):
     tagsJson = json.loads(tagsJson)
-
+    conn, cursor = dbfuncs.db_connection()
     for key, values in tagsJson.items():
         parsed_alias = values['alias'].split(".")
-        wip = parsed_alias[0]
-        qty = 0 
+        try:
+            wip = int(parsed_alias[0])
+        except:
+            wip = parsed_alias[0]
+        qty = 0
         if len(parsed_alias) == 2:
-            qty = parsed_alias[1]
+            try:
+                qty = int(parsed_alias[1])
+            except:
+                qty = parsed_alias[1]
+        if (not isinstance(wip, int) or not isinstance(qty, int)):
+            continue
         tagID = key.replace("0x", "")
         timestamp = values['timestamp']
         x = values['x']
         y = values['y']
-        zoneID = dbfuncs.getActiveTagZones(x, y)[0]
+        zoneID = dbfuncs.getActiveTagZones(cursor, x, y)[0]
         dbfuncs.dbPushTblRawLocations(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
-        
+        dbfuncs.dbUpdateWipStatus(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
+    dbfuncs.closeDBConnection(conn)
     return tagsJson
 
 def isWorkHours():
@@ -190,22 +199,25 @@ def main(push_info_file, sample_file):
         pickle.dump(past_tag_values, file)
 
 if __name__ == "__main__":
-    if (("-h" in sys.argv) or ("--help" in sys.argv)):
-        print("Important: Please provide two files.")
-        print("Add two pickle file arguments like: \"push_info.pkl\" and \"samples.pkl\"")
-        print("Flags:")
-        print("-d \ --debug\tUsed to enable debug mode (disabled by default)")
-        exit()
-    elif (len(sys.argv) < 3):
-        print("Expected two arguments: txt and pkl file name")
-        print("Use -h or --help for help")
-        exit()
-    if (("-d" in sys.argv) or ("--debug" in sys.argv)):
-        print("Debug mode: ON")
-        DEBUG = True
+    # if (("-h" in sys.argv) or ("--help" in sys.argv)):
+    #     print("Important: Please provide two files.")
+    #     print("Add two pickle file arguments like: \"push_info.pkl\" and \"samples.pkl\"")
+    #     print("Flags:")
+    #     print("-d \ --debug\tUsed to enable debug mode (disabled by default)")
+    #     exit()
+    # elif (len(sys.argv) < 3):
+    #     print("Expected two arguments: txt and pkl file name")
+    #     print("Use -h or --help for help")
+    #     exit()
+    # if (("-d" in sys.argv) or ("--debug" in sys.argv)):
+    #     print("Debug mode: ON")
+    #     DEBUG = True
 
     conn, cursor = dbfuncs.db_connection()
     dbfuncs.db_init(cursor)
     dbfuncs.closeDBConnection(conn)
 
-    main(sys.argv[1], sys.argv[2])
+    if (len(sys.argv) < 3):
+        main("push_info.pkl", "samples.pkl")
+    else:
+        main(sys.argv[1], sys.argv[2])
