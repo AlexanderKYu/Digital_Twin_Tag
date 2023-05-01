@@ -259,7 +259,7 @@ def getActiveTagZones(cursor, x, y):
         return (1, 'No Zone', 0, 0, 0, 0)
 
 
-def dbPushZoneDef(cursor, ZoneName, x_lower, x_upper y_lower, y_upper, ActiveZone):
+def dbPushZoneDef(cursor, ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone):
 
     db_update_query = f"""UPDATE tblZoneDef SET ActiveZone = False WHERE ZoneName = '{ZoneName}'"""
     cursor.execute(db_update_query)
