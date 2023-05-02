@@ -16,10 +16,16 @@ presentDate = datetime.datetime.now()
 curr_unix_timestamp = datetime.datetime.timestamp(presentDate)
 
 def dict_to_json(dictionary):
+    """Convert the given dictionary to a json
+    the json will be used as a form of communication between 
+    different components and within the cloud"""
     json_object = json.dumps(dictionary, indent = 4)
     print(json_object)
 
 def dbTagsPush(tagsJson):
+    """Function to manipulate the givne tagsJson to be 
+    ready and be pushed into the database for new raw
+    locations data"""
     tagsJson = json.loads(tagsJson)
 
     for key, values in tagsJson.items():
@@ -38,6 +44,11 @@ def dbTagsPush(tagsJson):
     return tagsJson
 
 def compare_data_values(past, curr):
+    """Averaging mechanism used to determine if the 
+    data given is significant enough to be pushed into 
+    the database. The current data (curr) is compared 
+    against the average of the last three samples that 
+    are held in past"""
     curr = json.loads(curr)
     index = 0
 
@@ -89,6 +100,14 @@ def truncateTime():
     return True
 
 def main(push_info_file, sample_file):
+    """The main function that is invoked by the scheduler.
+    The function will take pickle files which hold the 
+    information of the last push information and a file 
+    that holds the last three samples pushed. The main 
+    is responsible for carrying out the functionalities 
+    of the cloud including periodic data pushes,
+    truncating time and removal of the last data points 
+    that are over a year"""
 
     last_active_dump = 0
     last_sleep = 0

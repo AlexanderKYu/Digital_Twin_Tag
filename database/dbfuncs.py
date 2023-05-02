@@ -6,6 +6,8 @@ basedir = path.abspath(path.dirname(path.dirname(__file__)))
 load_dotenv(path.join(basedir, '.env'))
 
 def db_connection():
+    """Establishing a connection with the database.
+    This will return a connection and a cursor variable"""
     conn = ""
     cursor = ""
     try:
@@ -24,6 +26,8 @@ def db_connection():
     return conn, cursor
 
 def closeDBConnection(conn):
+    """Given a connection this function 
+    will close the connection"""
     try:
         conn.close()
     except:
@@ -32,7 +36,8 @@ def closeDBConnection(conn):
     return True
 
 def db_init(cursor):
-    
+    """A function that will initialize the database to ensure
+    needed tables and data exist before executing functions"""
     db_query = """CREATE TABLE IF NOT EXISTS tblOrders (
     WIP INT NOT NULL,
     QTY INT NOT NULL,
@@ -86,7 +91,7 @@ def db_init(cursor):
     cursor.execute(db_query)
 
 def define_hard_zones(cursor):
-
+    """Initialized the hard coded initial zones of the production floor"""
     db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
     VALUES ('No Zone', 0, 0, 0 , 0,True);"""
 
@@ -187,32 +192,33 @@ def define_hard_zones(cursor):
     cursor.execute(db_query)
 
 def delete_all(cursor):
+    """THIS FUNCTION SHOULD NOT BE USED UNLESS NEEDED.
+    Function to delete all the existing tables."""
+    db_query = "DROP TABLE IF EXISTS tblOrders"
 
-   db_query = "DROP TABLE IF EXISTS tblOrders"
+    cursor.execute(db_query)
 
-   cursor.execute(db_query)
+    db_query = "DROP TABLE IF EXISTS tblPaths"
 
-   db_query = "DROP TABLE IF EXISTS tblPaths"
+    cursor.execute(db_query)
 
-   cursor.execute(db_query)
-   
-   db_query = "DROP TABLE IF EXISTS tblRawLocations"
+    db_query = "DROP TABLE IF EXISTS tblRawLocations"
 
-   cursor.execute(db_query)
+    cursor.execute(db_query)
 
-   db_query = "DROP TABLE IF EXISTS tblZoneDef"
+    db_query = "DROP TABLE IF EXISTS tblZoneDef"
 
-   cursor.execute(db_query)
+    cursor.execute(db_query)
 
 def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
-
+    """Function to insert data into the tblOrders table"""
     db_query = f"""INSERT INTO tblOrders (
     {WIP}, {QTY}, '{tagID},' {inProd}, {t_start}, {t_end}, {time_on_floor}, {build_time}, {lastZone}, {zoneName} 
     );"""
     cursor.execute(db_query)
 
 def dbPushTblPaths(cursor, WIP, QTY, tagID, zoneID, zoneName, time):
-
+    """Function to insert data into the tblPaths table"""
     db_query = f"""INSERT INTO tblPaths (
     {WIP}, {QTY}, '{tagID}', {zoneID}, '{zoneName}', {time}
     );"""
@@ -221,21 +227,23 @@ def dbPushTblPaths(cursor, WIP, QTY, tagID, zoneID, zoneName, time):
 
 
 def dbPushTblRawLocations(cursor, WIP, QTY, tagID, timestamp, x, y, zoneID):
-
+    """Function to insert data into the tblRawLocations table"""
     db_query = f"""INSERT INTO tblRawLocations (WIP, QTY, tagID, timestamp, x, y, zoneID)
     VALUES ({WIP}, {QTY}, '{tagID}', {timestamp}, {x}, {y}, {zoneID});"""
     cursor.execute(db_query)
 
-def getActiveTimes(cursor):
-   db_query = """SELECT loctime FROM tag_threshold
-                 WHERE overallx > 9.8 OR overally > 9.8 OR overallz > 9.8;"""
-   cursor.execute(db_query)
+# def getActiveTimes(cursor):
+#    """Function to get all the entires where sample movement is over 9.8.
+#    This function is deprecated and is not needed in production"""
+#    db_query = """SELECT loctime FROM tag_threshold
+#                  WHERE overallx > 9.8 OR overally > 9.8 OR overallz > 9.8;"""
+#    cursor.execute(db_query)
 
-   data = cursor.fetchall()
-   return data
+#    data = cursor.fetchall()
+#    return data
 
 def getActiveZones(cursor):
-
+    """Function to get all the active zones that are being used"""
     db_query = """SELECT * FROM tblzonedef WHERE activezone = true;"""
 
     cursor.execute(db_query)
@@ -245,7 +253,7 @@ def getActiveZones(cursor):
     return data
 
 def getActiveTagZones(cursor, x, y):
-
+    """Function to determine which zone a tag is in based on its coordinates"""
     db_query = f"""SELECT * FROM tblzonedef 
     WHERE activezone = true AND tblzonedef.x_lower <= {x} AND tblzonedef.x_upper >= {x} 
     AND tblzonedef.y_lower <= {y} AND tblzonedef.y_upper >= {y};"""
@@ -260,7 +268,7 @@ def getActiveTagZones(cursor, x, y):
 
 
 def dbPushZoneDef(cursor, ZoneName, x_lower, x_upper, y_lower, y_upper):
-
+    """Function to 'upsert' zoning information"""
     db_update_query = f"""UPDATE tblZoneDef SET ActiveZone = False WHERE ZoneName = '{ZoneName}'"""
     cursor.execute(db_update_query)
 
@@ -270,5 +278,6 @@ def dbPushZoneDef(cursor, ZoneName, x_lower, x_upper, y_lower, y_upper):
 
 
 def disableZoneDef(cursor, ZoneName):
+    """Function to disable a zone definition"""
     db_update_query = f"""UPDATE tblZoneDef SET ActiveZone = False WHERE ZoneName = '{ZoneName}'"""
     cursor.execute(db_update_query)
