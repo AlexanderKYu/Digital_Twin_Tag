@@ -28,6 +28,9 @@ def dbTagsPush(tagsJson):
     tagsJson = json.loads(tagsJson)
     conn, cursor = dbfuncs.db_connection()
     for key, values in tagsJson.items():
+
+        if (values['alias'] == "Not Associated"):
+            continue
         parsed_alias = values['alias'].split(".")
         try:
             wip = int(parsed_alias[0])
