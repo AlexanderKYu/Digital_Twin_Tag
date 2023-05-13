@@ -28,9 +28,11 @@ def dbTagsPush(tagsJson):
     tagsJson = json.loads(tagsJson)
     conn, cursor = dbfuncs.db_connection()
     for key, values in tagsJson.items():
-
-        if (values['alias'] == "Not Associated"):
-            continue
+        tagID = key.replace("0x", "")
+        timestamp = values['timestamp']
+        x = values['x']
+        y = values['y']
+        zoneID = dbfuncs.getActiveTagZones(cursor, x, y)[0]
         parsed_alias = values['alias'].split(".")
         try:
             wip = int(parsed_alias[0])
@@ -43,12 +45,14 @@ def dbTagsPush(tagsJson):
             except:
                 qty = parsed_alias[1]
         if (not isinstance(wip, int) or not isinstance(qty, int)):
+            lastWip, lastQty = dbfuncs.getLastInProdWIPBasedOnTagId(cursor, tagID)
+            dbfuncs.setWIPInProd(cursor, lastWip, lastQty, False)
+            dbfuncs.setProdEndTime(cursor, lastWip, lastQty, timestamp)
             continue
-        tagID = key.replace("0x", "")
-        timestamp = values['timestamp']
-        x = values['x']
-        y = values['y']
-        zoneID = dbfuncs.getActiveTagZones(cursor, x, y)[0]
+        if (dbfuncs.checkIfNewWIP(cursor, wip, qty)):
+            zoneName = dbfuncs.getZoneName(cursor, zoneID)
+            dbfuncs.dbPushTblOrders(cursor, wip, qty, tagID, True, timestamp, 0, 0, 0, zoneID, zoneName)
+        
         dbfuncs.dbPushTblRawLocations(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
         dbfuncs.dbUpdateWipStatus(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
     dbfuncs.closeDBConnection(conn)
