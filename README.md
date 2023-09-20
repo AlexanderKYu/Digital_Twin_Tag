@@ -2,22 +2,26 @@
 Capstone Project for Team 33
 
 ## Description
-The Digital Twin Tag (DTT) is a project designed to gather information on components using the tag to build a digitalized twin. The project is an all in one real-time system used to monitor different components.
+The Digital Twin Tag (DTT) is a project designed to gather information on components using the tag to build a digitalized twin. The project is an all in one real-time system used to monitor different components. By tagging different entities the user is able to gather insightful information about the entities positioning within a designated area. The information can then be analysed based on the user's preferences and needs.
 
 ## Team Members
-|Name|Student Number|
-|-|-|
-|Alexander Yu|300120635|
-|Gabriel Beaupré-Jacques|300119485|
-|Alexis Verana|300116080|
-|Alois Clerc|300070936|
-|Sonya Patel|300124330|
+|Name|Student Number|Role|
+|-|-|-|
+|Alexander Yu|300120635|Backend/Cloud|
+|Gabriel Beaupré-Jacques|300119485|Server|
+|Alexis Verana|300116080|Frontend|
+|Alois Clerc|300070936|Full Stack|
+|Sonya Patel|300124330|Full Stack|
 
 ## Technologies Used
 * Eliko Ultra-Wideband Real-Time Location System (UWB RTLS)
 * Python
   * Matplotlib
   * PyQT5
+
+## Other Tools
+* Jira
+* AWS RDS
 
 ## Objectives
 
