@@ -5,9 +5,8 @@ import AllTag from "./TagAll.js";
 import ZoneRow from "./ZoneRow.js";
 import ZoneRowB from "./ZoneRowB.js";
 import FloorMap from "./FloorMap.js";
-import { sampleData } from "./SampleData";
 
-export default function Dashbooard() {
+export default function Dashbooard({tagData}) {
   return (
     <>
       <Flex align="center" mt={0} bg="black" color="white">
@@ -21,7 +20,7 @@ export default function Dashbooard() {
                   FLOOR MAP
                 </Text>
                 <Box bg="white" borderRadius={20} pr={8} pb={8} pl={2} pt={2}>
-                <FloorMap tagData={sampleData}></FloorMap>
+                <FloorMap tagData={tagData}></FloorMap>
                 </Box>
               </Box>
               {/* ZONES */}
@@ -46,7 +45,7 @@ export default function Dashbooard() {
                 <Text color="white" fontSize="5xl" mb={2}>
                   TAGS
                 </Text>
-                <AllTag></AllTag>
+                <AllTag tagData={tagData}></AllTag>
               </Box>
 
               {/* ZONES */}

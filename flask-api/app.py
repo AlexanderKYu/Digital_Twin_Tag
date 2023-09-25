@@ -40,7 +40,6 @@ def emit_tag_data():
         tagJson = json.loads(tagJson)
 
         s.close()
-
         socketio.emit("getTags",tagJson,broadcast=True)
 
 scheduler = BackgroundScheduler()
