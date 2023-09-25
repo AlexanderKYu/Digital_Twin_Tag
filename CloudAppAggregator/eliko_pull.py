@@ -206,20 +206,6 @@ def main(push_info_file, sample_file):
         pickle.dump(past_tag_values, file)
 
 if __name__ == "__main__":
-    # if (("-h" in sys.argv) or ("--help" in sys.argv)):
-    #     print("Important: Please provide two files.")
-    #     print("Add two pickle file arguments like: \"push_info.pkl\" and \"samples.pkl\"")
-    #     print("Flags:")
-    #     print("-d \ --debug\tUsed to enable debug mode (disabled by default)")
-    #     exit()
-    # elif (len(sys.argv) < 3):
-    #     print("Expected two arguments: txt and pkl file name")
-    #     print("Use -h or --help for help")
-    #     exit()
-    # if (("-d" in sys.argv) or ("--debug" in sys.argv)):
-    #     print("Debug mode: ON")
-    #     DEBUG = True
-
     conn, cursor = dbfuncs.db_connection()
     dbfuncs.db_init(cursor)
     dbfuncs.closeDBConnection(conn)
