@@ -25,9 +25,6 @@ export default function Dashbooard() {
                 </Box>
               </Box>
               {/* ZONES */}
-              <Box p={10} borderColor="white" borderWidth={2} borderRadius={20}>
-                <ZoneRow></ZoneRow>
-              </Box>
             </Box>
             <Box
               flex="1"
@@ -53,9 +50,6 @@ export default function Dashbooard() {
               </Box>
 
               {/* ZONES */}
-              <Box p={10} borderColor="white" borderWidth={2} borderRadius={20}>
-                <ZoneRowB></ZoneRowB>
-              </Box>
             </Box>
           </Flex>
         </Box>

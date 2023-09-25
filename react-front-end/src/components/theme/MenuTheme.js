@@ -15,11 +15,17 @@ const baseStyle = definePartsStyle({
   },
   list: {
     // this will style the MenuList component
-    py: "10",
+    py: "5",
     borderRadius: "0",
     border: "none",
     bg: "black",
-    //outlineColor: "grey",
+    minWidth:'120px',
+    borderWidth: '10px',
+    border: 'solid',
+    borderRightColor: 'white',
+    borderLeftColor: 'black',
+    borderTopColor: 'black',
+    borderBottomColor: 'black',
   },
   item: {
     // this will style the MenuItem and MenuItemOption components

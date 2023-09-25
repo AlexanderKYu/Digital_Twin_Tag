@@ -1,5 +1,11 @@
 import { ReactNode } from "react";
 import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link as RouteLink
+} from "react-router-dom";
+import {
   Box,
   useDisclosure,
   Image,
@@ -12,6 +18,8 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+
+
 
 export default function Nav() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -36,7 +44,22 @@ export default function Nav() {
                   {isOpen ? <CloseIcon /> : <HamburgerIcon />}
                 </MenuButton>
 
-                <MenuList></MenuList>
+                <MenuList>
+                  <RouteLink to="/">
+                  <MenuItem> 
+                    Production
+                  </MenuItem> 
+                  </RouteLink>
+                  <RouteLink to="/dashboard">
+                  <MenuItem> 
+                    Dashboard
+                  </MenuItem> 
+                  </RouteLink>
+                </MenuList>
+
+
+
+
               </>
             )}
           </Menu>

@@ -8,9 +8,13 @@ import {
   Alert,
   Button,
   InputRightElement,
+  Center,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import TagData from "./WipRow.js";
+import theme from "./theme/Theme"
+import { ChakraProvider } from '@chakra-ui/react'
+import Nav from "./Nav";
 
 export default function WIP() {
   const [tag, setTag] = useState("");
@@ -125,7 +129,8 @@ export default function WIP() {
   };
 
   return (
-    <>
+    <ChakraProvider theme={theme}>
+      <Nav></Nav>
       {confirmation && !status && (
         <Alert status="success" variant="solid" fontFamily="Arial" bg="#a3142e">
           {confirmation}
@@ -137,9 +142,9 @@ export default function WIP() {
         </Alert>
       )}
       <Flex align="center" mt={0} bg="black" color="white">
-        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box>
-        <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="black">
-          <Flex align="center" mt={0} bg="black" color="white">
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box> {/* left border */}
+        <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="black"> {/* all middle */}
+          <Flex align="center" mt={0} bg="black" color="white"> {/* flex for middle */}
             <Box
               flex="1"
               flexGrow="0.5"
@@ -149,11 +154,12 @@ export default function WIP() {
               pl={20}
               pr={20}
               bg="black"
+              align="center"
               borderRight="solid"
               border-color="white"
               border-width="4px"
-            >
-              <Text fontSize="5xl">TAG</Text>
+            > {/* left side */}
+              <Text fontSize="5xl" textAlign="center">TAG</Text>
 
               <InputGroup>
                 <Input
@@ -191,7 +197,7 @@ export default function WIP() {
                   </InputRightElement>
                 )}
               </InputGroup>
-              <Text fontSize="5xl">WIP</Text>
+              <Text fontSize="5xl" textAlign="center">WIP</Text>
 
               <Input
                 variant="wipInput"
@@ -219,8 +225,8 @@ export default function WIP() {
               pl={20}
               pr={20}
               bg="black"
-            >
-              <Text fontSize="5xl">SEARCH / RECHERCHE</Text>
+            > {/* right side */}
+              <Text fontSize="5xl" textAlign="center">SEARCH / RECHERCHE</Text>
               <InputGroup>
                 <Input variant="wipInput" type="" placeholder="" />
               </InputGroup>
@@ -230,8 +236,8 @@ export default function WIP() {
             </Box>
           </Flex>
         </Box>
-        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box>
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box> {/* right border */}
       </Flex>
-    </>
+      </ChakraProvider>
   );
 }

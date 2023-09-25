@@ -44,13 +44,10 @@ function App() {
 
   return (
     <ChakraProvider theme={theme}>
-      <div className="App">
-        <Nav></Nav>
+      <div className="App">  
+        <Nav></Nav>   
         <Dashboard tagData={tagData}></Dashboard>  
-        <WIP></WIP>    
-
-    </div>
-    
+      </div>
     </ChakraProvider>
   );
 }
