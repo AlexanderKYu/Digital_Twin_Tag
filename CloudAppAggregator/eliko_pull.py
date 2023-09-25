@@ -15,27 +15,60 @@ DEBUG = False
 presentDate = datetime.datetime.now()
 curr_unix_timestamp = datetime.datetime.timestamp(presentDate)
 
+TIME_START = "7::00::00"
+TIME_LUNCH_START = "11::00::00"
+TIME_LUNCH_END = "13::00::00"
+TIME_END = "16::00::00"
+
 def dict_to_json(dictionary):
     json_object = json.dumps(dictionary, indent = 4)
     print(json_object)
 
 def dbTagsPush(tagsJson):
     tagsJson = json.loads(tagsJson)
-
+    conn, cursor = dbfuncs.db_connection()
     for key, values in tagsJson.items():
-        parsed_alias = values['alias'].split(".")
-        wip = parsed_alias[0]
-        qty = 0 
-        if len(parsed_alias) == 2:
-            qty = parsed_alias[1]
         tagID = key.replace("0x", "")
         timestamp = values['timestamp']
         x = values['x']
         y = values['y']
-        zoneID = 1 # will need to be configured later
-        dbfuncs.dbPushTblRawLocations(wip, qty, tagID, timestamp, x, y, zoneID)
+        zoneID = dbfuncs.getActiveTagZones(cursor, x, y)[0]
+        parsed_alias = values['alias'].split(".")
+        try:
+            wip = int(parsed_alias[0])
+        except:
+            wip = parsed_alias[0]
+        qty = 0
+        if len(parsed_alias) == 2:
+            try:
+                qty = int(parsed_alias[1])
+            except:
+                qty = parsed_alias[1]
+        if (not isinstance(wip, int) or not isinstance(qty, int)):
+            lastWip, lastQty = dbfuncs.getLastInProdWIPBasedOnTagId(cursor, tagID)
+            dbfuncs.setWIPInProd(cursor, lastWip, lastQty, False)
+            dbfuncs.setProdEndTime(cursor, lastWip, lastQty, timestamp)
+            continue
+        if (dbfuncs.checkIfNewWIP(cursor, wip, qty)):
+            zoneName = dbfuncs.getZoneName(cursor, zoneID)
+            dbfuncs.dbPushTblOrders(cursor, wip, qty, tagID, True, timestamp, 0, 0, 0, zoneID, zoneName)
         
+        dbfuncs.dbPushTblRawLocations(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
+        dbfuncs.dbUpdateWipStatus(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
+    dbfuncs.closeDBConnection(conn)
     return tagsJson
+
+def isWorkHours():
+    time_start = datetime.datetime.strptime(TIME_START, '%H::%M::%S').time()
+    time_lunch_start = datetime.datetime.strptime(TIME_LUNCH_START, '%H::%M::%S').time()
+    time_lunch_end = datetime.datetime.strptime(TIME_LUNCH_END, '%H::%M::%S').time() 
+    time_end = datetime.datetime.strptime(TIME_END, '%H::%M::%S').time()
+
+    currDatetime = presentDate.time()
+    if (currDatetime >= time_start and currDatetime <= time_lunch_start and currDatetime >= time_lunch_end and currDatetime <= time_end):
+        return True
+    else:
+        return False
 
 def compare_data_values(past, curr):
     curr = json.loads(curr)
@@ -45,6 +78,11 @@ def compare_data_values(past, curr):
     for index in range(len(past)):
         if (past[index] == {}):
             return True
+    
+    threshold_bias = 10
+
+    if isWorkHours():
+        threshold_bias = 9.5
     
     tag_coord = {}
     tag_avgs = {}
@@ -79,7 +117,7 @@ def compare_data_values(past, curr):
 
     for key, values in overall_diff.items():
         for value in values:
-            if (value > 9.8):
+            if (value > threshold_bias):
                 return True
     return False
 
@@ -168,18 +206,11 @@ def main(push_info_file, sample_file):
         pickle.dump(past_tag_values, file)
 
 if __name__ == "__main__":
-    if (("-h" in sys.argv) or ("--help" in sys.argv)):
-        print("Important: Please provide two files.")
-        print("Add two pickle file arguments like: \"push_info.pkl\" and \"samples.pkl\"")
-        print("Flags:")
-        print("-d \ --debug\tUsed to enable debug mode (disabled by default)")
-        exit()
-    elif (len(sys.argv) < 3):
-        print("Expected two arguments: txt and pkl file name")
-        print("Use -h or --help for help")
-        exit()
-    if (("-d" in sys.argv) or ("--debug" in sys.argv)):
-        print("Debug mode: ON")
-        DEBUG = True
+    conn, cursor = dbfuncs.db_connection()
+    dbfuncs.db_init(cursor)
+    dbfuncs.closeDBConnection(conn)
 
-    main(sys.argv[1], sys.argv[2])
+    if (len(sys.argv) < 3):
+        main("push_info.pkl", "samples.pkl")
+    else:
+        main(sys.argv[1], sys.argv[2])
