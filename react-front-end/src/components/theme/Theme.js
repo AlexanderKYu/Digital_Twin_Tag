@@ -19,7 +19,6 @@ const theme = extendTheme({
     Button,
     Input,
     Accordion,
-    
   }
 })
 
