@@ -13,6 +13,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 sys.path.append('..')
 
 from Eliko import JSON_eliko_call
+from CloudAppAggregator import eliko_pull
 
 clients = 0
 
@@ -44,6 +45,8 @@ def emit_tag_data():
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
+
+eliko_pull.temp_unified("Here1", "Here2")
 
 @app.route("/link-wip", methods=['POST'])
 def link_wip():
