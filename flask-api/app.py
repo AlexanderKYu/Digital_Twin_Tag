@@ -45,8 +45,7 @@ def emit_tag_data():
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
-
-eliko_pull.temp_unified("Here1", "Here2")
+scheduler.add_job(func=eliko_pull.temp_unified("Here1", "Here2"), trigger="interval", seconds=300)
 
 @app.route("/link-wip", methods=['POST'])
 def link_wip():
