@@ -44,8 +44,11 @@ def emit_tag_data():
         socketio.emit("getTags",tagJson,broadcast=True)
 
 scheduler = BackgroundScheduler()
+aggregator_scheduler = BackgroundScheduler()
 scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
-scheduler.add_job(func=eliko_pull.temp_unified("Here1", "Here2"), trigger="interval", seconds=300)
+aggregator_scheduler.add_job(func=eliko_pull.temp_unified("Here1", "Here2"), trigger="interval", seconds=300)
+if(not(aggregator_scheduler.running)):
+        aggregator_scheduler.start()
 
 @app.route("/link-wip", methods=['POST'])
 def link_wip():
