@@ -205,11 +205,6 @@ def main(push_info_file, sample_file):
     with open(sample_file, "wb") as file:
         pickle.dump(past_tag_values, file)
 
-
-def temp_unified(string1, string2):
-    print("Here in temp_unified")
-    print(string1, string2)
-
 if __name__ == "__main__":
     conn, cursor = dbfuncs.db_connection()
     dbfuncs.db_init(cursor)
