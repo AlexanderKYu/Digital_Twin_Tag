@@ -43,10 +43,13 @@ def emit_tag_data():
         s.close()
         socketio.emit("getTags",tagJson,broadcast=True)
 
+def invoke_eliko_pull_api():
+    eliko_pull.main("push_info.pkl", "samples.pkl")
+
 scheduler = BackgroundScheduler()
 aggregator_scheduler = BackgroundScheduler()
 scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
-aggregator_scheduler.add_job(func=eliko_pull.temp_unified("Here1", "Here2"), trigger="interval", seconds=300)
+aggregator_scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=1)
 if(not(aggregator_scheduler.running)):
         aggregator_scheduler.start()
 
