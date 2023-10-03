@@ -129,8 +129,7 @@ export default function WIP() {
   };
 
   return (
-    <ChakraProvider theme={theme}>
-      <Nav></Nav>
+    <>
       {confirmation && !status && (
         <Alert status="success" variant="solid" fontFamily="Arial" bg="#a3142e">
           {confirmation}
@@ -238,6 +237,6 @@ export default function WIP() {
         </Box>
         <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box> {/* right border */}
       </Flex>
-      </ChakraProvider>
+      </>
   );
 }

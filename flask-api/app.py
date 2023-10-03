@@ -29,22 +29,31 @@ socketio.init_app(app)
 
 def emit_tag_data():
     with app.test_request_context('/'):
-        TCP_IP = environ.get('TCP_IP')
-        TCP_PORT = int(environ.get('TCP_PORT'))
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(3)
+        try:
+            TCP_IP = environ.get('TCP_IP')
+            TCP_PORT = int(environ.get('TCP_PORT'))
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(3)
 
-        s.connect((TCP_IP, TCP_PORT))
+            s.connect((TCP_IP, TCP_PORT))
 
-        #getting battery status of tag
-        tagJson = JSON_eliko_call.getTags(s)
-        tagJson = json.loads(tagJson)
+            #getting battery status of tag
+            tagJson = JSON_eliko_call.getTags(s)
+            tagJson = json.loads(tagJson)
 
-        s.close()
-        socketio.emit("getTags",tagJson,broadcast=True)
+            s.close()
+            socketio.emit("getTags",tagJson,broadcast=True)
+        except:
+            socketio.emit("serverDown", {'status': True, 'message': "Eliko Unreachable"}, broadcast=True)
+        
 
 def invoke_eliko_pull_api():
-    eliko_pull.main("push_info.pkl", "samples.pkl")
+    print("cloud aggregator pulled")
+    try:
+        eliko_pull.main("push_info.pkl", "samples.pkl")
+        socketio.emit("serverDown", {'status': False, 'message': ""}, broadCast=True)
+    except:
+        socketio.emit("serverDown", {'status': True, 'message': "Database Unreachable"}, broadcast=True)
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10, id="emit_tag_data")
@@ -152,16 +161,10 @@ def connected():
     clients+=1
     print(request.sid)
     print("client has connected")
-    print_jobs()
+    scheduler.print_jobs()
     scheduler.resume_job("emit_tag_data")
 
     emit("connect",{"data":f"id: {request.sid} is connected"})
-
-@socketio.on('data')
-def handle_data(data):
-    """event listener when client types a message"""
-    print("data from the front end: ",str(data))
-    emit("data",{'data':data,'id':request.sid},broadcast=True)
 
 @socketio.on("disconnect")
 def disconnected():
