@@ -49,7 +49,7 @@ def invoke_eliko_pull_api():
 scheduler = BackgroundScheduler()
 aggregator_scheduler = BackgroundScheduler()
 scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
-aggregator_scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=1)
+aggregator_scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=5)
 if(not(aggregator_scheduler.running)):
         aggregator_scheduler.start()
 
