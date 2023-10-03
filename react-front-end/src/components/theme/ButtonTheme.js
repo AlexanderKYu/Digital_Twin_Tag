@@ -31,11 +31,13 @@ export const buttonTheme = defineStyleConfig({
     tagBtn: {
       bg: "black",
       color: "white",
-      fontSize: "sm",
-      width:"500px",
+      fontSize: "xl",
+      letterSpacing: "1.5px",
       borderRadius: 150,
       outlineColor: "black",
       outlineOffset: "2",
+      pl: "12",
+      pr: "12",
       _hover: {
           bg: "black",
           outlineColor: "#009cd9",

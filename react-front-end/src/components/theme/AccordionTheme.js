@@ -32,7 +32,7 @@ const outline = definePartsStyle((props) => {
       borderRadius: "50",
       letterSpacing: "1",
       p: "4",
-      mb: "5",
+      mb: "3",
       _hover: {
         bg: "white",
         borderRadius: "50",
@@ -49,8 +49,8 @@ const outline = definePartsStyle((props) => {
     },
     panel: {
       bg: "white",
-      borderRadius: "50",
-      p: "4",
+      borderRadius: "30",
+      p: "5",
       mb: "5",
     },
     icon: {

@@ -4,8 +4,6 @@ import { ArrowForwardIcon } from "@chakra-ui/icons";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { useState } from 'react';
 import AllTag from "./TagAll.js";
-import ZoneRow from "./ZoneRow.js";
-import ZoneRowB from "./ZoneRowB.js";
 import FloorMap from "./FloorMap.js";
 import theme from "./theme/Theme"
 
