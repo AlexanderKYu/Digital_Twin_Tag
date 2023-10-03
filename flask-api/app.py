@@ -47,11 +47,13 @@ def invoke_eliko_pull_api():
     eliko_pull.main("push_info.pkl", "samples.pkl")
 
 scheduler = BackgroundScheduler()
-aggregator_scheduler = BackgroundScheduler()
-scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
-aggregator_scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=5)
-if(not(aggregator_scheduler.running)):
-        aggregator_scheduler.start()
+scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10, id="emit_tag_data")
+scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=5)
+
+if(not(scheduler.running)):
+    scheduler.start()
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
 
 @app.route("/link-wip", methods=['POST'])
 def link_wip():
@@ -150,11 +152,9 @@ def connected():
     clients+=1
     print(request.sid)
     print("client has connected")
-    if(not(scheduler.running)):
-        scheduler.start()
+    print_jobs()
+    scheduler.resume_job("emit_tag_data")
 
-    # Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
 @socketio.on('data')
@@ -170,7 +170,7 @@ def disconnected():
     clients-=1
     if(clients == 0):
         print("Last User Disconnected")
-        scheduler.shutdown()
+        scheduler.pause_job("emit_tag_data")
     print("user disconnected")
     emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
 
