@@ -13,6 +13,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 sys.path.append('..')
 
 from Eliko import JSON_eliko_call
+from CloudAppAggregator import eliko_pull
 
 clients = 0
 
@@ -28,22 +29,40 @@ socketio.init_app(app)
 
 def emit_tag_data():
     with app.test_request_context('/'):
-        TCP_IP = environ.get('TCP_IP')
-        TCP_PORT = int(environ.get('TCP_PORT'))
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(3)
+        try:
+            TCP_IP = environ.get('TCP_IP')
+            TCP_PORT = int(environ.get('TCP_PORT'))
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(3)
 
-        s.connect((TCP_IP, TCP_PORT))
+            s.connect((TCP_IP, TCP_PORT))
 
-        #getting battery status of tag
-        tagJson = JSON_eliko_call.getTags(s)
-        tagJson = json.loads(tagJson)
+            #getting battery status of tag
+            tagJson = JSON_eliko_call.getTags(s)
+            tagJson = json.loads(tagJson)
 
-        s.close()
-        socketio.emit("getTags",tagJson,broadcast=True)
+            s.close()
+            socketio.emit("getTags",tagJson,broadcast=True)
+        except:
+            socketio.emit("serverDown", {'status': True, 'message': "Eliko Unreachable"}, broadcast=True)
+        
+
+def invoke_eliko_pull_api():
+    print("cloud aggregator pulled")
+    try:
+        eliko_pull.main("push_info.pkl", "samples.pkl")
+        socketio.emit("serverDown", {'status': False, 'message': ""}, broadCast=True)
+    except:
+        socketio.emit("serverDown", {'status': True, 'message': "Database Unreachable"}, broadcast=True)
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10)
+scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10, id="emit_tag_data")
+scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=5)
+
+if(not(scheduler.running)):
+    scheduler.start()
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
 
 @app.route("/link-wip", methods=['POST'])
 def link_wip():
@@ -142,18 +161,10 @@ def connected():
     clients+=1
     print(request.sid)
     print("client has connected")
-    if(not(scheduler.running)):
-        scheduler.start()
+    scheduler.print_jobs()
+    scheduler.resume_job("emit_tag_data")
 
-    # Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())
     emit("connect",{"data":f"id: {request.sid} is connected"})
-
-@socketio.on('data')
-def handle_data(data):
-    """event listener when client types a message"""
-    print("data from the front end: ",str(data))
-    emit("data",{'data':data,'id':request.sid},broadcast=True)
 
 @socketio.on("disconnect")
 def disconnected():
@@ -162,7 +173,7 @@ def disconnected():
     clients-=1
     if(clients == 0):
         print("Last User Disconnected")
-        scheduler.shutdown()
+        scheduler.pause_job("emit_tag_data")
     print("user disconnected")
     emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
 
