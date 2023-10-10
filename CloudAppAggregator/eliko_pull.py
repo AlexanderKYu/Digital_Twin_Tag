@@ -83,11 +83,6 @@ def compare_data_values(past, curr):
                 return True
     return False
 
-def truncateTime():
-    # when the last three pushes were on sleep mode then truncate
-    # the frequency times 3
-    return True
-
 def main(push_info_file, sample_file):
 
     last_active_dump = 0
