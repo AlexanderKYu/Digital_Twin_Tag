@@ -1,5 +1,11 @@
 import { ReactNode } from "react";
 import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link as RouteLink
+} from "react-router-dom";
+import {
   Box,
   useDisclosure,
   Image,
@@ -12,6 +18,8 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+
+
 
 export default function Nav() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -37,11 +45,21 @@ export default function Nav() {
                 </MenuButton>
 
                 <MenuList>
-                  <MenuItem>New Tab</MenuItem>
-                  <MenuItem>New Window</MenuItem>
-                  <MenuItem>Open Closed Tab</MenuItem>
-                  <MenuItem>Open File...</MenuItem>
+                  <RouteLink to="/">
+                  <MenuItem> 
+                    Production
+                  </MenuItem> 
+                  </RouteLink>
+                  <RouteLink to="/dashboard">
+                  <MenuItem> 
+                    Dashboard
+                  </MenuItem> 
+                  </RouteLink>
                 </MenuList>
+
+
+
+
               </>
             )}
           </Menu>
@@ -53,7 +71,7 @@ export default function Nav() {
               boxSize="150px"
               src="/bauerLogo.png"
               alt="Bauer Logo"
-            />  
+            />
           </AspectRatio>
         </Box>
       </HStack>
