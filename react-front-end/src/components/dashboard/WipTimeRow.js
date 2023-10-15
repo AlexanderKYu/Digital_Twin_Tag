@@ -13,6 +13,7 @@ import {
   Td,
   TableCaption,
   TableContainer,
+  Input,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 
@@ -25,7 +26,7 @@ export default function WipTimeRow(props) {
             <Tr>
               <Th>WIP</Th>
               <Th>Start Time</Th>
-              <Th>Last Seen</Th>
+              <Th>End Time</Th>
               <Th></Th>
             </Tr>
           </Thead>
@@ -33,20 +34,20 @@ export default function WipTimeRow(props) {
             <Tr>
               <Td>00000</Td>
               <Td>00000</Td>
-              <Td>00000</Td>
-              <Td><Button variant="editBtn">Edit End Time</Button></Td>
+              <Td><Input variant='endTimeInput' placeholder='Input End Time'/></Td>
+              <Td><Button variant="editBtn">Submit</Button></Td>
             </Tr>
             <Tr>
               <Td>00000</Td>
               <Td>00000</Td>
-              <Td>00000</Td>
-              <Td>Edit</Td>
+              <Td><Input variant='endTimeInput' placeholder='Input End Time'/></Td>
+              <Td><Button variant="editBtn">Submit</Button></Td>
             </Tr>
             <Tr>
               <Td>00000</Td>
               <Td>00000</Td>
-              <Td>00000</Td>
-              <Td>Edit</Td>
+              <Td><Input variant='endTimeInput' placeholder='Input End Time'/></Td>
+              <Td><Button variant="editBtn">Submit</Button></Td>
             </Tr>
           </Tbody>
         </Table>
