@@ -8,8 +8,8 @@ import chakraTheme from '@chakra-ui/theme'
 import '@fontsource/antonio/500.css'
 import theme from "./components/theme/Theme"
 import Nav from "./components/Nav";
-import WIP from "./components/WIP";
-import Dashboard from "./components/Dashboard.js";
+import WIP from "./components/production/WIP";
+import Dashboard from "./components/dashboard/Dashboard.js";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   Alert,

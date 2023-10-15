@@ -48,6 +48,29 @@ const wipInput = definePartsStyle((props) => {
   }
 })
 
+const endTimeInput = definePartsStyle((props) => {
+  return {
+    field: {
+        bg: "none",
+        color: "whitw",
+        fontSize: "16px",
+        borderRadius: "150",
+        borderWidth: "1px",
+        borderColor: "grey.20",
+        letterSpacing:"1.5",
+        width: "150px",
+        textAlign:"center",
+        _focus: {
+          borderStyle: "none",
+          borderColor: "white",
+          outlineColor: "#009cd9",
+          outlineWidth: 3,
+          outlineOffset: 2,
+      },
+    }
+  }
+})
+
 const variantFilled = definePartsStyle((props) => {
   return {
     field: {
@@ -115,6 +138,7 @@ const variants = {
   wipInput: wipInput,
   filled: variantFilled,
   custom: variantCustom,
+  endTimeInput: endTimeInput,
 }
 
 const size = {

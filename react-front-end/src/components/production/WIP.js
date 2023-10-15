@@ -12,9 +12,9 @@ import {
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import TagData from "./WipRow.js";
-import theme from "./theme/Theme"
+import theme from "../theme/Theme.js"
 import { ChakraProvider } from '@chakra-ui/react'
-import Nav from "./Nav";
+import Nav from "../Nav.js";
 
 export default function WIP() {
   const [tag, setTag] = useState("");
