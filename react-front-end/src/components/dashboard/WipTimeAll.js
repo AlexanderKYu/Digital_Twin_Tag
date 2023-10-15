@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { Box, Flex, Accordion } from "@chakra-ui/react";
-import TagRow from "./TagRow.js";
+import WipTime from "./WipTimeRow.js";
 
-export default function TagAll({ tagData }) {
+export default function WipTimeAll({ tagData }) {
   const tagKeys = Object.keys(tagData);
   console.log(tagData);
 
@@ -10,7 +10,7 @@ export default function TagAll({ tagData }) {
     <>
       <Accordion variant="outline" defaultIndex={[-1]} allowMultiple>
         {tagKeys.map((key) => (
-          <TagRow key={key} tagId={key} tag={tagData[key]}></TagRow>
+          <WipTime key={key} tagId={key} tag={tagData[key]}></WipTime>
         ))}
       </Accordion>
     </>

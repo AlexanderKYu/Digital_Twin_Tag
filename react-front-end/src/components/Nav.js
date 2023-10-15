@@ -56,10 +56,6 @@ export default function Nav() {
                   </MenuItem> 
                   </RouteLink>
                 </MenuList>
-
-
-
-
               </>
             )}
           </Menu>

@@ -19,6 +19,37 @@ const theme = extendTheme({
     Button,
     Input,
     Accordion,
+    Table: {
+      variants: {
+        wipTable: {
+          thead: { 
+            tr: { 
+              background: "#0d1117",
+            },
+            th: {
+              fontSize:"17px",
+              fontWeight: "light",
+              letterSpacing: "1px",
+            }
+          },
+          tbody: { 
+            fontFamily: "arial",
+            letterSpacing: "1px",
+            tr: { 
+              _odd: {
+                background: "#21262d",
+              },
+
+            },
+            
+          },
+          tr: {
+            
+            
+          },
+        }
+      }
+    }
   }
 })
 

@@ -34,7 +34,6 @@ function App() {
   useEffect(() => {
       // create websocket/connect
       socket = io();
-      setTagData(sampleData);
 
       socket.on("getTags", (data) => {
         //set newly recieved tag data to tagData state variable

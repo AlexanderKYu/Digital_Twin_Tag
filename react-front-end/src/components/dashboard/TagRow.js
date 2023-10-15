@@ -34,18 +34,18 @@ export default function TagRow(props) {
           {/* flex for accordian button */}
           <Flex
             align="center"
-            bg="white"
+            bg="#21262d"
             width="100%"
-            color="gray.900"
+            color="white"
             letterSpacing="1px"
             textAlign="center"
-            fontSize="md"
+            fontSize="17px"
+            fontFamily="arial"
           >
             {/* box for wip on accordian button */}
             <Box
               flex="1"
               flexGrow="1"
-              bg="gray.900"
               color="white"
               borderRadius={50}
               p={1.5}
@@ -53,11 +53,11 @@ export default function TagRow(props) {
               <Text>{props.tagId}</Text>
             </Box>
             {/* box for last seen */}
-            <Box flex="1" flexGrow="4" fontFamily="arial">
+            <Box flex="1" flexGrow="4">
               <Text>Last Online: {lastSeenAll}</Text>
             </Box>
             {/* box for battery */}
-            <Box flex="1" flexGrow="0.5" fontFamily="arial">
+            <Box flex="1" flexGrow="0.5">
               <Text>87%</Text>
             </Box>
           </Flex>
@@ -67,8 +67,10 @@ export default function TagRow(props) {
           {/* flex for panel */}
           <Flex
             direction="row"
-            bg="white"
-            color="gray.900"
+            bg="#21262d"
+            color="white"
+            fontSize="17px"
+            letterSpacing="1px"
             textAlign="center"
             borderRadius={30}
           >
@@ -76,27 +78,22 @@ export default function TagRow(props) {
             <Flex
               width="50%"
               direction="column"
-              bg="white"
-              borderRadius={30}
               pl={2}
               pr={2}
             >
               {/* tag alias */}
               <Box mb={6}>
                 <Text
-                  fontSize="xl"
-                  fontWeight="bold"
-                  letterSpacing="1px"
+                  fontSize="18px"
                   mb={2}
                 >
                   TAG ALIAS
                 </Text>
                 <Box
-                  bg="gray.200"
-                  borderRadius={10}
-                  fontSize="xl"
-                  letterSpacing="1px"
+                  borderWidth={0.2}
+                  borderRadius={50}
                   p={1.5}
+                  fontFamily="arial"
                 >
                   <Text>{props.tag.alias}</Text>
                 </Box>
@@ -104,29 +101,25 @@ export default function TagRow(props) {
               {/* current coordinates */}
               <Box mb={6}>
                 <Text
-                  fontSize="xl"
-                  fontWeight="bold"
-                  letterSpacing="1px"
+                  fontSize="18px"
                   mb={2}
                 >
                   CURRENT COORDINATES
                 </Text>
                 <Box
-                  bg="gray.200"
-                  borderRadius={10}
-                  fontSize="xl"
-                  letterSpacing="1px"
+                  borderWidth={0.2}
+                  borderRadius={50}
                   p={1.5}
-                  mb={1}
+                  mb={1.5}
+                  fontFamily="arial"
                 >
                   <Text>X &nbsp; {props.tag.x}</Text>
                 </Box>
                 <Box
-                  bg="gray.200"
-                  borderRadius={10}
-                  fontSize="xl"
-                  letterSpacing="1px"
+                  borderWidth={0.2}
+                  borderRadius={50}
                   p={1.5}
+                  fontFamily="arial"
                 >
                   <Text>Y &nbsp; {props.tag.y}</Text>
                 </Box>
@@ -134,19 +127,16 @@ export default function TagRow(props) {
               {/*last seen*/}
               <Box>
                 <Text
-                  fontSize="xl"
-                  fontWeight="bold"
-                  letterSpacing="1px"
+                  fontSize="18px"
                   mb={2}
                 >
                   LAST ONLINE
                 </Text>
                 <Box
-                  bg="gray.200"
-                  borderRadius={10}
-                  fontSize="xl"
-                  letterSpacing="1px"
+                  borderWidth={0.2}
+                  borderRadius={50}
                   p={1.5}
+                  fontFamily="arial"
                 >
                   <Text>{lastSeenAll}</Text>
                 </Box>
@@ -156,39 +146,33 @@ export default function TagRow(props) {
             {/* flex for panel right */}
             <Flex
               width="50%"
-              flex="1"
               direction="column"
-              bg="white"
-              borderRadius={30}
               pl={2}
               pr={2}
             >
               {/* zones */}
               <Box mb={6}>
                 <Text
-                  fontSize="xl"
-                  fontWeight="bold"
-                  letterSpacing="1px"
+                  fontSize="18px"
                   mb={2}
                 >
                   ZONE
                 </Text>
                 <Box
-                  bg="gray.200"
-                  borderRadius={10}
-                  fontSize="xl"
-                  letterSpacing="1px"
+                  borderWidth={0.2}
+                  borderRadius={50}
                   p={1.5}
-                  mb={1}
+                  mb={1.5}
+                  fontFamily="arial"
                 >
                   <Text>X &nbsp; {props.tag.x}</Text>
                 </Box>
                 <Box
-                  bg="gray.200"
-                  borderRadius={10}
-                  fontSize="xl"
+                  borderWidth={0.2}
+                  borderRadius={50}
                   letterSpacing="1px"
                   p={1.5}
+                  fontFamily="arial"
                 >
                   <Text>Y &nbsp; {props.tag.y}</Text>
                 </Box>
@@ -196,19 +180,16 @@ export default function TagRow(props) {
               {/* battery */}
               <Box mb={16}>
                 <Text
-                  fontSize="xl"
-                  fontWeight="bold"
-                  letterSpacing="1px"
+                  fontSize="18px"
                   mb={2}
                 >
                   BATTERY
                 </Text>
                 <Box
-                  bg="gray.200"
-                  borderRadius={10}
-                  fontSize="xl"
-                  letterSpacing="1px"
+                  borderWidth={0.2}
+                  borderRadius={50}
                   p={1.5}
+                  fontFamily="arial"
                 >
                   <Text>87%</Text>
                 </Box>
