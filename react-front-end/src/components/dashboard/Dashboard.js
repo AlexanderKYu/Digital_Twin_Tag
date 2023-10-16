@@ -33,43 +33,32 @@ export default function Dashboard({tagData}) {
     return ( <> {
         !isAuthenticated
             ? (
-                <Flex align="center" mt={0} bg="black" color="white">
-                    <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box>
+                <Flex align="center" mt={0} bg="#0d1117" color="white">
+                    <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box>
                     <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="pink">
-                        <Flex mt={0} bg="black" color="white">
-                            <Box flex="1" flexGrow="0.5" minH="100vh" pr={10} pl={10}></Box>
+                        <Flex mt={0} bg="#0d1117" color="white">
+                            <Box flex="1" flexGrow="0.5" minH="100vh" pr={10} pl={10} textAlign="center"></Box>
                             <form onSubmit={handleSubmit}>
-                                <Text fontSize="5xl" textAlign="center">Enter Password for Supervisor Dashboard</Text>
-                                <br></br>
+                                <Text fontSize="5xl" textAlign="center">Enter password for supervisor dashboard</Text>
                                 <Input
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     bg="white"
                                     color="black"
-                                    mt={3}
-                                    mr={2}
-                                    borderRadius="150"/>
-                                <Button
-                                    type="submit"
-                                    value="Submit"
-                                    bg="black"
-                                    color="white"
-                                    borderColor="white"
-                                    colorScheme="linkedin"
-                                    height={14}
-                                    width={20}
-                                    borderWidth={3}
+                                    m={7}
+                                    textAlign="center"
                                     borderRadius="150"
-                                    mt={6}
-                                    pl={20}
-                                    pr={20}>
+                                    width="500px"/>
+                                <br></br>
+                                <Button
+                                    variant="wipBtn">
                                     <ArrowForwardIcon></ArrowForwardIcon>
                                 </Button>
                             </form>
                         </Flex>
                     </Box>
-                    <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box>
+                    <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box>
                 </Flex>
             )
             : (

@@ -18,24 +18,26 @@ const baseStyle = definePartsStyle({
     py: "5",
     borderRadius: "0",
     border: "none",
-    bg: "black",
+    bg: "#0d1117",
     minWidth:'120px',
-    borderWidth: '10px',
+    borderWidth: '1px',
     border: 'solid',
-    borderRightColor: 'white',
-    borderLeftColor: 'black',
-    borderTopColor: 'black',
-    borderBottomColor: 'black',
+    borderRightColor: '#0d1117',
+    borderLeftColor: '#0d1117',
+    borderTopColor: '#0d1117',
+    borderBottomColor: 'white',
+    mt: "-4px",
   },
+
   item: {
     // this will style the MenuItem and MenuItemOption components
     color: "white",
-    bg:"black",
+    bg:"#0d1117",
     _hover: {
-      bg: "teal.600",
+      bg: "#009cd9",
     },
     _focus: {
-      bg: "teal.600",
+      bg: "#009cd9",
     },
   },
   groupTitle: {

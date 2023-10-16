@@ -26,7 +26,7 @@ export default function Nav() {
 
   return (
     <>
-      <HStack bg="black" spacing="5px" px={5} h="3em">
+      <HStack bg="#0d1117" spacing="5px" px={5} h="3em">
         <Box>
           <Menu>
             {({ isOpen }) => (
