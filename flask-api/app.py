@@ -7,6 +7,7 @@ import sys
 import json
 import time
 import atexit
+from database import dbfuncs
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -71,6 +72,9 @@ def link_wip():
     resString = ""
     success = False
     status = -1
+
+    check_for_old_wip(data['tagNumber'])
+
     #call eliko api
     #connected through router
     TCP_IP = environ.get('TCP_IP')
@@ -106,8 +110,6 @@ def link_wip():
         print("Eliko Socket Timed Out")
         resString = 'Linking Tag to WIP unsuccessful'
 
-    # check if tag has old wip in database
-    
 
     #return confirmation
     response = {
@@ -122,6 +124,19 @@ def link_wip():
                     } 
                 }
     return jsonify(response)
+
+def check_for_old_wip(tagId):
+    # check if tag is still considered "In Production" in database
+    conn, cursor = dbfuncs.db_connection()
+
+    inProd, wipNumber, qty, startTime = dbfuncs.getInProdBasedOnTagId(cursor, tagId)
+    dbfuncs.closeDBConnection(conn)
+
+    wipNumber = wipNumber + "." + qty
+    if inProd:
+        # send tag information to front end so that the supervisor can add an end time
+        socketio.emit("tagOverwritten",{'tagId': tagId, 'wip': wipNumber, 'startTime': startTime},broadcast=True)
+
 
 
 @app.route("/link-battery", methods=['POST'])

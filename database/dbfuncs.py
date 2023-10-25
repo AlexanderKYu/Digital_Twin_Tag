@@ -304,9 +304,9 @@ def getLastInProdWIPBasedOnTagId(cursor, tagid):
         return 0, 0
     return data
 
-def getWIPBasedOnTagId(cursor, tagid):
+def getInProdBasedOnTagId(cursor, tagid):
     
-    db_query = f"""SELECT WIP, QTY FROM tblorders
+    db_query = f"""SELECT inProd, WIP, QTY, t_start FROM tblorders
     WHERE tagid = '{tagid}'"""
 
     cursor.execute(db_query)
@@ -314,7 +314,7 @@ def getWIPBasedOnTagId(cursor, tagid):
     data = cursor.fetchone()
 
     if data is None:
-        return 0, 0
+        return 0, 0, 0, 0
     return data
 
 def setWIPInProd(cursor, WIP, QTY, inprod):
