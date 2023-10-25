@@ -51,7 +51,7 @@ def invoke_eliko_pull_api():
     print("cloud aggregator pulled")
     try:
         eliko_pull.main("push_info.pkl", "samples.pkl")
-        socketio.emit("serverDown", {'status': False, 'message': ""}, broadCast=True)
+        socketio.emit("serverDown", {'status': False, 'message': ""}, broadcast=True)
     except:
         socketio.emit("serverDown", {'status': True, 'message': "Database Unreachable"}, broadcast=True)
 
@@ -104,7 +104,10 @@ def link_wip():
             resString = 'Tag ' + data['tagNumber'] + ' not found'
     except:
         print("Eliko Socket Timed Out")
-        resString = 'Unable to connect to Eliko API'
+        resString = 'Linking Tag to WIP unsuccessful'
+
+    # check if tag has old wip in database
+    
 
     #return confirmation
     response = {
@@ -145,7 +148,7 @@ def link_battery():
     except:
         print("Eliko Socket Timed Out")
         status = "Couldn't retrieve battery"
-        resString = 'Unable to connect to Eliko API'
+        resString = 'Unable to retrieve Tag Battery'
         
     response = {
         'status': status
