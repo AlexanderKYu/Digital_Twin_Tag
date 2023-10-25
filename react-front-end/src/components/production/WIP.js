@@ -140,10 +140,10 @@ export default function WIP() {
           {confirmation}
         </Alert>
       )}
-      <Flex align="center" mt={0} bg="black" color="white">
-        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box> {/* left border */}
-        <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="black"> {/* all middle */}
-          <Flex align="center" mt={0} bg="black" color="white"> {/* flex for middle */}
+      <Flex align="center" mt={0} bg="#0d1117" color="white">
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box> {/* left border */}
+        <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="#0d1117"> {/* all middle */}
+          <Flex align="center" mt={0} bg="#0d1117" color="white"> {/* flex for middle */}
             <Box
               flex="1"
               flexGrow="0.5"
@@ -152,7 +152,7 @@ export default function WIP() {
               pb={10}
               pl={20}
               pr={20}
-              bg="black"
+              bg="#0d1117"
               align="center"
               borderRight="solid"
               border-color="white"
@@ -223,7 +223,7 @@ export default function WIP() {
               pb={10}
               pl={20}
               pr={20}
-              bg="black"
+              bg="#0d1117"
             > {/* right side */}
               <Text fontSize="5xl" textAlign="center">SEARCH / RECHERCHE</Text>
               <InputGroup>
@@ -235,7 +235,7 @@ export default function WIP() {
             </Box>
           </Flex>
         </Box>
-        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box> {/* right border */}
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box> {/* right border */}
       </Flex>
       </>
   );
