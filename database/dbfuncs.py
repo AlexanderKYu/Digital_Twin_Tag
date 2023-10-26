@@ -331,3 +331,17 @@ def checkIfNewWIP(cursor, WIP, QTY):
         return False
     return True
 
+def manualWIPOverrideForAllQTY(cursor, WIP, t_end):
+    
+    db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
+    WHERE WIP = {WIP} AND inprod = True"""
+
+    cursor.execute(db_query)
+
+
+def manualWIPOverrideForQTY(cursor, WIP, QTY, t_end):
+
+    db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
+    WHERE WIP = {WIP} AND QTY = {QTY} AND inprod = True"""
+
+    cursor.execute(db_query)
