@@ -27,7 +27,7 @@ def read(soc):
         data=""
         while(loop):
             tmp = soc.recv(1024)
-            data=data+tmp.decode('ascii')
+            data=data+tmp.decode('utf-8')
             if b'EOF' in tmp:
                 loop=False
         dataArr=data.split("$")
@@ -42,7 +42,7 @@ def getBattery(soc):
 
     json_data = {}
     try:
-        soc.send(msg.encode("ascii"))
+        soc.send(msg.encode("utf-8"))
         rawData=read(soc)
         count=-1
         for i in rawData:
@@ -65,7 +65,7 @@ def getTags(soc):
     json_data = {}
 
     try:
-        soc.send(msg.encode("ascii"))
+        soc.send(msg.encode("utf-8"))
         rawData=read(soc)
         count=-1
         for i in rawData:
@@ -78,7 +78,8 @@ def getTags(soc):
         json_data = json.dumps(json_data, indent=4)
 
 
-    except socket.error:
+    except Exception as error:
+        print(error)
         print('Failed to send data')
     return json_data
 

@@ -83,7 +83,7 @@ def read(socket):
         data=""
         while(loop):
             tmp = s.recv(1024)
-            data=data+tmp.decode('ascii')
+            data=data+tmp.decode("utf-8")
             #if data received is only a bit of that string there might be problem or if a tag name contains EOF
             if b'EOF' in tmp:
                 loop=False
@@ -98,7 +98,7 @@ def getTags(socket):
     msg = msg + "\r\n" # YOU NEED TO TERMINATE WITH CARRIAGE RETURN-LINE FEED OR YOU NEVER GET A RESPONSE!
 
     try:
-        socket.send(msg.encode("ascii"))
+        socket.send(msg.encode("utf-8"))
         rawData=read(socket)
         # json_data="["
         json_data = {}
