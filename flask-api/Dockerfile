@@ -4,10 +4,12 @@ EXPOSE 5000/tcp
 
 WORKDIR /app
 
-COPY requirments.txt .
+COPY requirements.txt .
 
-RUN pip install -r requirments.txt
+RUN pip install -r requirements.txt
 
-COPY ./flask-api /app
+COPY app.py .
+
+COPY config.py .
 
 # CMD[]
