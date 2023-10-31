@@ -331,3 +331,29 @@ def checkIfNewWIP(cursor, WIP, QTY):
         return False
     return True
 
+
+def checkIfTagZoneOnPath(cursor, WIP, QTY, zoneID):
+    
+    db_query = f"""SELECT * FROM tblPaths
+    WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+    if len(data) > 0:
+        return True
+    return False
+
+def queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID):
+    
+    db_query = f"""SELECT Timestamp FROM tblRawLocations
+    WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}
+    ORDER BY Timestamp ASC"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+
+    if len(data) >= 2:
+        return data[-1] - data[0]
+    return 0
