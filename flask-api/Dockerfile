@@ -6,10 +6,10 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt
-
 COPY app.py .
 
 COPY config.py .
 
-# CMD[]
+RUN pip install -r requirements.txt
+
+CMD["uwsgi" , "app.ini"]
