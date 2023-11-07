@@ -375,7 +375,7 @@ def addWIPOverrideIntoQueue(cursor, WIP, QTY):
 
     cursor.execute(db_query)
 
-    t_start = cursor.fetchone()
+    t_start = cursor.fetchone()[0]
 
     db_query = f"""INSERT INTO wipOverrideQueue (WIP, QTY, t_start)
     VALUES ({WIP}, {QTY}, {t_start})"""
