@@ -26,12 +26,13 @@ function App() {
 
   const {loginWithPopup, loginWithRedirect, logout, user, isAuthenticated} = useAuth0()
 
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessages, setErrorMessages] = useState([]);
   const [tagData, setTagData] = useState({});
-  const [serverDown, setServerDown] = useState(false);
+  const [overwrittenWips, setOverwrittenWips] = useState([])
 
-
+  
   useEffect(() => {
+
       // create websocket/connect
       socket = io();
 
@@ -42,18 +43,55 @@ function App() {
 
       socket.on("serverDown", (data) => {
         // set banner up or down depending on whether db pull worked or not
-        setServerDown(data.status);
-        setErrorMessage(data.message);
+        if(data.down){
+          setErrorMessages(oldMessages => { 
+            if(!oldMessages.some(({id}) => id === data.id)){
+              return [
+                ...oldMessages,
+                {id: data.id, msg: data.message}
+              ]
+            } else {
+              return [
+                ...oldMessages
+              ]
+            }
+            });
+        } else {
+          setErrorMessages(oldMessages => oldMessages.filter(e => 
+            e.id !== data.id
+            ));
+        }
       })
 
       //Implementing the setInterval method
       const interval = setInterval(() => {
         if(!socket.connected){
-          //setServerDown(true);
-          setServerDown(true);
-          setErrorMessage("Flask Server Not Connected");
+          setErrorMessages(oldMessages => {
+            if(!oldMessages.some(({id}) => id === 0)){
+            return [
+            ...oldMessages,
+            {id: 0, msg: "Flask Server Not Connected"}
+            ]
+          }
+          else {
+            return [
+              ...oldMessages
+              ]
+          }
+        });
+        } else {
+          setErrorMessages(oldMessages => oldMessages.filter(e => 
+            e.id !== 0
+            ));
         }
       }, 15000);
+
+      socket.on("tagOverwritten", (data) => {
+        //adds another tag to overwrittenWips when a new wip overwrite is detected
+        let temp = overwrittenWips;
+        temp.push(data);
+        setOverwrittenWips(temp);
+      })
 
       // when component unmounts, disconnect
       return (() => {
@@ -69,12 +107,13 @@ function App() {
       <div className="App"> 
       
       <Nav></Nav>
-      {serverDown && (
-        <Alert status="error" variant="solid" fontFamily="Arial" bg="#a3142e">
+      {(errorMessages) && (
+        errorMessages.map((error, i) => (
+        <Alert status="error" variant="solid" fontFamily="Arial" bg="#a3142e" key={error.id + "." + i}>
           <AlertIcon />
           <Box>
             <AlertDescription>
-              {errorMessage}
+              {error.msg}
             </AlertDescription>
           </Box>
           <CloseButton
@@ -83,16 +122,20 @@ function App() {
             right={1}
             top={2}
             onClick={()=>{
-              setServerDown(false);
+              const uniqueErrors = [...new Set(errorMessages.filter(e => 
+                e.id !== error.id
+                ))];
+              setErrorMessages(uniqueErrors);
             }}
           />
           
         </Alert>
-      )}
+        )
+      ))}
 
           <Routes>
             <Route path="/" element={<WIP></WIP>} />
-            <Route path="dashboard" element={<Dashboard tagData={tagData}></Dashboard> } />
+            <Route path="dashboard" element={<Dashboard tagData={tagData} overwrittenWips={overwrittenWips} ></Dashboard> } />
           </Routes>
           </div>
         </BrowserRouter>

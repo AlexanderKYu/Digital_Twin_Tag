@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Input,
@@ -8,13 +8,12 @@ import {
   Alert,
   Button,
   InputRightElement,
-  Center,
+  AlertIcon,
+  AlertDescription,
+  CloseButton
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import TagData from "./WipRow.js";
-import theme from "../theme/Theme.js"
-import { ChakraProvider } from '@chakra-ui/react'
-import Nav from "../Nav.js";
 
 export default function WIP() {
   const [tag, setTag] = useState("");
@@ -131,14 +130,44 @@ export default function WIP() {
   return (
     <>
       {confirmation && !status && (
-        <Alert status="success" variant="solid" fontFamily="Arial" bg="#a3142e">
-          {confirmation}
-        </Alert>
+        <Alert status="error" variant="solid" fontFamily="Arial" bg="#a3142e">
+        <AlertIcon />
+        <Box>
+          <AlertDescription>
+            {confirmation}
+          </AlertDescription>
+        </Box>
+        <CloseButton
+          alignSelf='end'
+          position='absolute'
+          right={1}
+          top={2}
+          onClick={()=>{
+            setConfirmation('');
+          }}
+        />
+        
+      </Alert>
       )}
       {confirmation && status && (
         <Alert status="success" variant="solid" fontFamily="Arial" bg="#009cd9">
-          {confirmation}
-        </Alert>
+        <AlertIcon />
+        <Box>
+          <AlertDescription>
+            {confirmation}
+          </AlertDescription>
+        </Box>
+        <CloseButton
+          alignSelf='end'
+          position='absolute'
+          right={1}
+          top={2}
+          onClick={()=>{
+            setConfirmation('');
+          }}
+        />
+        
+      </Alert>
       )}
       <Flex align="center" mt={0} bg="#0d1117" color="white">
         <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box> {/* left border */}

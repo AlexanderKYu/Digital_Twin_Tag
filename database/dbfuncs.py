@@ -314,6 +314,18 @@ def getLastInProdWIPBasedOnTagId(cursor, tagid):
         return 0, 0
     return data
 
+def getLastInProdBasedOnTagIdExt(cursor, tagid):
+    
+    db_query = f"""SELECT WIP, QTY, t_start FROM tblorders
+    WHERE inprod = True AND tagid = '{tagid}'"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchone()
+
+    if data is None:
+        return 0, 0, 0
+    return data
 
 def setWIPInProd(cursor, WIP, QTY, inprod):
 
@@ -340,7 +352,6 @@ def checkIfNewWIP(cursor, WIP, QTY):
     if len(data) > 0:
         return False
     return True
-
 
 def checkIfTagZoneOnPath(cursor, WIP, QTY, zoneID):
     
@@ -388,3 +399,19 @@ def deleteWIPOverrideFromQueue(cursor, WIP, QTY):
     WHERE WIP = {WIP} AND QTY = {QTY}"""
 
     cursor.execute(db_query)
+
+def manualWIPOverrideForAllQTY(cursor, WIP, t_end):
+    
+    db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
+    WHERE WIP = {WIP} AND inprod = True"""
+
+    cursor.execute(db_query)
+
+
+def manualWIPOverrideForQTY(cursor, WIP, QTY, t_end):
+
+    db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
+    WHERE WIP = {WIP} AND QTY = {QTY} AND inprod = True"""
+
+    cursor.execute(db_query)
+
