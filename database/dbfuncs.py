@@ -355,5 +355,5 @@ def queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID):
     data = cursor.fetchall()
 
     if len(data) >= 2:
-        return data[-1] - data[0]
+        return data[-1][0] - data[0][0]
     return 0
