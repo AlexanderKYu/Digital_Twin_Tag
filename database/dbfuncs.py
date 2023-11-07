@@ -98,6 +98,14 @@ def db_init(cursor):
 
     cursor.execute(db_query)
 
+    db_query = """CREATE TABLE IF NOT EXISTS wipOverrideQueue (
+    WIP INT NOT NULL,
+    QTY INT NOT NULL,
+    t_start FLOAT
+    )"""
+
+    cursor.execute(db_query)
+
 def define_hard_zones(cursor):
 
     db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
@@ -221,6 +229,8 @@ def delete_all(cursor):
 
    cursor.execute(db_query)
 
+   db_query = "DROP TABLE IF EXISTS wipOverrideQueue"
+
 def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
 
     db_query = f"""INSERT INTO tblOrders (WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName)
@@ -343,6 +353,53 @@ def checkIfNewWIP(cursor, WIP, QTY):
         return False
     return True
 
+def checkIfTagZoneOnPath(cursor, WIP, QTY, zoneID):
+    
+    db_query = f"""SELECT * FROM tblPaths
+    WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+    if len(data) > 0:
+        return True
+    return False
+
+def queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID):
+    
+    db_query = f"""SELECT Timestamp FROM tblRawLocations
+    WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}
+    ORDER BY Timestamp ASC"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+
+    if len(data) >= 2:
+        return data[-1] - data[0]
+    return 0
+
+def addWIPOverrideIntoQueue(cursor, WIP, QTY):
+    
+    db_query = f"""SELECT t_start FROM tblOrders
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
+
+    t_start = cursor.fetchone()[0]
+
+    db_query = f"""INSERT INTO wipOverrideQueue (WIP, QTY, t_start)
+    VALUES ({WIP}, {QTY}, {t_start})"""
+
+    cursor.execute(db_query)
+
+def deleteWIPOverrideFromQueue(cursor, WIP, QTY):
+    
+    db_query = f"""DELETE FROM wipOverrideQueue
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
+
 def manualWIPOverrideForAllQTY(cursor, WIP, t_end):
     
     db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
@@ -357,3 +414,4 @@ def manualWIPOverrideForQTY(cursor, WIP, QTY, t_end):
     WHERE WIP = {WIP} AND QTY = {QTY} AND inprod = True"""
 
     cursor.execute(db_query)
+
