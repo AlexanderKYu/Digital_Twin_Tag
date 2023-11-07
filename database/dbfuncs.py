@@ -98,6 +98,14 @@ def db_init(cursor):
 
     cursor.execute(db_query)
 
+    db_query = """CREATE TABLE IF NOT EXISTS wipOverrideQueue (
+    WIP INT NOT NULL,
+    QTY INT NOT NULL,
+    t_start FLOAT
+    )"""
+
+    cursor.execute(db_query)
+
 def define_hard_zones(cursor):
 
     db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
@@ -220,6 +228,8 @@ def delete_all(cursor):
    db_query = "DROP TABLE IF EXISTS tblwipstatus"
 
    cursor.execute(db_query)
+
+   db_query = "DROP TABLE IF EXISTS wipOverrideQueue"
 
 def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
 
@@ -357,3 +367,24 @@ def queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID):
     if len(data) >= 2:
         return data[-1] - data[0]
     return 0
+
+def addWIPOverrideIntoQueue(cursor, WIP, QTY):
+    
+    db_query = f"""SELECT t_start FROM tblOrders
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
+
+    t_start = cursor.fetchone()
+
+    db_query = f"""INSERT INTO wipOverrideQueue (WIP, QTY, t_start)
+    VALUES ({WIP}, {QTY}, {t_start})"""
+
+    cursor.execute(db_query)
+
+def deleteWIPOverrideFromQueue(cursor, WIP, QTY):
+    
+    db_query = f"""DELETE FROM wipOverrideQueue
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
