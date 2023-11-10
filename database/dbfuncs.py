@@ -313,7 +313,7 @@ def getLastInProdWIPBasedOnTagId(cursor, tagid):
 
     if data is None:
         return 0, 0
-    return data[-1][0]
+    return data[-1][0], data[-1][1]
 
 def getLastInProdBasedOnTagIdExt(cursor, tagid):
     
