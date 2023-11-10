@@ -56,6 +56,7 @@ def dbTagsPush(tagsJson):
         if (dbfuncs.checkIfTagZoneOnPath(cursor, wip, qty, zoneID)):
             dbfuncs.dbUpdateWIPOnTblPaths(cursor,wip, qty, zoneID)
         else:
+            zoneName = dbfuncs.getZoneName(cursor, zoneID)
             dbfuncs.dbPushTblPaths(cursor, wip, qty, tagID, zoneID, zoneName, 0)
         
         dbfuncs.dbPushTblRawLocations(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
