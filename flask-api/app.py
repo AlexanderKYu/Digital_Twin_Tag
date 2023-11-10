@@ -8,12 +8,14 @@ import json
 import time
 import atexit
 
+
 from apscheduler.schedulers.background import BackgroundScheduler
 
 sys.path.append('..')
 
 from Eliko import JSON_eliko_call
 from CloudAppAggregator import eliko_pull
+from database import dbfuncs
 
 clients = 0
 
@@ -44,16 +46,16 @@ def emit_tag_data():
             s.close()
             socketio.emit("getTags",tagJson,broadcast=True)
         except:
-            socketio.emit("serverDown", {'status': True, 'message': "Eliko Unreachable"}, broadcast=True)
+            socketio.emit("serverDown", {'id': 1, 'down': True, 'message': "Eliko Unreachable"}, broadcast=True)
         
 
 def invoke_eliko_pull_api():
     print("cloud aggregator pulled")
     try:
         eliko_pull.main("push_info.pkl", "samples.pkl")
-        socketio.emit("serverDown", {'status': False, 'message': ""}, broadCast=True)
+        socketio.emit("serverDown", {'id': 2, 'down': False, 'message': ""}, broadcast=True)
     except:
-        socketio.emit("serverDown", {'status': True, 'message': "Database Unreachable"}, broadcast=True)
+        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Database Unreachable"}, broadcast=True)
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10, id="emit_tag_data")
@@ -71,6 +73,9 @@ def link_wip():
     resString = ""
     success = False
     status = -1
+
+    check_for_old_wip(data['tagNumber'])
+
     #call eliko api
     #connected through router
     TCP_IP = environ.get('TCP_IP')
@@ -104,7 +109,8 @@ def link_wip():
             resString = 'Tag ' + data['tagNumber'] + ' not found'
     except:
         print("Eliko Socket Timed Out")
-        resString = 'Unable to connect to Eliko API'
+        resString = 'Linking Tag to WIP unsuccessful'
+
 
     #return confirmation
     response = {
@@ -119,6 +125,19 @@ def link_wip():
                     } 
                 }
     return jsonify(response)
+
+def check_for_old_wip(tagId):
+    # check if tag is still considered "In Production" in database
+    conn, cursor = dbfuncs.db_connection()
+
+    wipNumber, qty, startTime = dbfuncs.getLastInProdBasedOnTagIdExt(cursor, tagId)
+    dbfuncs.closeDBConnection(conn)
+
+    wipNumber = wipNumber + "." + qty
+    if wipNumber != 0:
+        # send tag information to front end so that the supervisor can add an end time
+        socketio.emit("tagOverwritten",{'tagId': tagId, 'wip': wipNumber, 'startTime': startTime},broadcast=True)
+
 
 
 @app.route("/link-battery", methods=['POST'])
@@ -145,7 +164,7 @@ def link_battery():
     except:
         print("Eliko Socket Timed Out")
         status = "Couldn't retrieve battery"
-        resString = 'Unable to connect to Eliko API'
+        resString = 'Unable to retrieve Tag Battery'
         
     response = {
         'status': status
