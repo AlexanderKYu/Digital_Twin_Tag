@@ -240,8 +240,8 @@ def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_flo
 
 def dbPushTblPaths(cursor, WIP, QTY, tagID, zoneID, zoneName, time):
 
-    db_query = f"""INSERT INTO tblPaths (
-    {WIP}, {QTY}, '{tagID}', {zoneID}, '{zoneName}', {time}
+    db_query = f"""INSERT INTO tblPaths (WIP, QTY, TagID, ZoneID, ZoneName, Time)
+    VALUES ({WIP}, {QTY}, '{tagID}', {zoneID}, '{zoneName}', {time}
     );"""
 
     cursor.execute(db_query)
@@ -376,8 +376,17 @@ def queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID):
     data = cursor.fetchall()
 
     if len(data) >= 2:
-        return data[-1] - data[0]
+        return data[-1][0] - data[0][0]
     return 0
+
+def dbUpdateWIPOnTblPaths(cursor, WIP, QTY, zoneID):
+
+    zone_duration = queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID)
+
+    db_query = f"""UPDATE tblPaths SET Time = {zone_duration}
+    WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}"""
+
+    cursor.execute(db_query)
 
 def addWIPOverrideIntoQueue(cursor, WIP, QTY):
     
