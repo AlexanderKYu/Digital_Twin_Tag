@@ -12,6 +12,4 @@ COPY config.py .
 
 RUN pip install -r requirements.txt
 
-EXPOSE 5000
-
 CMD ["uwsgi" , "--ini", "app.ini"]
