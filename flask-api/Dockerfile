@@ -8,6 +8,8 @@ COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 
+COPY /Eliko /app/Eliko
+
 COPY app.py .
 
 COPY app.ini .
