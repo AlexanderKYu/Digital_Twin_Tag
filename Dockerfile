@@ -9,7 +9,7 @@ COPY flask-api/requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY /Eliko /app/Eliko
-COPY /flask-api /app/flask-api
+COPY /flask-api /app
 COPY /CloudAppAggregator /app/CloudAppAggregator
 
 CMD ["uwsgi" , "app.ini"]
