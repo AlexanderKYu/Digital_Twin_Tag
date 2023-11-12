@@ -4,16 +4,16 @@ EXPOSE 5000/tcp
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY flask-api/requirements.txt .
 
 RUN pip install -r requirements.txt
 
 COPY /Eliko /app/Eliko
 
-COPY app.py .
+COPY flask-api/app.py .
 
-COPY app.ini .
+COPY flask-api/app.ini .
 
-COPY config.py .
+COPY flask-api/config.py .
 
 CMD ["uwsgi" , "app.ini"]
