@@ -8,6 +8,8 @@ COPY requirements.txt .
 
 COPY app.py .
 
+COPY app.ini .
+
 COPY config.py .
 
 RUN pip install -r requirements.txt
