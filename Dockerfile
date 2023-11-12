@@ -12,4 +12,4 @@ COPY /Eliko /app/Eliko
 COPY /flask-api /app
 COPY /CloudAppAggregator /app/CloudAppAggregator
 
-CMD ["uwsgi" , "app.ini"]
+CMD ["uwsgi" , "flask-api/app.ini"]
