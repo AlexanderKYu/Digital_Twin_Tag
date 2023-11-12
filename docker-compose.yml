@@ -1,6 +1,6 @@
 services:
   flask-api:
-    build: 
+    build: .
     container_name: flask-api 
     restart: always
     environment:
