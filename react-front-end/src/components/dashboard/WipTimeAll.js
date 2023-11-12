@@ -4,7 +4,6 @@ import WipTime from "./WipTimeRow.js";
 
 export default function WipTimeAll({ tagData }) {
   const tagKeys = Object.keys(tagData);
-  console.log(tagData);
 
   return (
     <>

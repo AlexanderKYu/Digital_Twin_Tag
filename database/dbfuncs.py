@@ -415,3 +415,12 @@ def manualWIPOverrideForQTY(cursor, WIP, QTY, t_end):
 
     cursor.execute(db_query)
 
+def getAllWIPOverride(cursor):
+
+    db_query = f"""SELECT * FROM wipOverrideQueue"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+    
+    return data

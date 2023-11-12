@@ -70,7 +70,7 @@ function App() {
             if(!oldMessages.some(({id}) => id === 0)){
             return [
             ...oldMessages,
-            {id: 0, msg: "Flask Server Not Connected"}
+            {id: 0, msg: "Le serveur Flask n'est pas connecté / Flask Server Not Connected"}
             ]
           }
           else {

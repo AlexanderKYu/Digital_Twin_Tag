@@ -25,7 +25,7 @@ export default function FloorMap(props) {
       let tempObject = {};
       tempObject.x = props.tagData[tag].x;
       tempObject.y = props.tagData[tag].y;
-      tempObject.tag = tag;
+      tempObject.tag = props.tagData[tag].alias;
       //setMapCoords( arr => [...arr, tempObject]);
       tempCoords.push(tempObject);
       
