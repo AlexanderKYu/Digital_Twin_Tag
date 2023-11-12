@@ -1,4 +1,5 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect} from "react";
+
 import {
   Box,
   Flex,
@@ -15,13 +16,27 @@ import {
   TableContainer,
   Input,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function WipTimeRow({overwrittenWips}) {
-
-
+  const [endTimes, setEndTimes] = useState([]);
+  const handleChange = (e, i) => {
+    setEndTimes(oldEndTimes => {
+      const newEndTimes = oldEndTimes.map((event, index) => {
+        if (i === index) {
+          return e;
+        } else {
+          return event;
+        }
+      });
+      return newEndTimes;
+    })
+  }
+  
   return (
     <>
+    
       <TableContainer>
         <Table variant="wipTable">
           <Thead>
@@ -33,11 +48,18 @@ export default function WipTimeRow({overwrittenWips}) {
             </Tr>
           </Thead>
           <Tbody>
-          {overwrittenWips.map((wip) => (
+          {overwrittenWips.map((wip, i) => (
           <Tr>
             <Td>{wip['wip']}</Td>
             <Td>{wip['startTime']}</Td>
-            <Td><Input variant='endTimeInput' placeholder='Input End Time'/></Td>
+            <Td>
+              <Input
+                placeholder="Select Date and Time"
+                size="md"
+                type="datetime-local"
+                value={endTimes[i]}
+                onChange={e=> handleChange(e.target.value, i)}
+                /></Td>
             <Td><Button variant="editBtn">Submit</Button></Td>
           </Tr>
           ))}
