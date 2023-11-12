@@ -2,7 +2,7 @@ FROM python:3.11
 
 EXPOSE 5000/tcp
 
-WORKDIR 
+WORKDIR .
 
 COPY flask-api/requirements.txt .
 
