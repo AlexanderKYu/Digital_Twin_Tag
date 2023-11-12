@@ -7,6 +7,7 @@ import sys
 import json
 import time
 import atexit
+import datetime
 
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -77,11 +78,13 @@ def link_wip():
     # check if tag is set to disponible
     if data["wipNumber"] == "DISPONIBLE":
         conn, cursor = dbfuncs.db_connection()
-        oldWip, oldQty = dbfuncs.getLastInProdWIPBasedOnTagId(cursor, data['tagNumber'])
+        oldWip, oldQty = dbfuncs.getLastInProdWIPBasedOnTagId(cursor, data['tagNumber'][2:])
         dbfuncs.setWIPInProd(cursor, oldWip, oldQty, False)
+        # dbfuncs.setProdEndTime(cursor, oldWip, oldQty, )
+        # TODO: get eliko timestamp and put it into above function
         dbfuncs.closeDBConnection(conn)
     else:
-        check_for_old_wip(data['tagNumber'])
+        check_for_old_wip(data['tagNumber'][2:])
     
 
     #call eliko api
@@ -120,6 +123,7 @@ def link_wip():
 
 
     #return confirmation
+    # TODO: replace phony values with real ones
     response = {
                     'data':resString, 
                     'success':success, 
@@ -134,8 +138,6 @@ def link_wip():
     return jsonify(response)
 
 def check_for_old_wip(tagId):
-
-    socketio.emit("tagOverwritten",{'tagId': 12345, 'wip': 54321, 'startTime': 12345678},broadcast=True)
 
     # check if tag is still considered "In Production" in database
     try:
@@ -208,7 +210,7 @@ def update_tend():
     return jsonify(response)
 
 @app.route("/get-overwritten-wips", methods=['GET'])
-def update_tend():
+def get_overwritten_wips():
     
     wips = []
     try:

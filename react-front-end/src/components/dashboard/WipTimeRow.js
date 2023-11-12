@@ -17,7 +17,6 @@ import {
   Input,
 } from "@chakra-ui/react";
 
-import "react-datepicker/dist/react-datepicker.css";
 
 export default function WipTimeRow({overwrittenWips}) {
   const [endTimes, setEndTimes] = useState([]);
@@ -32,6 +31,12 @@ export default function WipTimeRow({overwrittenWips}) {
       });
       return newEndTimes;
     })
+  }
+
+  // TODO: call flask to get list of overwritten wips
+  // TODO: have button update t-end
+  const updateTEnd = (i) =>{
+    
   }
   
   return (
@@ -60,7 +65,7 @@ export default function WipTimeRow({overwrittenWips}) {
                 value={endTimes[i]}
                 onChange={e=> handleChange(e.target.value, i)}
                 /></Td>
-            <Td><Button variant="editBtn">Submit</Button></Td>
+            <Td><Button variant="editBtn" onClick={() => updateTEnd(i)}>Submit</Button></Td>
           </Tr>
           ))}
           </Tbody>
