@@ -1,6 +1,6 @@
 FROM python:3.11
 
-EXPOSE 80/tcp
+EXPOSE 5000/tcp
 
 WORKDIR .
 
