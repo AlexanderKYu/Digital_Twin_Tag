@@ -3,6 +3,7 @@ import { Box, Flex, Accordion } from "@chakra-ui/react";
 import TagRow from "./TagRow.js";
 
 export default function TagAll({ tagData }) {
+
   const tagKeys = Object.keys(tagData);
 
   return (
