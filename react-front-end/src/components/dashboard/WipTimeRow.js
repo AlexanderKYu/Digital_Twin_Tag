@@ -1,24 +1,19 @@
 import { ReactNode, useState, useEffect} from "react";
 
 import {
-  Box,
-  Flex,
-  Text,
   Button,
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
   Input,
 } from "@chakra-ui/react";
 
 
-export default function WipTimeRow({overwrittenWips}) {
+export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
   const [endTimes, setEndTimes] = useState([]);
   const handleChange = (e, i) => {
     setEndTimes(oldEndTimes => {
@@ -33,10 +28,39 @@ export default function WipTimeRow({overwrittenWips}) {
     })
   }
 
-  // TODO: call flask to get list of overwritten wips
-  // TODO: have button update t-end
-  const updateTEnd = (i) =>{
-    
+  useEffect(() => {
+    fetch("/get-overwritten-wips")
+        .then((res) => res.json())
+        .then((data) => {
+          if(data.status){
+            setOverwrittenWips(data.wips)
+          }
+        });
+    setOverwrittenWips()
+  }, []);
+
+
+  const updateTEnd = (wip, i) =>{
+    var jsonData = {
+      wip: wip['wip'],
+      qty: wip['qty'],
+      tEnd: endTimes[i],
+    };
+    const aliasData = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(jsonData),
+    };
+    fetch("/update-tend", aliasData)
+        .then((res) => res.json())
+        .then((data) => {
+          // TODO: confirmation banner when t-end is successful
+          if(data.status){
+            setOverwrittenWips(oldWips => oldWips.filter(w => 
+              w.wip !== wip.wip
+              ))
+          }
+        });
   }
   
   return (
@@ -55,7 +79,7 @@ export default function WipTimeRow({overwrittenWips}) {
           <Tbody>
           {overwrittenWips.map((wip, i) => (
           <Tr>
-            <Td>{wip['wip']}</Td>
+            <Td>{wip['wip'] + "." + wip['qty']}</Td>
             <Td>{wip['startTime']}</Td>
             <Td>
               <Input
@@ -65,7 +89,7 @@ export default function WipTimeRow({overwrittenWips}) {
                 value={endTimes[i]}
                 onChange={e=> handleChange(e.target.value, i)}
                 /></Td>
-            <Td><Button variant="editBtn" onClick={() => updateTEnd(i)}>Submit</Button></Td>
+            <Td><Button variant="editBtn" onClick={() => updateTEnd(wip, i)}>Submit</Button></Td>
           </Tr>
           ))}
           </Tbody>

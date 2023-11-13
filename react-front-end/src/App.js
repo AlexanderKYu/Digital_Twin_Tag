@@ -88,9 +88,7 @@ function App() {
 
       socket.on("tagOverwritten", (data) => {
         //adds another tag to overwrittenWips when a new wip overwrite is detected
-        let temp = overwrittenWips;
-        temp.push(data);
-        setOverwrittenWips(temp);
+        setOverwrittenWips(oldWips => [...oldWips, data]);
       })
 
       // when component unmounts, disconnect
@@ -135,7 +133,7 @@ function App() {
 
           <Routes>
             <Route path="/" element={<WIP></WIP>} />
-            <Route path="dashboard" element={<Dashboard tagData={tagData} overwrittenWips={overwrittenWips} ></Dashboard> } />
+            <Route path="dashboard" element={<Dashboard tagData={tagData} overwrittenWips={overwrittenWips} setOverwrittenWips={setOverwrittenWips} ></Dashboard> } />
           </Routes>
           </div>
         </BrowserRouter>

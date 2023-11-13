@@ -75,28 +75,34 @@ def link_wip():
     success = False
     status = -1
 
+    
+    #call eliko api
+    #connected through router
+    s, socketState = JSON_eliko_call.createSocket()
+
+    if not socketState:
+        response = {
+                    'data': "Unable to Create Connection to Eliko", 
+                    'success':False,  
+                }
+        return jsonify(response)
+    
+    # get eliko data that will be used differently depending on the situation
+    tagList = JSON_eliko_call.getTags()
+    tagList = json.loads(tagList)
+        
     # check if tag is set to disponible
     if data["wipNumber"] == "DISPONIBLE":
         conn, cursor = dbfuncs.db_connection()
         oldWip, oldQty = dbfuncs.getLastInProdWIPBasedOnTagId(cursor, data['tagNumber'][2:])
         dbfuncs.setWIPInProd(cursor, oldWip, oldQty, False)
-        # dbfuncs.setProdEndTime(cursor, oldWip, oldQty, )
-        # TODO: get eliko timestamp and put it into above function
+
+        dbfuncs.setProdEndTime(cursor, oldWip, oldQty, tagList[data["tagNumber"]]["timestamp"])
         dbfuncs.closeDBConnection(conn)
     else:
         check_for_old_wip(data['tagNumber'][2:])
-    
-
-    #call eliko api
-    #connected through router
-    TCP_IP = environ.get('TCP_IP')
-    TCP_PORT = int(environ.get('TCP_PORT'))
-    BUFFER_SIZE = 100
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(3)
 
     try:
-        s.connect((TCP_IP, TCP_PORT))
 
         #getting battery status of tag
         batteryData = JSON_eliko_call.getBattery(s)
@@ -108,7 +114,7 @@ def link_wip():
         s.send(eCall.encode())
 
         #break point. It looks like the message isnt properly received by the server
-        res = s.recv(BUFFER_SIZE)
+        res = s.recv(100)
         s.close()
         res = str(res)
         print ("received data:", res)
@@ -132,7 +138,7 @@ def link_wip():
                         'alias': data['wipNumber'],
                         'voltage': 4087,
                         'status': status,
-                        'timestamp': 1212343243,
+                        'timestamp': tagList[data['tagNumber']]["timestamp"],
                     } 
                 }
     return jsonify(response)
@@ -196,8 +202,8 @@ def update_tend():
 
     try:
         conn, cursor = dbfuncs.db_connection()
-        dbfuncs.manualWIPOverrideForQTY(cursor, data.wip, data.qty, data.tEnd)
-        dbfuncs.deleteWIPOverrideFromQueue(cursor, data.wip, data.qty)
+        dbfuncs.manualWIPOverrideForQTY(cursor, data["wip"], data["qty"], data["tEnd"])
+        dbfuncs.deleteWIPOverrideFromQueue(cursor, data["wip"], data["qty"])
         dbfuncs.closeDBConnection(conn)
         status = True
     except:
@@ -217,10 +223,13 @@ def get_overwritten_wips():
         conn, cursor = dbfuncs.db_connection()
         wips = dbfuncs.getAllWIPOverride(cursor)
         dbfuncs.closeDBConnection(conn)
+        status = True
     except:
         dbfuncs.closeDBConnection(conn)
+        status = False
 
     response = {
+        'status': status,
         'wips': wips
     }
     return jsonify(response)

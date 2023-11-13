@@ -15,7 +15,7 @@ import TagAll from "./TagAll.js";
 import WipTimeAll from "./WipTimeAll.js";
 import WipTimeRow from "./WipTimeRow.js";
 
-export default function Dashboard({tagData, overwrittenWips}) {
+export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}) {
     const [password,
         setPassword] = useState('');
     const [isAuthenticated,
@@ -122,7 +122,7 @@ export default function Dashboard({tagData, overwrittenWips}) {
               <Text color="white" fontSize="5xl" mb={2}>
                 WIP TIME EDIT
               </Text>
-              <WipTimeRow overwrittenWips={overwrittenWips}>
+              <WipTimeRow overwrittenWips={overwrittenWips} setOverwrittenWips={setOverwrittenWips}>
 
               </WipTimeRow>
               {/* <WipTimeAll tagData={tagData}></WipTimeAll> */}
