@@ -36,7 +36,6 @@ export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
             setOverwrittenWips(data.wips)
           }
         });
-    setOverwrittenWips()
   }, []);
 
 
