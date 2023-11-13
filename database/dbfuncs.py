@@ -102,6 +102,7 @@ def db_init(cursor):
     WIP INT NOT NULL,
     QTY INT NOT NULL,
     t_start FLOAT
+    CONSTRAINT OVERRIDE_PAIR PRIMARY KEY (WIP, QTY)
     )"""
 
     cursor.execute(db_query)
