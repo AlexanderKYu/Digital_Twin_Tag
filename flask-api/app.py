@@ -71,6 +71,7 @@ if(not(scheduler.running)):
 def link_wip():
     """set WIP number as alias for tag and return confirmation"""
     data = request.get_json()
+    tagId = data["tagNumber"]
     resString = ""
     success = False
     status = -1
@@ -88,28 +89,30 @@ def link_wip():
         return jsonify(response)
     
     # get eliko data that will be used differently depending on the situation
-    tagList = JSON_eliko_call.getTags()
+    tagList = JSON_eliko_call.getTags(s)
     tagList = json.loads(tagList)
         
     # check if tag is set to disponible
     if data["wipNumber"] == "DISPONIBLE":
         conn, cursor = dbfuncs.db_connection()
-        oldWip, oldQty = dbfuncs.getLastInProdWIPBasedOnTagId(cursor, data['tagNumber'][2:])
+        oldWip, oldQty = dbfuncs.getLastInProdWIPBasedOnTagId(cursor, tagId[2:])
         dbfuncs.setWIPInProd(cursor, oldWip, oldQty, False)
 
-        dbfuncs.setProdEndTime(cursor, oldWip, oldQty, tagList[data["tagNumber"]]["timestamp"])
+        tempTag = tagList.get(tagId, {"timestamp": 0})
+        timestamp = tempTag["timestamp"]
+        dbfuncs.setProdEndTime(cursor, oldWip, oldQty, timestamp)
         dbfuncs.closeDBConnection(conn)
     else:
-        check_for_old_wip(data['tagNumber'][2:])
+        check_for_old_wip(tagId[2:])
 
     try:
 
         #getting battery status of tag
         batteryData = JSON_eliko_call.getBattery(s)
         batteryData = json.loads(batteryData)
-        status = batteryData[data["tagNumber"]]["status"]
+        status = batteryData[tagId]["status"]
         
-        eCall ='$PEKIO,SET_TAG_ALIAS,'+ data['tagNumber'] + "," + data['wipNumber']
+        eCall ='$PEKIO,SET_TAG_ALIAS,'+ tagId + "," + data['wipNumber']
         eCall = eCall + "\r\n"
         s.send(eCall.encode())
 
@@ -119,10 +122,10 @@ def link_wip():
         res = str(res)
         print ("received data:", res)
         if res[9:11] == 'OK':
-            resString = 'Tag ' + data['tagNumber'] + ' set to Alias ' + data['wipNumber']
+            resString = 'Tag ' + tagId + ' set to Alias ' + data['wipNumber']
             success = True
         else:
-            resString = 'Tag ' + data['tagNumber'] + ' not found'
+            resString = 'Tag ' + tagId + ' not found'
     except:
         print("Eliko Socket Timed Out")
         resString = 'Linking Tag to WIP unsuccessful'
@@ -130,6 +133,9 @@ def link_wip():
 
     #return confirmation
     # TODO: replace phony values with real ones
+    tempTag = tagList.get(tagId, {"timestamp": 0})
+    timestamp = tempTag["timestamp"]
+
     response = {
                     'data':resString, 
                     'success':success, 
@@ -138,7 +144,7 @@ def link_wip():
                         'alias': data['wipNumber'],
                         'voltage': 4087,
                         'status': status,
-                        'timestamp': tagList[data['tagNumber']]["timestamp"],
+                        'timestamp': timestamp,
                     } 
                 }
     return jsonify(response)
@@ -150,7 +156,7 @@ def check_for_old_wip(tagId):
         conn, cursor = dbfuncs.db_connection()
 
         wipNumber, qty, startTime = dbfuncs.getLastInProdBasedOnTagIdExt(cursor, tagId)
-        
+
 
         if wipNumber != 0:
             dbfuncs.addWIPOverrideIntoQueue(cursor, wipNumber, qty)
@@ -223,6 +229,13 @@ def get_overwritten_wips():
         conn, cursor = dbfuncs.db_connection()
         wips = dbfuncs.getAllWIPOverride(cursor)
         dbfuncs.closeDBConnection(conn)
+        wipObjects = []
+        for wip in wips:
+            wipObjects.append({
+                'wip': wip[0],
+                'qty': wip[1],
+                'startTime': [2],
+            })
         status = True
     except:
         dbfuncs.closeDBConnection(conn)
@@ -230,7 +243,7 @@ def get_overwritten_wips():
 
     response = {
         'status': status,
-        'wips': wips
+        'wips': wipObjects
     }
     return jsonify(response)
 

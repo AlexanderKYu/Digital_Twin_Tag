@@ -34,6 +34,11 @@ export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
         .then((data) => {
           if(data.status){
             setOverwrittenWips(data.wips)
+            let tempEndTimes = []
+            for(let wip in data.wips){
+              tempEndTimes.push('');
+            }
+            setEndTimes(tempEndTimes)
           }
         });
   }, []);
@@ -43,7 +48,7 @@ export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
     var jsonData = {
       wip: wip['wip'],
       qty: wip['qty'],
-      tEnd: endTimes[i],
+      tEnd: Date.parse(endTimes[i]),
     };
     const aliasData = {
       method: "POST",
@@ -61,7 +66,7 @@ export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
           }
         });
   }
-  
+
   return (
     <>
     
@@ -77,7 +82,7 @@ export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
           </Thead>
           <Tbody>
           {overwrittenWips.map((wip, i) => (
-          <Tr>
+          <Tr key={wip}>
             <Td>{wip['wip'] + "." + wip['qty']}</Td>
             <Td>{wip['startTime']}</Td>
             <Td>
