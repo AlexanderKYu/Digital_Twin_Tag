@@ -1,7 +1,7 @@
 services:
   flask-api:
     build: .
-    container_name: flask-api 
+    container_name: flask-api
     restart: always
     environment:
       - APP_NAME=MyFlaskApp
