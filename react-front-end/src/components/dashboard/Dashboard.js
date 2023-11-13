@@ -94,13 +94,29 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
             <Box
               p={5}
               pb={10}
-              height="auto"
+              height="600px"
+              overflowY="scroll"
+              width="auto"
               borderColor="grey.200"
               borderWidth={0.2}
               borderRadius={10}
               color="white"
               mb={5}
               bg="#0d1117"
+              css={{
+                '&::-webkit-scrollbar': {
+                  width: '4px',
+                  height: '10px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  marginTop: "10px",
+                  marginBottom: "10px",
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: "white ",
+                  borderRadius: '10px',
+                },
+              }}
             >
               <Text color="white" fontSize="5xl" mb={2}>
                 TAGS
