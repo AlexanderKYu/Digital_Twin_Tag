@@ -48,7 +48,7 @@ export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
     var jsonData = {
       wip: wip['wip'],
       qty: wip['qty'],
-      tEnd: Date.parse(endTimes[i]),
+      tEnd: (Date.parse(endTimes[i])/1000),
     };
     const aliasData = {
       method: "POST",
