@@ -3,7 +3,7 @@ from os import environ, path
 from dotenv import load_dotenv
 
 basedir = path.abspath(path.dirname(path.dirname(__file__)))
-load_dotenv(path.join(basedir, '.env'))
+load_dotenv(path.join(basedir, 'flask-api/.env'))
 
 def db_connection():
     conn = ""
@@ -101,7 +101,7 @@ def db_init(cursor):
     db_query = """CREATE TABLE IF NOT EXISTS wipOverrideQueue (
     WIP INT NOT NULL,
     QTY INT NOT NULL,
-    t_start FLOAT
+    t_start FLOAT,
     CONSTRAINT OVERRIDE_PAIR PRIMARY KEY (WIP, QTY)
     )"""
 
@@ -312,7 +312,7 @@ def getLastInProdWIPBasedOnTagId(cursor, tagid):
 
     data = cursor.fetchall()
 
-    if data is None:
+    if len(data) <= 0:
         return 0, 0
     return data[-1][0], data[-1][1]
 
@@ -325,7 +325,7 @@ def getLastInProdBasedOnTagIdExt(cursor, tagid):
 
     data = cursor.fetchone()
 
-    if data is None:
+    if len(data) <= 0:
         return 0, 0, 0
     return data
 
