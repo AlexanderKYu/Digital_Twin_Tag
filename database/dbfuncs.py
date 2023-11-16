@@ -3,7 +3,7 @@ from os import environ, path
 from dotenv import load_dotenv
 
 basedir = path.abspath(path.dirname(path.dirname(__file__)))
-load_dotenv(path.join(basedir, '.env'))
+load_dotenv(path.join(basedir, 'flask-api/.env'))
 
 def db_connection():
     conn = ""
@@ -101,7 +101,8 @@ def db_init(cursor):
     db_query = """CREATE TABLE IF NOT EXISTS wipOverrideQueue (
     WIP INT NOT NULL,
     QTY INT NOT NULL,
-    t_start FLOAT
+    t_start FLOAT,
+    CONSTRAINT OVERRIDE_PAIR PRIMARY KEY (WIP, QTY)
     )"""
 
     cursor.execute(db_query)
@@ -304,15 +305,16 @@ def getZoneName(cursor, ZoneID):
 def getLastInProdWIPBasedOnTagId(cursor, tagid):
     
     db_query = f"""SELECT WIP, QTY FROM tblorders
-    WHERE inprod = True AND tagid = '{tagid}'"""
+    WHERE inprod = True AND tagid = '{tagid}'
+    ORDER BY t_start ASC"""
 
     cursor.execute(db_query)
 
-    data = cursor.fetchone()
+    data = cursor.fetchall()
 
-    if data is None:
+    if len(data) <= 0:
         return 0, 0
-    return data
+    return data[-1][0], data[-1][1]
 
 def getLastInProdBasedOnTagIdExt(cursor, tagid):
     
@@ -323,7 +325,7 @@ def getLastInProdBasedOnTagIdExt(cursor, tagid):
 
     data = cursor.fetchone()
 
-    if data is None:
+    if len(data) <= 0:
         return 0, 0, 0
     return data
 
@@ -423,6 +425,16 @@ def manualWIPOverrideForQTY(cursor, WIP, QTY, t_end):
     WHERE WIP = {WIP} AND QTY = {QTY} AND inprod = True"""
 
     cursor.execute(db_query)
+
+def getAllWIPOverride(cursor):
+
+    db_query = f"""SELECT * FROM wipOverrideQueue"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+    
+    return data
 
 def dbPushZoneDef(cursor, ZoneName, x_lower, x_upper, y_lower, y_upper):
 

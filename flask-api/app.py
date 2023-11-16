@@ -7,6 +7,7 @@ import sys
 import json
 import time
 import atexit
+import datetime
 
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -46,7 +47,7 @@ def emit_tag_data():
             s.close()
             socketio.emit("getTags",tagJson,broadcast=True)
         except:
-            socketio.emit("serverDown", {'id': 1, 'down': True, 'message': "Eliko Unreachable"}, broadcast=True)
+            socketio.emit("serverDown", {'id': 1, 'down': True, 'message': "Eliko inaccessible / Eliko Unreachable"}, broadcast=True)
         
 
 def invoke_eliko_pull_api():
@@ -55,7 +56,7 @@ def invoke_eliko_pull_api():
         eliko_pull.main("push_info.pkl", "samples.pkl")
         socketio.emit("serverDown", {'id': 2, 'down': False, 'message': ""}, broadcast=True)
     except:
-        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Database Unreachable"}, broadcast=True)
+        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10, id="emit_tag_data")
@@ -70,49 +71,71 @@ if(not(scheduler.running)):
 def link_wip():
     """set WIP number as alias for tag and return confirmation"""
     data = request.get_json()
+    tagId = data["tagNumber"]
     resString = ""
     success = False
     status = -1
 
-    check_for_old_wip(data['tagNumber'])
-
+    
     #call eliko api
     #connected through router
-    TCP_IP = environ.get('TCP_IP')
-    TCP_PORT = int(environ.get('TCP_PORT'))
-    BUFFER_SIZE = 100
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(3)
+    s, socketState = JSON_eliko_call.createSocket()
+
+    if not socketState:
+        response = {
+                    'data': "Unable to Create Connection to Eliko", 
+                    'success':False,  
+                }
+        return jsonify(response)
+    
+    # get eliko data that will be used differently depending on the situation
+    tagList = JSON_eliko_call.getTags(s)
+    tagList = json.loads(tagList)
+        
+    # check if tag is set to disponible
+    if data["wipNumber"] == "DISPONIBLE":
+        conn, cursor = dbfuncs.db_connection()
+        oldWip, oldQty = dbfuncs.getLastInProdWIPBasedOnTagId(cursor, tagId[2:])
+        dbfuncs.setWIPInProd(cursor, oldWip, oldQty, False)
+
+        tempTag = tagList.get(tagId, {"timestamp": 0})
+        timestamp = tempTag["timestamp"]
+        dbfuncs.setProdEndTime(cursor, oldWip, oldQty, timestamp)
+        dbfuncs.closeDBConnection(conn)
+    else:
+        check_for_old_wip(tagId[2:])
 
     try:
-        s.connect((TCP_IP, TCP_PORT))
 
         #getting battery status of tag
         batteryData = JSON_eliko_call.getBattery(s)
         batteryData = json.loads(batteryData)
-        status = batteryData[data["tagNumber"]]["status"]
+        status = batteryData[tagId]["status"]
         
-        #str ='$PEKIO,GET_TAGS,'
-        eCall ='$PEKIO,SET_TAG_ALIAS,'+ data['tagNumber'] + "," + data['wipNumber']
+        eCall ='$PEKIO,SET_TAG_ALIAS,'+ tagId + "," + data['wipNumber']
         eCall = eCall + "\r\n"
         s.send(eCall.encode())
 
         #break point. It looks like the message isnt properly received by the server
-        res = s.recv(BUFFER_SIZE)
+        res = s.recv(100)
         s.close()
         res = str(res)
         print ("received data:", res)
         if res[9:11] == 'OK':
-            resString = 'Tag ' + data['tagNumber'] + ' set to Alias ' + data['wipNumber']
+            resString = 'Tag ' + tagId + ' set to Alias ' + data['wipNumber']
             success = True
         else:
-            resString = 'Tag ' + data['tagNumber'] + ' not found'
+            resString = 'Tag ' + tagId + ' not found'
     except:
         print("Eliko Socket Timed Out")
         resString = 'Linking Tag to WIP unsuccessful'
 
 
     #return confirmation
+    # TODO: replace phony values with real ones
+    tempTag = tagList.get(tagId, {"timestamp": 0})
+    timestamp = tempTag["timestamp"]
+
     response = {
                     'data':resString, 
                     'success':success, 
@@ -121,22 +144,32 @@ def link_wip():
                         'alias': data['wipNumber'],
                         'voltage': 4087,
                         'status': status,
-                        'timestamp': 1212343243,
+                        'timestamp': timestamp,
                     } 
                 }
     return jsonify(response)
 
 def check_for_old_wip(tagId):
+
     # check if tag is still considered "In Production" in database
-    conn, cursor = dbfuncs.db_connection()
+    try:
+        conn, cursor = dbfuncs.db_connection()
 
-    wipNumber, qty, startTime = dbfuncs.getLastInProdBasedOnTagIdExt(cursor, tagId)
-    dbfuncs.closeDBConnection(conn)
+        wipNumber, qty, startTime = dbfuncs.getLastInProdBasedOnTagIdExt(cursor, tagId)
 
-    wipNumber = wipNumber + "." + qty
-    if wipNumber != 0:
-        # send tag information to front end so that the supervisor can add an end time
-        socketio.emit("tagOverwritten",{'tagId': tagId, 'wip': wipNumber, 'startTime': startTime},broadcast=True)
+
+        if wipNumber != 0:
+            dbfuncs.addWIPOverrideIntoQueue(cursor, wipNumber, qty)
+            dbfuncs.closeDBConnection(conn)
+            # send tag information to front end so that the supervisor can add an end time
+            startTimeObj = datetime.datetime.fromtimestamp(int(startTime))
+            startTimeText = startTimeObj.strftime( "%Y-%m-%d %I:%M %p")
+            socketio.emit("tagOverwritten",{'tagId': tagId, 'wip': wipNumber, 'qty': qty, 'startTime': startTimeText},broadcast=True)
+        else:
+            dbfuncs.closeDBConnection(conn)
+    except:
+        print("Connection to Database Failed")
+        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
 
 
 
@@ -172,6 +205,50 @@ def link_battery():
 
     return jsonify(response)
 
+@app.route("/update-tend", methods=['POST'])
+def update_tend():
+    data = request.get_json()
+
+    try:
+        conn, cursor = dbfuncs.db_connection()
+        dbfuncs.manualWIPOverrideForQTY(cursor, data["wip"], data["qty"], data["tEnd"])
+        dbfuncs.deleteWIPOverrideFromQueue(cursor, data["wip"], data["qty"])
+        dbfuncs.closeDBConnection(conn)
+        status = True
+    except:
+        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
+        status = False
+
+    response = {
+        'status': status
+    }
+    return jsonify(response)
+
+@app.route("/get-overwritten-wips", methods=['GET'])
+def get_overwritten_wips():
+    
+    wips = []
+    try:
+        conn, cursor = dbfuncs.db_connection()
+        wips = dbfuncs.getAllWIPOverride(cursor)
+        dbfuncs.closeDBConnection(conn)
+        wipObjects = []
+        for wip in wips:
+            wipObjects.append({
+                'wip': wip[0],
+                'qty': wip[1],
+                'startTime': datetime.datetime.fromtimestamp(int(wip[2])).strftime( "%Y-%m-%d %I:%M %p"),
+            })
+        status = True
+    except:
+        dbfuncs.closeDBConnection(conn)
+        status = False
+
+    response = {
+        'status': status,
+        'wips': wipObjects
+    }
+    return jsonify(response)
 
 @socketio.on("connect")
 def connected():

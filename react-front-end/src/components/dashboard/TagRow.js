@@ -50,7 +50,7 @@ export default function TagRow(props) {
               borderRadius={50}
               p={1.5}
             >
-              <Text>{props.tagId}</Text>
+              <Text>{props.tag.alias}</Text>
             </Box>
             {/* box for last seen */}
             <Box flex="1" flexGrow="4">
@@ -81,13 +81,13 @@ export default function TagRow(props) {
               pl={2}
               pr={2}
             >
-              {/* tag alias */}
+              {/* tag ID */}
               <Box mb={6}>
                 <Text
                   fontSize="18px"
                   mb={2}
                 >
-                  TAG ALIAS
+                  TAG ID
                 </Text>
                 <Box
                   borderWidth={0.2}
@@ -95,7 +95,7 @@ export default function TagRow(props) {
                   p={1.5}
                   fontFamily="arial"
                 >
-                  <Text>{props.tag.alias}</Text>
+                  <Text>{props.tagId}</Text>
                 </Box>
               </Box>
               {/* current coordinates */}

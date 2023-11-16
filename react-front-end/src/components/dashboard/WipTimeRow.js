@@ -1,27 +1,75 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect} from "react";
+
 import {
-  Box,
-  Flex,
-  Text,
   Button,
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
   Input,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 
-export default function WipTimeRow({overwrittenWips}) {
 
+export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
+  const [endTimes, setEndTimes] = useState([]);
+  const handleChange = (e, i) => {
+    setEndTimes(oldEndTimes => {
+      const newEndTimes = oldEndTimes.map((event, index) => {
+        if (i === index) {
+          return e;
+        } else {
+          return event;
+        }
+      });
+      return newEndTimes;
+    })
+  }
+
+  useEffect(() => {
+    fetch("/get-overwritten-wips")
+        .then((res) => res.json())
+        .then((data) => {
+          if(data.status){
+            setOverwrittenWips(data.wips)
+            let tempEndTimes = []
+            for(let wip in data.wips){
+              tempEndTimes.push('');
+            }
+            setEndTimes(tempEndTimes)
+          }
+        });
+  }, []);
+
+
+  const updateTEnd = (wip, i) =>{
+    var jsonData = {
+      wip: wip['wip'],
+      qty: wip['qty'],
+      tEnd: (Date.parse(endTimes[i])/1000),
+    };
+    const aliasData = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(jsonData),
+    };
+    fetch("/update-tend", aliasData)
+        .then((res) => res.json())
+        .then((data) => {
+          // TODO: confirmation banner when t-end is successful
+          if(data.status){
+            setOverwrittenWips(oldWips => oldWips.filter(w => 
+              w.wip !== wip.wip
+              ))
+          }
+        });
+  }
 
   return (
     <>
+    
       <TableContainer>
         <Table variant="wipTable">
           <Thead>
@@ -33,12 +81,19 @@ export default function WipTimeRow({overwrittenWips}) {
             </Tr>
           </Thead>
           <Tbody>
-          {overwrittenWips.map((wip) => (
-          <Tr>
-            <Td>{wip['wip']}</Td>
+          {overwrittenWips.map((wip, i) => (
+          <Tr key={wip}>
+            <Td>{wip['wip'] + "." + wip['qty']}</Td>
             <Td>{wip['startTime']}</Td>
-            <Td><Input variant='endTimeInput' placeholder='Input End Time'/></Td>
-            <Td><Button variant="editBtn">Submit</Button></Td>
+            <Td>
+              <Input
+                placeholder="Select Date and Time"
+                size="md"
+                type="datetime-local"
+                value={endTimes[i]}
+                onChange={e=> handleChange(e.target.value, i)}
+                /></Td>
+            <Td><Button variant="editBtn" onClick={() => updateTEnd(wip, i)}>Submit</Button></Td>
           </Tr>
           ))}
           </Tbody>
