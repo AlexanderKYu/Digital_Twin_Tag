@@ -27,14 +27,14 @@ const outline = definePartsStyle((props) => {
       width: "auto",
     },
     button: {
-      bg: "white",
+      bg: "#21262d",
       color: "black",
       borderRadius: "50",
       letterSpacing: "1",
       p: "4",
-      mb: "5",
+      mb: "3",
       _hover: {
-        bg: "white",
+        bg: "#21262d",
         borderRadius: "50",
         p: "4",
         outlineColor: "#009cd9",
@@ -48,9 +48,9 @@ const outline = definePartsStyle((props) => {
       },
     },
     panel: {
-      bg: "white",
-      borderRadius: "50",
-      p: "4",
+      bg: "#21262d",
+      borderRadius: "30",
+      p: "5",
       mb: "5",
     },
     icon: {

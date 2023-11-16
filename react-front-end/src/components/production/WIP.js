@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Input,
@@ -8,13 +8,12 @@ import {
   Alert,
   Button,
   InputRightElement,
-  Center,
+  AlertIcon,
+  AlertDescription,
+  CloseButton
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import TagData from "./WipRow.js";
-import theme from "./theme/Theme"
-import { ChakraProvider } from '@chakra-ui/react'
-import Nav from "./Nav";
 
 export default function WIP() {
   const [tag, setTag] = useState("");
@@ -131,19 +130,49 @@ export default function WIP() {
   return (
     <>
       {confirmation && !status && (
-        <Alert status="success" variant="solid" fontFamily="Arial" bg="#a3142e">
-          {confirmation}
-        </Alert>
+        <Alert status="error" variant="solid" fontFamily="Arial" bg="#a3142e">
+        <AlertIcon />
+        <Box>
+          <AlertDescription>
+            {confirmation}
+          </AlertDescription>
+        </Box>
+        <CloseButton
+          alignSelf='end'
+          position='absolute'
+          right={1}
+          top={2}
+          onClick={()=>{
+            setConfirmation('');
+          }}
+        />
+        
+      </Alert>
       )}
       {confirmation && status && (
         <Alert status="success" variant="solid" fontFamily="Arial" bg="#009cd9">
-          {confirmation}
-        </Alert>
+        <AlertIcon />
+        <Box>
+          <AlertDescription>
+            {confirmation}
+          </AlertDescription>
+        </Box>
+        <CloseButton
+          alignSelf='end'
+          position='absolute'
+          right={1}
+          top={2}
+          onClick={()=>{
+            setConfirmation('');
+          }}
+        />
+        
+      </Alert>
       )}
-      <Flex align="center" mt={0} bg="black" color="white">
-        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box> {/* left border */}
-        <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="black"> {/* all middle */}
-          <Flex align="center" mt={0} bg="black" color="white"> {/* flex for middle */}
+      <Flex align="center" mt={0} bg="#0d1117" color="white">
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box> {/* left border */}
+        <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="#0d1117"> {/* all middle */}
+          <Flex align="center" mt={0} bg="#0d1117" color="white"> {/* flex for middle */}
             <Box
               flex="1"
               flexGrow="0.5"
@@ -152,7 +181,7 @@ export default function WIP() {
               pb={10}
               pl={20}
               pr={20}
-              bg="black"
+              bg="#0d1117"
               align="center"
               borderRight="solid"
               border-color="white"
@@ -223,7 +252,7 @@ export default function WIP() {
               pb={10}
               pl={20}
               pr={20}
-              bg="black"
+              bg="#0d1117"
             > {/* right side */}
               <Text fontSize="5xl" textAlign="center">SEARCH / RECHERCHE</Text>
               <InputGroup>
@@ -235,7 +264,7 @@ export default function WIP() {
             </Box>
           </Flex>
         </Box>
-        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="black"></Box> {/* right border */}
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box> {/* right border */}
       </Flex>
       </>
   );

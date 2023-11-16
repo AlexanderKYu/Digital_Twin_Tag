@@ -3,7 +3,7 @@ from os import environ, path
 from dotenv import load_dotenv
 
 basedir = path.abspath(path.dirname(path.dirname(__file__)))
-load_dotenv(path.join(basedir, '.env'))
+load_dotenv(path.join(basedir, 'flask-api/.env'))
 
 def db_connection():
     conn = ""
@@ -94,6 +94,15 @@ def db_init(cursor):
     y FLOAT,
     ZoneID INT,
     CONSTRAINT COMP_NAME PRIMARY KEY (WIP, QTY)
+    )"""
+
+    cursor.execute(db_query)
+
+    db_query = """CREATE TABLE IF NOT EXISTS wipOverrideQueue (
+    WIP INT NOT NULL,
+    QTY INT NOT NULL,
+    t_start FLOAT,
+    CONSTRAINT OVERRIDE_PAIR PRIMARY KEY (WIP, QTY)
     )"""
 
     cursor.execute(db_query)
@@ -221,6 +230,8 @@ def delete_all(cursor):
 
    cursor.execute(db_query)
 
+   db_query = "DROP TABLE IF EXISTS wipOverrideQueue"
+
 def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
 
     db_query = f"""INSERT INTO tblOrders (WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName)
@@ -230,8 +241,8 @@ def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_flo
 
 def dbPushTblPaths(cursor, WIP, QTY, tagID, zoneID, zoneName, time):
 
-    db_query = f"""INSERT INTO tblPaths (
-    {WIP}, {QTY}, '{tagID}', {zoneID}, '{zoneName}', {time}
+    db_query = f"""INSERT INTO tblPaths (WIP, QTY, TagID, ZoneID, ZoneName, Time)
+    VALUES ({WIP}, {QTY}, '{tagID}', {zoneID}, '{zoneName}', {time}
     );"""
 
     cursor.execute(db_query)
@@ -294,16 +305,29 @@ def getZoneName(cursor, ZoneID):
 def getLastInProdWIPBasedOnTagId(cursor, tagid):
     
     db_query = f"""SELECT WIP, QTY FROM tblorders
+    WHERE inprod = True AND tagid = '{tagid}'
+    ORDER BY t_start ASC"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+
+    if len(data) <= 0:
+        return 0, 0
+    return data[-1][0], data[-1][1]
+
+def getLastInProdBasedOnTagIdExt(cursor, tagid):
+    
+    db_query = f"""SELECT WIP, QTY, t_start FROM tblorders
     WHERE inprod = True AND tagid = '{tagid}'"""
 
     cursor.execute(db_query)
 
     data = cursor.fetchone()
 
-    if data is None:
-        return 0, 0
+    if len(data) <= 0:
+        return 0, 0, 0
     return data
-
 
 def setWIPInProd(cursor, WIP, QTY, inprod):
 
@@ -331,3 +355,97 @@ def checkIfNewWIP(cursor, WIP, QTY):
         return False
     return True
 
+def checkIfTagZoneOnPath(cursor, WIP, QTY, zoneID):
+    
+    db_query = f"""SELECT * FROM tblPaths
+    WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+    if len(data) > 0:
+        return True
+    return False
+
+def queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID):
+    
+    db_query = f"""SELECT Timestamp FROM tblRawLocations
+    WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}
+    ORDER BY Timestamp ASC"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+
+    if len(data) >= 2:
+        return data[-1][0] - data[0][0]
+    return 0
+
+def dbUpdateWIPOnTblPaths(cursor, WIP, QTY, zoneID):
+
+    zone_duration = queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID)
+
+    db_query = f"""UPDATE tblPaths SET Time = {zone_duration}
+    WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}"""
+
+    cursor.execute(db_query)
+
+def addWIPOverrideIntoQueue(cursor, WIP, QTY):
+    
+    db_query = f"""SELECT t_start FROM tblOrders
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
+
+    t_start = cursor.fetchone()[0]
+
+    db_query = f"""INSERT INTO wipOverrideQueue (WIP, QTY, t_start)
+    VALUES ({WIP}, {QTY}, {t_start})"""
+
+    cursor.execute(db_query)
+
+def deleteWIPOverrideFromQueue(cursor, WIP, QTY):
+    
+    db_query = f"""DELETE FROM wipOverrideQueue
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
+
+def manualWIPOverrideForAllQTY(cursor, WIP, t_end):
+    
+    db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
+    WHERE WIP = {WIP} AND inprod = True"""
+
+    cursor.execute(db_query)
+
+
+def manualWIPOverrideForQTY(cursor, WIP, QTY, t_end):
+
+    db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
+    WHERE WIP = {WIP} AND QTY = {QTY} AND inprod = True"""
+
+    cursor.execute(db_query)
+
+def getAllWIPOverride(cursor):
+
+    db_query = f"""SELECT * FROM wipOverrideQueue"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+    
+    return data
+
+def dbPushZoneDef(cursor, ZoneName, x_lower, x_upper, y_lower, y_upper):
+
+    db_update_query = f"""UPDATE tblZoneDef SET ActiveZone = False WHERE ZoneName = '{ZoneName}'"""
+    cursor.execute(db_update_query)
+
+    db_insert_query = f"""INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone) 
+    VALUES ('{ZoneName}', {x_lower}, {x_upper}, {y_lower}, {y_upper}, True)"""
+    cursor.execute(db_insert_query)
+
+
+def disableZoneDef(cursor, ZoneName):
+    db_update_query = f"""UPDATE tblZoneDef SET ActiveZone = False WHERE ZoneName = '{ZoneName}'"""
+    cursor.execute(db_update_query)
