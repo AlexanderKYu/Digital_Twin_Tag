@@ -162,11 +162,14 @@ def check_for_old_wip(tagId):
             dbfuncs.addWIPOverrideIntoQueue(cursor, wipNumber, qty)
             dbfuncs.closeDBConnection(conn)
             # send tag information to front end so that the supervisor can add an end time
-            socketio.emit("tagOverwritten",{'tagId': tagId, 'wip': wipNumber, 'qty': qty, 'startTime': startTime},broadcast=True)
+            startTimeObj = datetime.datetime.fromtimestamp(int(startTime))
+            startTimeText = startTimeObj.strftime( "%Y-%m-%d %I:%M %p")
+            socketio.emit("tagOverwritten",{'tagId': tagId, 'wip': wipNumber, 'qty': qty, 'startTime': startTimeText},broadcast=True)
         else:
             dbfuncs.closeDBConnection(conn)
     except:
-        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Database Unreachable"}, broadcast=True)
+        print("Connection to Database Failed")
+        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
 
 
 
@@ -213,7 +216,7 @@ def update_tend():
         dbfuncs.closeDBConnection(conn)
         status = True
     except:
-        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Database Unreachable"}, broadcast=True)
+        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
         status = False
 
     response = {
@@ -234,7 +237,7 @@ def get_overwritten_wips():
             wipObjects.append({
                 'wip': wip[0],
                 'qty': wip[1],
-                'startTime': [2],
+                'startTime': datetime.datetime.fromtimestamp(int(wip[2])).strftime( "%Y-%m-%d %I:%M %p"),
             })
         status = True
     except:
