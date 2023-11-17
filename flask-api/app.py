@@ -29,6 +29,10 @@ socketio = SocketIO(cors_allowed_origins="*")
 socketio.init_app(app)
 
 
+@app.route('/healthcheck')
+def healthcheck():
+    return 'API is healthy!'
+
 
 def emit_tag_data():
     with app.test_request_context('/'):
