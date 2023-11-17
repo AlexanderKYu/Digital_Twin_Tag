@@ -25,6 +25,11 @@ socketio = SocketIO(cors_allowed_origins="*")
 
 socketio.init_app(app)
 
+# Health check endpoint
+@app.route('/healthcheck')
+def health_check():
+    # You can add more sophisticated checks here if needed
+    return 'Backend is up and running!'
 
 
 def emit_tag_data():
