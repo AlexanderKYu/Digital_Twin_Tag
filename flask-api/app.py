@@ -43,6 +43,12 @@ def emit_tag_data():
             #getting battery status of tag
             tagJson = JSON_eliko_call.getTags(s)
             tagJson = json.loads(tagJson)
+            batteryJson = JSON_eliko_call.getBattery(s)
+            batteryJson = json.loads(batteryJson)
+
+            for tag in tagJson:
+                if(batteryJson[tag]):
+                    tagJson[tag].update(batteryJson[tag])
 
             s.close()
             socketio.emit("getTags",tagJson,broadcast=True)
