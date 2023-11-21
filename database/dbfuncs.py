@@ -319,15 +319,16 @@ def getLastInProdWIPBasedOnTagId(cursor, tagid):
 def getLastInProdBasedOnTagIdExt(cursor, tagid):
     
     db_query = f"""SELECT WIP, QTY, t_start FROM tblorders
-    WHERE inprod = True AND tagid = '{tagid}'"""
+    WHERE inprod = True AND tagid = '{tagid}'
+    ORDER BY t_start ASC"""
 
     cursor.execute(db_query)
 
-    data = cursor.fetchone()
+    data = cursor.fetchall()
 
     if len(data) <= 0:
         return 0, 0, 0
-    return data
+    return data[-1][0], data[-1][1], data[-1][2]
 
 def setWIPInProd(cursor, WIP, QTY, inprod):
 
