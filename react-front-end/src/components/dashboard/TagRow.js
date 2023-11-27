@@ -58,7 +58,7 @@ export default function TagRow(props) {
             </Box>
             {/* box for battery */}
             <Box flex="1" flexGrow="0.5">
-              <Text>87%</Text>
+              <Text>{props.tag.status}</Text>
             </Box>
           </Flex>
         </AccordionButton>
@@ -191,7 +191,7 @@ export default function TagRow(props) {
                   p={1.5}
                   fontFamily="arial"
                 >
-                  <Text>87%</Text>
+                  <Text>{props.tag.status}</Text>
                 </Box>
               </Box>
               <Box mb={2}>
