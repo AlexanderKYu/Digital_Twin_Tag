@@ -471,6 +471,6 @@ def clearAllInactive(cursor):
     cursor.execute(db_query)
 
 def dbPushInactiveTags(cursor, tagID, WIP, QTY, inactive_duration):
-    db_query = f"""INSERT INTO inactive (TagID, WIP, QTY, ZoneID, inactive_duration)
+    db_query = f"""INSERT INTO inactivetags (TagID, WIP, QTY, inactive_duration)
     VALUES ('{tagID}', {WIP}, {QTY}, {inactive_duration})"""
     cursor.execute(db_query)
