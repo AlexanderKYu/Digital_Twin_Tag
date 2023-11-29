@@ -24,7 +24,7 @@ export default function Filter({tagData, filterTagData, setFilterTagData}) {
     if(e.target.checked){
       setFilterTagData(oldTagData => {
         var results = Object.keys(oldTagData).reduce(function(acc, val) {
-          if(oldTagData[val][attribute] === '34343')  acc[val] = oldTagData[val];
+          if(oldTagData[val][attribute] === true)  acc[val] = oldTagData[val];
         return acc;
         }, {});
         return results;
@@ -58,7 +58,7 @@ export default function Filter({tagData, filterTagData, setFilterTagData}) {
                 />
               </MenuButton>
               <MenuList>
-                <MenuItem><Checkbox colorScheme="blue" onChange={(e) => handleClick(e, "alias")}>Filter 1</Checkbox></MenuItem>
+                <MenuItem><Checkbox colorScheme="blue" onChange={(e) => handleClick(e, "inactive")}>Inactive</Checkbox></MenuItem>
               </MenuList>
             </Menu>
           </Box>
