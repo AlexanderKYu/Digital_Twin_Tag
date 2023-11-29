@@ -474,3 +474,12 @@ def dbPushInactiveTags(cursor, tagID, WIP, QTY, inactive_duration):
     db_query = f"""INSERT INTO inactivetags (TagID, WIP, QTY, inactive_duration)
     VALUES ('{tagID}', {WIP}, {QTY}, {inactive_duration})"""
     cursor.execute(db_query)
+
+def getInactiveInProdTags(cursor):
+    db_query = f"""SELECT * FROM tblOrders
+    INNER JOIN inactivetags ON tblOrders.tagid = inactivetags.tagid AND tblOrders.wip = inactivetags.wip AND tblOrders.qty = inactivetags.qty
+    WHERE inprod = true"""
+
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
