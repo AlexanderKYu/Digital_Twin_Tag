@@ -27,6 +27,7 @@ def dict_to_json(dictionary):
 def dbTagsPush(tagsJson):
     tagsJson = json.loads(tagsJson)
     conn, cursor = dbfuncs.db_connection()
+    dbfuncs.clearAllInactive(cursor)
     for key, values in tagsJson.items():
         tagID = key.replace("0x", "")
         timestamp = values['timestamp']
@@ -60,6 +61,9 @@ def dbTagsPush(tagsJson):
         else:
             zoneName = dbfuncs.getZoneName(cursor, zoneID)
             dbfuncs.dbPushTblPaths(cursor, wip, qty, tagID, zoneID, zoneName, 0)
+        tag_duration = dbfuncs.queryZoneDurationBasedOnTblRawLocations(cursor, wip, qty, zoneID)
+        if (tag_duration >= (48 * 60 * 60)):
+            dbfuncs.dbPushInactiveTags(cursor, tagID, wip, qty, tag_duration)
     dbfuncs.closeDBConnection(conn)
     return tagsJson
 

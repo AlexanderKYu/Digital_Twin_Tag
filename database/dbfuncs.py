@@ -107,6 +107,16 @@ def db_init(cursor):
 
     cursor.execute(db_query)
 
+    db_query = """CREATE TABLE IF NOT EXISTS inactiveTags (
+    TagID VARCHAR(6),
+    WIP INT,
+    QTY INT,
+    inactive_duration FLOAT,
+    PRIMARY KEY (TagID)
+    )"""
+
+    cursor.execute(db_query)
+
 def define_hard_zones(cursor):
 
     db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
@@ -231,6 +241,12 @@ def delete_all(cursor):
    cursor.execute(db_query)
 
    db_query = "DROP TABLE IF EXISTS wipOverrideQueue"
+
+   cursor.execute(db_query)
+
+   db_query = "DROP TABLE IF EXISTS inactiveTags"
+
+   cursor.execute(db_query)
 
 def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
 
@@ -450,3 +466,21 @@ def dbPushZoneDef(cursor, ZoneName, x_lower, x_upper, y_lower, y_upper):
 def disableZoneDef(cursor, ZoneName):
     db_update_query = f"""UPDATE tblZoneDef SET ActiveZone = False WHERE ZoneName = '{ZoneName}'"""
     cursor.execute(db_update_query)
+
+def clearAllInactive(cursor):
+    db_query = f"""DELETE FROM inactiveTags"""
+    cursor.execute(db_query)
+
+def dbPushInactiveTags(cursor, tagID, WIP, QTY, inactive_duration):
+    db_query = f"""INSERT INTO inactivetags (TagID, WIP, QTY, inactive_duration)
+    VALUES ('{tagID}', {WIP}, {QTY}, {inactive_duration})"""
+    cursor.execute(db_query)
+
+def getInactiveInProdTags(cursor):
+    db_query = f"""SELECT tblOrders.tagID, tblOrders.wip, tblOrders.qty, inactivetags.inactive_duration FROM tblOrders
+    INNER JOIN inactivetags ON tblOrders.tagid = inactivetags.tagid AND tblOrders.wip = inactivetags.wip AND tblOrders.qty = inactivetags.qty
+    WHERE inprod = true"""
+
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
