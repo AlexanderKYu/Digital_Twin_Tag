@@ -3,6 +3,11 @@ import json
 from os import environ
 
 def createSocket():
+    """
+    Function to create a socket to communicate with eliko
+    hardware.
+    Return socket object (soc), creation status (bool)
+    """
     TCP_IP = environ.get('TCP_IP')
     TCP_PORT = int(environ.get('TCP_PORT'))
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -15,6 +20,11 @@ def createSocket():
         return soc, False
 
 def closeSocket(soc):
+    """
+    Function to close a socket to terminate communication 
+    with eliko hardware.
+    Return termination status (bool)
+    """
     try:
         soc.close()
         return True
@@ -22,6 +32,10 @@ def closeSocket(soc):
         return False
 
 def read(soc):
+    """
+    Function to read data from eliko in the socket
+    Return a list of communicated data
+    """
     try:
         loop=True
         data=""
@@ -36,7 +50,11 @@ def read(soc):
         print('Failed to send data')
 
 def getBattery(soc):
-
+    """
+    Function to read tag battery data from eliko in 
+    the socket.
+    Return a json object of communicated data
+    """
     msg = "$PEKIO,GET_BATTERIES"
     msg = msg + "\r\n"
 
@@ -58,7 +76,11 @@ def getBattery(soc):
   
 
 def getTags(soc):
-
+    """
+    Function to read tag data from eliko in 
+    the socket.
+    Return a json object of communicated data
+    """
     msg = "$PEKIO,GET_TAGS"
     msg = msg + "\r\n"
 
