@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionButton,
   AccordionPanel,
+  Image,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 
@@ -25,8 +26,6 @@ export default function TagRow(props) {
     ":" +
     parseInt(lastSeen.getMilliseconds());
   const [value, setValue] = useState("1");
-
-  
 
   return (
     <>
@@ -47,11 +46,31 @@ export default function TagRow(props) {
             {/* box for wip on accordian button */}
             <Box
               flex="1"
-              flexGrow="1"
+              flexGrow="0.2"
               color="white"
               borderRadius={50}
               p={1.5}
+              pb={3}
             >
+              {props.tag.inactive && (
+                <Image
+                  mt={2}
+                  boxSize="12px"
+                  src="/activeTag.png"
+                  alt="Active Tag"
+                />
+              )}
+
+              {!props.tag.inactive && (
+                <Image
+                  mt={2}
+                  boxSize="12px"
+                  src="/inactiveTag.png"
+                  alt="Inactive Tag"
+                />
+              )}
+            </Box>
+            <Box flex="1" flexGrow="1" color="white" borderRadius={50} p={1.5}>
               <Text>{props.tag.alias}</Text>
             </Box>
             {/* box for last seen */}
@@ -77,18 +96,10 @@ export default function TagRow(props) {
             borderRadius={30}
           >
             {/* flex for panel left */}
-            <Flex
-              width="50%"
-              direction="column"
-              pl={2}
-              pr={2}
-            >
+            <Flex width="50%" direction="column" pl={2} pr={2}>
               {/* tag ID */}
               <Box mb={6}>
-                <Text
-                  fontSize="18px"
-                  mb={2}
-                >
+                <Text fontSize="18px" mb={2}>
                   TAG ID
                 </Text>
                 <Box
@@ -102,10 +113,7 @@ export default function TagRow(props) {
               </Box>
               {/* current coordinates */}
               <Box mb={6}>
-                <Text
-                  fontSize="18px"
-                  mb={2}
-                >
+                <Text fontSize="18px" mb={2}>
                   CURRENT COORDINATES
                 </Text>
                 <Box
@@ -128,10 +136,7 @@ export default function TagRow(props) {
               </Box>
               {/*last seen*/}
               <Box>
-                <Text
-                  fontSize="18px"
-                  mb={2}
-                >
+                <Text fontSize="18px" mb={2}>
                   LAST ONLINE
                 </Text>
                 <Box
@@ -146,18 +151,10 @@ export default function TagRow(props) {
             </Flex>
 
             {/* flex for panel right */}
-            <Flex
-              width="50%"
-              direction="column"
-              pl={2}
-              pr={2}
-            >
+            <Flex width="50%" direction="column" pl={2} pr={2}>
               {/* zones */}
               <Box mb={6}>
-                <Text
-                  fontSize="18px"
-                  mb={2}
-                >
+                <Text fontSize="18px" mb={2}>
                   ZONE
                 </Text>
                 <Box
@@ -180,11 +177,8 @@ export default function TagRow(props) {
                 </Box>
               </Box>
               {/* battery */}
-              <Box mb={16}>
-                <Text
-                  fontSize="18px"
-                  mb={2}
-                >
+              <Box mb={6}>
+                <Text fontSize="18px" mb={2}>
                   BATTERY
                 </Text>
                 <Box
@@ -197,9 +191,21 @@ export default function TagRow(props) {
                 </Box>
               </Box>
               <Box mb={2}>
-                <Button variant="tagBtn">
-                  SHOW ON MAP
-                </Button>
+                <Text fontSize="18px" mb={2}>
+                  STATUS
+                </Text>
+                <Box
+                  borderWidth={0.2}
+                  borderRadius={50}
+                  p={1.5}
+                  fontFamily="arial"
+                >
+                  <Text>{props.tag.inactive} </Text>
+
+                  {props.tag.inactive && <Text>Active</Text>}
+
+                  {!props.tag.inactive && <Text>Inactive</Text>}
+                </Box>
               </Box>
             </Flex>
           </Flex>
@@ -208,3 +214,4 @@ export default function TagRow(props) {
     </>
   );
 }
+ 
