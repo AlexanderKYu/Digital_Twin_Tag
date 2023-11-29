@@ -46,9 +46,29 @@ def emit_tag_data():
             batteryJson = JSON_eliko_call.getBattery(s)
             batteryJson = json.loads(batteryJson)
 
+            try:
+                conn, cursor = dbfuncs.db_connection()
+
+                inactiveTags = dbfuncs.getInactiveInProdTags(cursor)
+
+                print(inactiveTags)
+
+                dbfuncs.closeDBConnection(conn)
+
+            except:
+                print("Connection to Database Failed")
+                socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
+
+
+
             for tag in tagJson:
                 if(batteryJson[tag]):
                     tagJson[tag].update(batteryJson[tag])
+                tagJson[tag]["inactive"] = False
+                for inactiveTag in inactiveTags:
+                    if tag[2:] == inactiveTag[0]: #have to cut out first 2 letters of tag because we have to remove the "0x"
+                        tagJson[tag]["inactive"] = True
+
 
             s.close()
             socketio.emit("getTags",tagJson,broadcast=True)
@@ -65,7 +85,7 @@ def invoke_eliko_pull_api():
         socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=10, id="emit_tag_data")
+scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=30, id="emit_tag_data")
 scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=5)
 
 if(not(scheduler.running)):
@@ -265,6 +285,9 @@ def connected():
     print("client has connected")
     scheduler.print_jobs()
     scheduler.resume_job("emit_tag_data")
+
+    if clients > 1:
+        emit_tag_data()
 
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
