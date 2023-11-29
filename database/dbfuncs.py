@@ -476,7 +476,7 @@ def dbPushInactiveTags(cursor, tagID, WIP, QTY, inactive_duration):
     cursor.execute(db_query)
 
 def getInactiveInProdTags(cursor):
-    db_query = f"""SELECT * FROM tblOrders
+    db_query = f"""SELECT tblOrders.tagID, tblOrders.wip, tblOrders.qty, inactivetags.inactive_duration FROM tblOrders
     INNER JOIN inactivetags ON tblOrders.tagid = inactivetags.tagid AND tblOrders.wip = inactivetags.wip AND tblOrders.qty = inactivetags.qty
     WHERE inprod = true"""
 
