@@ -5,15 +5,13 @@ import {
     Text,
     Input,
     Button,
-    ChakraProvider
 } from "@chakra-ui/react";
 import {ArrowForwardIcon} from "@chakra-ui/icons";
-import {HamburgerIcon, CloseIcon} from "@chakra-ui/icons";
 import {useState} from 'react';
 import FloorMap from "./FloorMap.js";
 import TagAll from "./TagAll.js";
-import WipTimeAll from "./WipTimeAll.js";
 import WipTimeRow from "./WipTimeRow.js";
+import Filter from "./Filter.js";
 
 export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}) {
     const [password,
@@ -29,6 +27,8 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
             alert('Incorrect Password');
         }
     };
+    
+    const [filterTagData, setFilterTagData] = useState(tagData);
 
     return ( <> {
         !isAuthenticated
@@ -83,9 +83,15 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
               <Text color="white" fontSize="5xl" mb={2}>
                 FLOOR MAP
               </Text>
+              
               <Box bg="#21262d" borderRadius={10} p={2}>
-                <FloorMap tagData={tagData}></FloorMap>
+                <FloorMap tagData={filterTagData}></FloorMap>
               </Box>
+            </Box>
+
+            {/* FILTER TEST */}
+            <Box> 
+
             </Box>
           </Box>
           {/* right panel box of middle */}
@@ -118,22 +124,36 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
                 },
               }}
             >
-              <Text color="white" fontSize="5xl" mb={2}>
-                TAGS
-              </Text>
-              <TagAll tagData={tagData}></TagAll>
+              <Filter tagData={tagData} filterTagData={filterTagData} setFilterTagData={setFilterTagData}></Filter>
+              <TagAll tagData={filterTagData}></TagAll>
             </Box>
             {/* WIP TIME */}
             <Box
               p={5}
               pb={10}
-              height="auto"
+              height="600px"
+              overflowY="scroll"
+              width="auto"
               borderColor="grey.200"
               borderWidth={0.2}
               borderRadius={10}
               color="white"
               mb={5}
               bg="#0d1117"
+              css={{
+                '&::-webkit-scrollbar': {
+                  width: '4px',
+                  height: '10px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  marginTop: "10px",
+                  marginBottom: "10px",
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: "white ",
+                  borderRadius: '10px',
+                },
+              }}
             >
               <Text color="white" fontSize="5xl" mb={2}>
                 WIP TIME EDIT
