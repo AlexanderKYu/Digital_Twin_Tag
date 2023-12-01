@@ -85,7 +85,7 @@ def invoke_eliko_pull_api():
         socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=30, id="emit_tag_data")
+scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=20, id="emit_tag_data")
 scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=5)
 
 if(not(scheduler.running)):

@@ -16,21 +16,19 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 
-export default function Filter({tagData, filterTagData, setFilterTagData}) {
+export default function Filter({setFilters}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleClick = (e, attribute) => {
     e.preventDefault();
     if(e.target.checked){
-      setFilterTagData(oldTagData => {
-        var results = Object.keys(oldTagData).reduce(function(acc, val) {
-          if(oldTagData[val][attribute] === true)  acc[val] = oldTagData[val];
-        return acc;
-        }, {});
-        return results;
+      setFilters(oldFilters => {
+        return {...oldFilters, "inactive": true}
       });
     } else {
-      setFilterTagData(tagData);
+      setFilters(oldFilters => {
+        return {...oldFilters, "inactive": false}
+      });
     }
     
   }

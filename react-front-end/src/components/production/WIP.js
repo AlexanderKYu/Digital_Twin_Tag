@@ -72,7 +72,6 @@ export default function WIP() {
       tagNumber: "0x" + tag,
       wipNumber: wip,
     };
-    console.log(jsonData);
     const aliasData = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
