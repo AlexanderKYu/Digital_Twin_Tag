@@ -52,7 +52,7 @@ export default function TagRow(props) {
               p={1.5}
               pb={3}
             >
-              {props.tag.inactive && (
+              {!props.tag.inactive && (
                 <Image
                   mt={2}
                   boxSize="12px"
@@ -61,7 +61,7 @@ export default function TagRow(props) {
                 />
               )}
 
-              {!props.tag.inactive && (
+              {props.tag.inactive && (
                 <Image
                   mt={2}
                   boxSize="12px"
@@ -202,9 +202,9 @@ export default function TagRow(props) {
                 >
                   <Text>{props.tag.inactive} </Text>
 
-                  {props.tag.inactive && <Text>Active</Text>}
+                  {!props.tag.inactive && <Text>Active</Text>}
 
-                  {!props.tag.inactive && <Text>Inactive</Text>}
+                  {props.tag.inactive && <Text>Inactive</Text>}
                 </Box>
               </Box>
             </Flex>

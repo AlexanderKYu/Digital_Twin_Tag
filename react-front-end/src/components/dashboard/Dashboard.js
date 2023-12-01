@@ -1,4 +1,4 @@
-import {ReactNode} from "react";
+import {ReactNode, useEffect} from "react";
 import {
     Box,
     Flex,
@@ -29,6 +29,24 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
     };
     
     const [filterTagData, setFilterTagData] = useState(tagData);
+    const [filters, setFilters] = useState({
+      "inactive": false,
+    });
+
+    //filter and sort tags
+    const filterTags = (tags) => {
+      if(filters["inactive"]){
+        tags = Object.keys(tags).reduce(function(acc, val) {
+          if(tags[val]["inactive"] === true)  acc[val] = tags[val];
+        return acc;
+        }, {});
+      }
+      return tags
+    }
+
+    useEffect(()=> {
+      setFilterTagData(filterTags(tagData))
+    }, [tagData, filters]);
 
     
 
@@ -54,7 +72,9 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
                                     width="500px"/>
                                 <br></br>
                                 <Button
-                                    variant="wipBtn">
+                                    variant="wipBtn"
+                                    type="submit"
+                                    >
                                     <ArrowForwardIcon></ArrowForwardIcon>
                                 </Button>
                             </form>
@@ -126,7 +146,7 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
                 },
               }}
             >
-              <Filter tagData={tagData} filterTagData={filterTagData} setFilterTagData={setFilterTagData}></Filter>
+              <Filter setFilters={setFilters}></Filter>
               <TagAll tagData={filterTagData}></TagAll>
             </Box>
             {/* WIP TIME */}
