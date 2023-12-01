@@ -51,14 +51,11 @@ def emit_tag_data():
 
                 inactiveTags = dbfuncs.getInactiveInProdTags(cursor)
 
-                print(inactiveTags)
-
                 dbfuncs.closeDBConnection(conn)
 
             except:
                 print("Connection to Database Failed")
                 socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
-
 
 
             for tag in tagJson:
