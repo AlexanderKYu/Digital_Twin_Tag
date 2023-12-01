@@ -5,7 +5,18 @@ from dotenv import load_dotenv
 basedir = path.abspath(path.dirname(path.dirname(__file__)))
 load_dotenv(path.join(basedir, 'flask-api/.env'))
 
+"""
+--------------------
+CONNECTION FUNCTIONS
+--------------------
+"""
+
 def db_connection():
+    """
+    Function to establish a connection to the
+    database.
+    Returns the connection (conn), cursor
+    """
     conn = ""
     cursor = ""
     try:
@@ -24,6 +35,11 @@ def db_connection():
     return conn, cursor
 
 def closeDBConnection(conn):
+    """
+    Function to close a connection to the
+    database.
+    Returns the status of closure
+    """
     try:
         conn.close()
     except:
@@ -31,8 +47,17 @@ def closeDBConnection(conn):
         return False
     return True
 
+"""
+------------------------
+INITIALIZATION FUNCTIONS
+------------------------
+"""
+
 def db_init(cursor):
-    
+    """
+    Function to define all database tables to the
+    database.
+    """
     db_query = """CREATE TABLE IF NOT EXISTS tblOrders (
     WIP INT NOT NULL,
     QTY INT NOT NULL,
@@ -48,7 +73,6 @@ def db_init(cursor):
 
     cursor.execute(db_query)
 
-
     db_query = """CREATE TABLE IF NOT EXISTS tblPaths (
     WIP INT NOT NULL,
     QTY INT NOT NULL,
@@ -59,7 +83,6 @@ def db_init(cursor):
     )"""
 
     cursor.execute(db_query)
-
 
     db_query = """CREATE TABLE IF NOT EXISTS tblRawLocations (
     WIP INT NOT NULL,
@@ -118,6 +141,10 @@ def db_init(cursor):
     cursor.execute(db_query)
 
 def define_hard_zones(cursor):
+    """
+    Function to establish default zoning
+    coordinates
+    """
 
     db_query = """INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone)
     VALUES ('No Zone', 0, 0, 0 , 0,True);"""
@@ -218,37 +245,71 @@ def define_hard_zones(cursor):
     
     cursor.execute(db_query)
 
+"""
+----------------
+DELETE FUNCTIONS
+----------------
+"""
+
 def delete_all(cursor):
+    """
+    Function to drop all tables
+    """
+    db_query = "DROP TABLE IF EXISTS tblOrders"
 
-   db_query = "DROP TABLE IF EXISTS tblOrders"
+    cursor.execute(db_query)
 
-   cursor.execute(db_query)
+    db_query = "DROP TABLE IF EXISTS tblPaths"
 
-   db_query = "DROP TABLE IF EXISTS tblPaths"
+    cursor.execute(db_query)
 
-   cursor.execute(db_query)
-   
-   db_query = "DROP TABLE IF EXISTS tblRawLocations"
+    db_query = "DROP TABLE IF EXISTS tblRawLocations"
 
-   cursor.execute(db_query)
+    cursor.execute(db_query)
 
-   db_query = "DROP TABLE IF EXISTS tblZoneDef"
+    db_query = "DROP TABLE IF EXISTS tblZoneDef"
 
-   cursor.execute(db_query)
-   
-   db_query = "DROP TABLE IF EXISTS tblwipstatus"
+    cursor.execute(db_query)
 
-   cursor.execute(db_query)
+    db_query = "DROP TABLE IF EXISTS tblwipstatus"
 
-   db_query = "DROP TABLE IF EXISTS wipOverrideQueue"
+    cursor.execute(db_query)
 
-   cursor.execute(db_query)
+    db_query = "DROP TABLE IF EXISTS wipOverrideQueue"
 
-   db_query = "DROP TABLE IF EXISTS inactiveTags"
+    cursor.execute(db_query)
 
-   cursor.execute(db_query)
+    db_query = "DROP TABLE IF EXISTS inactiveTags"
+
+    cursor.execute(db_query)
+
+def deleteWIPOverrideFromQueue(cursor, WIP, QTY):
+    """
+    Function to delete a WIP from the override queue
+    """
+    
+    db_query = f"""DELETE FROM wipOverrideQueue
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
+
+def clearAllInactive(cursor):
+    """
+    Function to clear all inavtive tags
+    """
+    db_query = f"""DELETE FROM inactiveTags"""
+    cursor.execute(db_query)
+
+"""
+----------------
+INSERT FUNCTIONS
+----------------
+"""
 
 def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
+    """
+    Function to push data into tblOrders
+    """
 
     db_query = f"""INSERT INTO tblOrders (WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName)
     VALUES ({WIP}, {QTY}, '{tagID}', {inProd}, {t_start}, {t_end}, {time_on_floor}, {build_time}, {lastZone}, '{zoneName}' 
@@ -256,6 +317,9 @@ def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_flo
     cursor.execute(db_query)
 
 def dbPushTblPaths(cursor, WIP, QTY, tagID, zoneID, zoneName, time):
+    """
+    Function to push data into tblPaths
+    """
 
     db_query = f"""INSERT INTO tblPaths (WIP, QTY, TagID, ZoneID, ZoneName, Time)
     VALUES ({WIP}, {QTY}, '{tagID}', {zoneID}, '{zoneName}', {time}
@@ -265,28 +329,148 @@ def dbPushTblPaths(cursor, WIP, QTY, tagID, zoneID, zoneName, time):
 
 
 def dbPushTblRawLocations(cursor, WIP, QTY, tagID, timestamp, x, y, zoneID):
+    """
+    Function to push data into tblRawLocations
+    """
 
     db_query = f"""INSERT INTO tblRawLocations (WIP, QTY, tagID, timestamp, x, y, zoneID)
     VALUES ({WIP}, {QTY}, '{tagID}', {timestamp}, {x}, {y}, {zoneID});"""
     cursor.execute(db_query)
 
+def dbPushZoneDef(cursor, ZoneName, x_lower, x_upper, y_lower, y_upper):
+    """
+    Function to push data into Zone definition
+    """
+
+    db_update_query = f"""UPDATE tblZoneDef SET ActiveZone = False WHERE ZoneName = '{ZoneName}'"""
+    cursor.execute(db_update_query)
+
+    db_insert_query = f"""INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone) 
+    VALUES ('{ZoneName}', {x_lower}, {x_upper}, {y_lower}, {y_upper}, True)"""
+    cursor.execute(db_insert_query)
+
+def dbPushInactiveTags(cursor, tagID, WIP, QTY, inactive_duration):
+    """
+    Function to push data into inactivetags
+    """
+    db_query = f"""INSERT INTO inactivetags (TagID, WIP, QTY, inactive_duration)
+    VALUES ('{tagID}', {WIP}, {QTY}, {inactive_duration})"""
+    cursor.execute(db_query)
+
+def addWIPOverrideIntoQueue(cursor, WIP, QTY):
+    """
+    Function to add an overridden WIP and QTY to a queue for 
+    front-end
+    """
+    
+    db_query = f"""SELECT t_start FROM tblOrders
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
+
+    t_start = cursor.fetchone()[0]
+
+    db_query = f"""INSERT INTO wipOverrideQueue (WIP, QTY, t_start)
+    VALUES ({WIP}, {QTY}, {t_start})"""
+
+    cursor.execute(db_query)
+
+"""
+----------------
+UPDATE FUNCTIONS
+----------------
+"""
+
 def dbUpdateWipStatus(cursor, WIP, QTY, tagID, timestamp, x, y, zoneID):
+    """
+    Function to update the wip status
+    """
 
     db_query = f"""INSERT INTO tblwipstatus (WIP, QTY, tagID, timestamp, x, y, zoneID)
     VALUES ({WIP}, {QTY}, '{tagID}', {timestamp}, {x}, {y}, {zoneID}) ON CONFLICT (WIP, QTY) 
     DO UPDATE SET tagID = '{tagID}', timestamp = {timestamp}, x = {x}, y = {y}, zoneID = {zoneID};"""
     cursor.execute(db_query)
 
-def getActiveTimes(cursor):
-   db_query = """SELECT loctime FROM tag_threshold
-                 WHERE overallx > 9.8 OR overally > 9.8 OR overallz > 9.8;"""
-   cursor.execute(db_query)
+def dbUpdateWIPOnTblPaths(cursor, WIP, QTY, zoneID):
+    """
+    Function to update a WIP on tblPaths
+    """
 
-   data = cursor.fetchall()
-   return data
+    zone_duration = queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID)
+
+    db_query = f"""UPDATE tblPaths SET Time = {zone_duration}
+    WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}"""
+
+    cursor.execute(db_query)
+
+def setWIPInProd(cursor, WIP, QTY, inprod):
+    """
+    Function to set inprod status for a WIP and QTY
+    """
+
+    db_query = f"""UPDATE tblorders SET inprod = {inprod}
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
+
+def setProdEndTime(cursor, WIP, QTY, timestamp):
+    """
+    Function to set t_end for WIP and QTY end of production time
+    """
+
+    db_query = f"""UPDATE tblorders SET t_end = {timestamp}
+    WHERE WIP = {WIP} AND QTY = {QTY} AND inprod = False"""
+
+    cursor.execute(db_query)
+
+def manualWIPOverrideForAllQTY(cursor, WIP, t_end):
+    """
+    Function to manually override WIP's t_end
+    """
+    
+    db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
+    WHERE WIP = {WIP} AND inprod = True"""
+
+    cursor.execute(db_query)
+
+
+def manualWIPOverrideForQTY(cursor, WIP, QTY, t_end):
+    """
+    Function to manually override WIP's and QTY's t_end
+    """
+
+    db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
+    WHERE WIP = {WIP} AND QTY = {QTY} AND inprod = True"""
+
+    cursor.execute(db_query)
+
+def disableZoneDef(cursor, ZoneName):
+    """
+    Function to disable a defined zone
+    """
+    db_update_query = f"""UPDATE tblZoneDef SET ActiveZone = False WHERE ZoneName = '{ZoneName}'"""
+    cursor.execute(db_update_query)
+
+"""
+----------------
+GET FUNCTIONS
+----------------
+"""
+def getActiveTimes(cursor):
+    """
+    Function to get all active times
+    """
+    db_query = """SELECT loctime FROM tag_threshold
+                    WHERE overallx > 9.8 OR overally > 9.8 OR overallz > 9.8;"""
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+    return data
 
 def getActiveZones(cursor):
-
+    """
+    Fucntion to get all active time zones
+    """
     db_query = """SELECT * FROM tblzonedef WHERE activezone = true;"""
 
     cursor.execute(db_query)
@@ -296,6 +480,9 @@ def getActiveZones(cursor):
     return data
 
 def getActiveTagZones(cursor, x, y):
+    """
+    Function to get active tag zone based on coordinate
+    """
 
     db_query = f"""SELECT * FROM tblzonedef 
     WHERE activezone = true AND tblzonedef.x_lower <= {x} AND tblzonedef.x_upper >= {x} 
@@ -310,6 +497,9 @@ def getActiveTagZones(cursor, x, y):
         return (1, 'No Zone', 0, 0, 0, 0)
 
 def getZoneName(cursor, ZoneID):
+    """
+    Function to get a Zone name based on the id
+    """
 
     db_query = f"""SELECT ZoneName FROM tblzonedef
     WHERE ZoneID = {ZoneID}"""
@@ -319,6 +509,10 @@ def getZoneName(cursor, ZoneID):
     return cursor.fetchone()[0]
     
 def getLastInProdWIPBasedOnTagId(cursor, tagid):
+    """
+    Function to get the last inprod WIP and QTY 
+    set on a tag
+    """
     
     db_query = f"""SELECT WIP, QTY FROM tblorders
     WHERE inprod = True AND tagid = '{tagid}'
@@ -333,6 +527,10 @@ def getLastInProdWIPBasedOnTagId(cursor, tagid):
     return data[-1][0], data[-1][1]
 
 def getLastInProdBasedOnTagIdExt(cursor, tagid):
+    """
+    Function to get last in prod WIP, QTY and t_start
+    set on a tag
+    """
     
     db_query = f"""SELECT WIP, QTY, t_start FROM tblorders
     WHERE inprod = True AND tagid = '{tagid}'
@@ -346,21 +544,43 @@ def getLastInProdBasedOnTagIdExt(cursor, tagid):
         return 0, 0, 0
     return data[-1][0], data[-1][1], data[-1][2]
 
-def setWIPInProd(cursor, WIP, QTY, inprod):
+def getAllWIPOverride(cursor):
+    """
+    Function to get all overridden WIPs in 
+    the queue
+    """
 
-    db_query = f"""UPDATE tblorders SET inprod = {inprod}
-    WHERE WIP = {WIP} AND QTY = {QTY}"""
-
-    cursor.execute(db_query)
-
-def setProdEndTime(cursor, WIP, QTY, timestamp):
-
-    db_query = f"""UPDATE tblorders SET t_end = {timestamp}
-    WHERE WIP = {WIP} AND QTY = {QTY} AND inprod = False"""
+    db_query = f"""SELECT * FROM wipOverrideQueue"""
 
     cursor.execute(db_query)
+
+    data = cursor.fetchall()
+    
+    return data
+
+def getInactiveInProdTags(cursor):
+    """
+    Function to get inactive inprod tags
+    """
+
+    db_query = f"""SELECT tblOrders.tagID, tblOrders.wip, tblOrders.qty, inactivetags.inactive_duration FROM tblOrders
+    INNER JOIN inactivetags ON tblOrders.tagid = inactivetags.tagid AND tblOrders.wip = inactivetags.wip AND tblOrders.qty = inactivetags.qty
+    WHERE inprod = true"""
+
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
+
+"""
+----------------
+CHECK/DATA FUNCTIONS
+----------------
+"""
 
 def checkIfNewWIP(cursor, WIP, QTY):
+    """
+    Function to check if a WIP is in tblOrders
+    """
 
     db_query = f"""SELECT * FROM tblorders
     WHERE WIP = {WIP} AND QTY = {QTY}"""
@@ -373,6 +593,9 @@ def checkIfNewWIP(cursor, WIP, QTY):
     return True
 
 def checkIfTagZoneOnPath(cursor, WIP, QTY, zoneID):
+    """
+    Function to check if a WIP, QTY and zoneID is in tblPaths
+    """
     
     db_query = f"""SELECT * FROM tblPaths
     WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}"""
@@ -385,6 +608,9 @@ def checkIfTagZoneOnPath(cursor, WIP, QTY, zoneID):
     return False
 
 def queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID):
+    """
+    Function to get the duration of a WIP and QTY in a given zone
+    """
     
     db_query = f"""SELECT Timestamp FROM tblRawLocations
     WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}
@@ -397,90 +623,3 @@ def queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID):
     if len(data) >= 2:
         return data[-1][0] - data[0][0]
     return 0
-
-def dbUpdateWIPOnTblPaths(cursor, WIP, QTY, zoneID):
-
-    zone_duration = queryZoneDurationBasedOnTblRawLocations(cursor, WIP, QTY, zoneID)
-
-    db_query = f"""UPDATE tblPaths SET Time = {zone_duration}
-    WHERE WIP = {WIP} AND QTY = {QTY} AND ZoneID = {zoneID}"""
-
-    cursor.execute(db_query)
-
-def addWIPOverrideIntoQueue(cursor, WIP, QTY):
-    
-    db_query = f"""SELECT t_start FROM tblOrders
-    WHERE WIP = {WIP} AND QTY = {QTY}"""
-
-    cursor.execute(db_query)
-
-    t_start = cursor.fetchone()[0]
-
-    db_query = f"""INSERT INTO wipOverrideQueue (WIP, QTY, t_start)
-    VALUES ({WIP}, {QTY}, {t_start})"""
-
-    cursor.execute(db_query)
-
-def deleteWIPOverrideFromQueue(cursor, WIP, QTY):
-    
-    db_query = f"""DELETE FROM wipOverrideQueue
-    WHERE WIP = {WIP} AND QTY = {QTY}"""
-
-    cursor.execute(db_query)
-
-def manualWIPOverrideForAllQTY(cursor, WIP, t_end):
-    
-    db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
-    WHERE WIP = {WIP} AND inprod = True"""
-
-    cursor.execute(db_query)
-
-
-def manualWIPOverrideForQTY(cursor, WIP, QTY, t_end):
-
-    db_query = f"""UPDATE tblorders SET t_end = {t_end}, inprod = False
-    WHERE WIP = {WIP} AND QTY = {QTY} AND inprod = True"""
-
-    cursor.execute(db_query)
-
-def getAllWIPOverride(cursor):
-
-    db_query = f"""SELECT * FROM wipOverrideQueue"""
-
-    cursor.execute(db_query)
-
-    data = cursor.fetchall()
-    
-    return data
-
-def dbPushZoneDef(cursor, ZoneName, x_lower, x_upper, y_lower, y_upper):
-
-    db_update_query = f"""UPDATE tblZoneDef SET ActiveZone = False WHERE ZoneName = '{ZoneName}'"""
-    cursor.execute(db_update_query)
-
-    db_insert_query = f"""INSERT INTO tblZoneDef (ZoneName, x_lower, x_upper, y_lower, y_upper, ActiveZone) 
-    VALUES ('{ZoneName}', {x_lower}, {x_upper}, {y_lower}, {y_upper}, True)"""
-    cursor.execute(db_insert_query)
-
-
-def disableZoneDef(cursor, ZoneName):
-    db_update_query = f"""UPDATE tblZoneDef SET ActiveZone = False WHERE ZoneName = '{ZoneName}'"""
-    cursor.execute(db_update_query)
-
-def clearAllInactive(cursor):
-    db_query = f"""DELETE FROM inactiveTags"""
-    cursor.execute(db_query)
-
-def dbPushInactiveTags(cursor, tagID, WIP, QTY, inactive_duration):
-    db_query = f"""INSERT INTO inactivetags (TagID, WIP, QTY, inactive_duration)
-    VALUES ('{tagID}', {WIP}, {QTY}, {inactive_duration})"""
-    cursor.execute(db_query)
-
-def getInactiveInProdTags(cursor):
-    db_query = f"""SELECT tblOrders.tagID, tblOrders.wip, tblOrders.qty, inactivetags.inactive_duration FROM tblOrders
-    INNER JOIN inactivetags ON tblOrders.tagid = inactivetags.tagid AND tblOrders.wip = inactivetags.wip AND tblOrders.qty = inactivetags.qty
-    WHERE inprod = true"""
-
-    cursor.execute(db_query)
-    data = cursor.fetchall()
-    return data
