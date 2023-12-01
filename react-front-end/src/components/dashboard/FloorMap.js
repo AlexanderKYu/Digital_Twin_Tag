@@ -41,8 +41,8 @@ export default function FloorMap(props) {
         data: mapCoords,
         color: "#FFFFFF",
         backgroundColor: 'rgba(50, 180, 100, 1)',
-        pointRadius: 10,
-        pointHoverRadius: 15,
+        pointRadius: 6,
+        pointHoverRadius: 10,
       },
     ],
   };

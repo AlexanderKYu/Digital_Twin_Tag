@@ -21,12 +21,21 @@ TIME_LUNCH_END = "13::00::00"
 TIME_END = "16::00::00"
 
 def dict_to_json(dictionary):
+    """
+    Function to convert a dictionary object
+    to a json object
+    """
     json_object = json.dumps(dictionary, indent = 4)
     print(json_object)
 
 def dbTagsPush(tagsJson):
+    """
+    Function to transform eliko data to be 
+    ready and pushed into the database
+    """
     tagsJson = json.loads(tagsJson)
     conn, cursor = dbfuncs.db_connection()
+    dbfuncs.clearAllInactive(cursor)
     for key, values in tagsJson.items():
         tagID = key.replace("0x", "")
         timestamp = values['timestamp']
@@ -60,10 +69,18 @@ def dbTagsPush(tagsJson):
         else:
             zoneName = dbfuncs.getZoneName(cursor, zoneID)
             dbfuncs.dbPushTblPaths(cursor, wip, qty, tagID, zoneID, zoneName, 0)
+        tag_duration = dbfuncs.queryZoneDurationBasedOnTblRawLocations(cursor, wip, qty, zoneID)
+        if (tag_duration >= (48 * 60 * 60)):
+            dbfuncs.dbPushInactiveTags(cursor, tagID, wip, qty, tag_duration)
     dbfuncs.closeDBConnection(conn)
     return tagsJson
 
 def isWorkHours():
+    """
+    Function to determine the known working
+    hours to either set or not set a 
+    threshold bias
+    """
     time_start = datetime.datetime.strptime(TIME_START, '%H::%M::%S').time()
     time_lunch_start = datetime.datetime.strptime(TIME_LUNCH_START, '%H::%M::%S').time()
     time_lunch_end = datetime.datetime.strptime(TIME_LUNCH_END, '%H::%M::%S').time() 
@@ -76,6 +93,11 @@ def isWorkHours():
         return False
 
 def compare_data_values(past, curr):
+    """
+    Function to compare current poll to
+    previous polls to determine if the 
+    production floor is active or not
+    """
     curr = json.loads(curr)
     index = 0
 
@@ -127,6 +149,11 @@ def compare_data_values(past, curr):
     return False
 
 def main(push_info_file, sample_file):
+    """
+    Function to invoke the polling process
+    and help maintain pickle file data for 
+    past and current polls
+    """
 
     last_active_dump = 0
     last_sleep = 0
