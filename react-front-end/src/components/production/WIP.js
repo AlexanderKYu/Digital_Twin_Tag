@@ -217,19 +217,6 @@ export default function WIP() {
                   </InputRightElement>
                 )}
 
-                <InputRightElement
-                  bg="#a3142e"
-                  color="white"
-                  height="8"
-                  width="20"
-                  mt={3}
-                  mr={2}
-                  borderRadius="150"
-                  fontFamily="arial"
-                >
-                  <Text> 19%</Text>
-                </InputRightElement>
-
                 {lowBatt && parseInt(lowBatt) < 20 && (
                   <InputRightElement
                     bg="#a3142e"
@@ -287,7 +274,7 @@ export default function WIP() {
                 SEARCH / RECHERCHE
               </Text>
               <InputGroup>
-                <Input variant="wipInput" type="" placeholder="" />
+                <Input variant="wipInput" fontFamily="arial" type="" placeholder="" />
               </InputGroup>
               {connectedTags.map((tagValue) => (
                 <TagData key={tagValue.number} data={tagValue}></TagData>
