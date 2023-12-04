@@ -202,6 +202,7 @@ export default function WIP() {
                   <InputRightElement
                     bg="#009cd9"
                     color="white"
+                    height="8"
                     width="20"
                     mt={3}
                     mr={2}
@@ -210,11 +211,12 @@ export default function WIP() {
                     <Text> {lowBatt}</Text>
                   </InputRightElement>
                 )}
-
+                
                 {lowBatt && parseInt(lowBatt) < 20 && (
                   <InputRightElement
                     bg="#a3142e"
                     color="white"
+                    height="8"
                     width="20"
                     mt={3}
                     mr={2}
