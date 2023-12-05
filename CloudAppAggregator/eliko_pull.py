@@ -4,6 +4,7 @@ import os.path
 import datetime
 import json
 import pickle
+import math
 
 sys.path.append('..')
 
@@ -64,6 +65,15 @@ def dbTagsPush(tagsJson):
         
         dbfuncs.dbPushTblRawLocations(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
         dbfuncs.dbUpdateWipStatus(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
+
+
+        if(dbfuncs.checkIfNewDistance(cursor, wip, qty)):
+            dbfuncs.dbPushTblWipDistances(cursor, wip, qty, x, y, 0)
+        else:
+            previousX, previousY, distance = dbfuncs.getDistance(cursor, wip, qty)
+            dist = calulateDistance(x, y, previousX, previousY, distance)
+            dbfuncs.dbUpdateTblWipDistances(cursor, wip, qty, x, y, dist)
+
         if (dbfuncs.checkIfTagZoneOnPath(cursor, wip, qty, zoneID)):
             dbfuncs.dbUpdateWIPOnTblPaths(cursor,wip, qty, zoneID)
         else:
@@ -147,6 +157,13 @@ def compare_data_values(past, curr):
             if (value > threshold_bias):
                 return True
     return False
+
+def calulateDistance(x, y, previousX, previousY, distance):
+    difference= ((x - previousX) *  (x - previousX)) + ((y - previousY) * (y - previousY))
+    dist = math.sqrt(difference) + distance 
+
+    return dist
+
 
 def main(push_info_file, sample_file):
     """

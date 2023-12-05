@@ -306,6 +306,13 @@ INSERT FUNCTIONS
 ----------------
 """
 
+def dbPushTblWipDistances(cursor, WIP, QTY, x, y, distance):
+    db_query = f"""INSERT INTO tblwipdistances (WIP, QTY, lastX, lastY, distance)
+    VALUES ({WIP}, {QTY}, {x}, {y}, {distance});"""
+    
+    cursor.execute(db_query)
+
+
 def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
     """
     Function to push data into tblOrders
@@ -380,6 +387,12 @@ def addWIPOverrideIntoQueue(cursor, WIP, QTY):
 UPDATE FUNCTIONS
 ----------------
 """
+def dbUpdateTblWipDistances(cursor, WIP, QTY, x, y, distance):
+    db_query = f"""UPDATE tblwipdistances 
+    SET lastX = {x}, lastY = {y}, distance = {distance}
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
 
 def dbUpdateWipStatus(cursor, WIP, QTY, tagID, timestamp, x, y, zoneID):
     """
@@ -456,6 +469,16 @@ def disableZoneDef(cursor, ZoneName):
 GET FUNCTIONS
 ----------------
 """
+
+def getDistance(cursor, wip, qty):
+    db_query = f"""
+        SELECT * FROM tblwipdistances WHERE wip = {wip} AND qty = {qty} ;
+    """
+    cursor.execute(db_query)
+    data = cursor.fetchone()
+    # return in this order: PreviousX, Previous[Y], Distance
+    return data[2], data[3], data[4]
+
 def getActiveTimes(cursor):
     """
     Function to get all active times
@@ -571,11 +594,28 @@ def getInactiveInProdTags(cursor):
     data = cursor.fetchall()
     return data
 
+
+
 """
 ----------------
 CHECK/DATA FUNCTIONS
 ----------------
 """
+
+def checkIfNewDistance(cursor, WIP, QTY):
+    """
+    Function to check if a WIP is in tblDistance
+    """
+
+    db_query = f"""SELECT * FROM tblwipdistances
+    WHERE WIP = {WIP} AND QTY = {QTY}"""
+
+    cursor.execute(db_query)
+
+    data = cursor.fetchall()
+    if len(data) > 0:
+        return False
+    return True
 
 def checkIfNewWIP(cursor, WIP, QTY):
     """
