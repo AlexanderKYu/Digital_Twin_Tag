@@ -37,6 +37,8 @@ Clear all Inactive tags before populating it again in the poll
 ### Insert Functions
 Functions used to insert new data entries into the database
 
+`dbPushTblWipDistances(cursor, WIP, QTY, x, y, distance)`
+
 `dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName)`
 
 `dbPushTblPaths(cursor, WIP, QTY, tagID, zoneID, zoneName, time)`
@@ -53,6 +55,8 @@ Push a new zone definition. If the zone being pushed has a name that matches wit
 ### Update Functions
 Functions used to update existing data entries in the database
 
+`dbUpdateTblWipDistances(cursor, WIP, QTY, x, y, distance)`
+
 `dbUpdateWipStatus(cursor, WIP, QTY, tagID, timestamp, x, y, zoneID)`
 
 `dbUpdateWIPOnTblPaths(cursor, WIP, QTY, zoneID)`
@@ -68,6 +72,9 @@ Functions used to update existing data entries in the database
 `disableZoneDef(cursor, ZoneName)`
 
 ### Get Functions
+
+`getDistance(cursor, wip, qty)`
+Returns a tag lastX and lastY position and the total distance that specific object has travelled previously.
 
 `getActiveTimes(cursor)`
 ***Deprecated Function*** Gathered actives times to determine threshold based on 5 minute polling.
