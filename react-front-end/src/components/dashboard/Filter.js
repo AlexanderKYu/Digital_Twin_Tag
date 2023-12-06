@@ -1,33 +1,26 @@
-import { ReactNode } from "react";
 import {
   Box,
-  useDisclosure,
   Image,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
-  HStack,
-  Stack,
   Text,
   Flex,
-  AbsoluteCenter,
-  Center,
   Checkbox,
 } from "@chakra-ui/react";
 
 export default function Filter({setFilters}) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleClick = (e, attribute) => {
     e.preventDefault();
     if(e.target.checked){
       setFilters(oldFilters => {
-        return {...oldFilters, attribute: true}
+        return {...oldFilters, [attribute]: true}
       });
     } else {
       setFilters(oldFilters => {
-        return {...oldFilters, attribute: false}
+        return {...oldFilters, [attribute]: false}
       });
     }
     

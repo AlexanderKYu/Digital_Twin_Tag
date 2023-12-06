@@ -1,4 +1,4 @@
-import {ReactNode, useEffect} from "react";
+import {useEffect} from "react";
 import {
     Box,
     Flex,
@@ -41,7 +41,8 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
           if(tags[val]["inactive"] === true)  acc[val] = tags[val];
         return acc;
         }, {});
-      } else if(filters["rush"]){
+      } 
+      if(filters["rush"]){
         tags = Object.keys(tags).reduce(function(acc, val) {
           if(tags[val]["rush"] === true)  acc[val] = tags[val];
         return acc;
