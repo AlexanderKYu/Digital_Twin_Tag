@@ -2,7 +2,7 @@
 
 ## database connection
 
-Prerequisite: pgadmin4
+Prerequisite: pgadmin4, AWS RDS database connection info
 
 ## File dbfuncs
 
