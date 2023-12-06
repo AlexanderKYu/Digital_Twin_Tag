@@ -23,6 +23,7 @@ export default function WIP() {
   const [connectedTags, setConnectedTags] = useState([]);
   const [lowBatt, setlowBatt] = useState("");
   const [status, setStatus] = useState(false);
+  const [rushCheckbox, setRushCheckbox] = useState(false);
 
   const tagChange = (e) => {
     if (e.target.value.length <= 6) {
@@ -69,10 +70,25 @@ export default function WIP() {
   };
 
   const sendAndClear = (e) => {
-    var jsonData = {
-      tagNumber: "0x" + tag,
-      wipNumber: wip,
-    };
+    if(rushCheckbox){
+      //assign tag as rush
+      var jsonData = {
+        tagNumber: "0x" + tag,
+        wipNumber: wip,
+        rush: true,
+      };
+    } else {
+      // don't assign tag as rush
+      var jsonData = {
+        tagNumber: "0x" + tag,
+        wipNumber: wip,
+        rush: false,
+      };
+    }
+    //clear checkbox
+    setRushCheckbox(false);
+
+    
     const aliasData = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -126,6 +142,10 @@ export default function WIP() {
       }
     }
   };
+
+  const onRushChange = (e) => {
+    setRushCheckbox(e.target.checked);
+  }
 
   return (
     <>
@@ -245,7 +265,7 @@ export default function WIP() {
                 mb="3"
               />
               <Box mb={5}>
-                <Checkbox size='md' colorScheme='lime.100' fontFamily="arial" fontWeight="semibold">Créer commande rush / Create rush</Checkbox>
+                <Checkbox isChecked={rushCheckbox} onChange={onRushChange} size='md' colorScheme='lime.100' fontFamily="arial" fontWeight="semibold">Créer commande rush / Create rush</Checkbox>
               </Box>
               <Box>
                 <Button

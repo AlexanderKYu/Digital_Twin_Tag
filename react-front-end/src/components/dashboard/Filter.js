@@ -23,11 +23,11 @@ export default function Filter({setFilters}) {
     e.preventDefault();
     if(e.target.checked){
       setFilters(oldFilters => {
-        return {...oldFilters, "inactive": true}
+        return {...oldFilters, attribute: true}
       });
     } else {
       setFilters(oldFilters => {
-        return {...oldFilters, "inactive": false}
+        return {...oldFilters, attribute: false}
       });
     }
     
@@ -57,6 +57,7 @@ export default function Filter({setFilters}) {
               </MenuButton>
               <MenuList>
                 <MenuItem><Checkbox colorScheme="blue" onChange={(e) => handleClick(e, "inactive")}>Inactive</Checkbox></MenuItem>
+                <MenuItem><Checkbox colorScheme="blue" onChange={(e) => handleClick(e, "rush")}>Rush</Checkbox></MenuItem>
               </MenuList>
             </Menu>
           </Box>

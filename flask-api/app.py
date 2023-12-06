@@ -50,6 +50,7 @@ def emit_tag_data():
                 conn, cursor = dbfuncs.db_connection()
 
                 inactiveTags = dbfuncs.getInactiveInProdTags(cursor)
+                rushTags = {} #TODO: put query to get rush tags here
 
                 dbfuncs.closeDBConnection(conn)
 
@@ -62,9 +63,13 @@ def emit_tag_data():
                 if(batteryJson[tag]):
                     tagJson[tag].update(batteryJson[tag])
                 tagJson[tag]["inactive"] = False
+                tagJson[tag]["rush"] = False
                 for inactiveTag in inactiveTags:
                     if tag[2:] == inactiveTag[0]: #have to cut out first 2 letters of tag because we have to remove the "0x"
                         tagJson[tag]["inactive"] = True
+                for rushTag in rushTags:
+                    if tag[2:] == rushTag[0]: #have to cut out first 2 letters of tag because we have to remove the "0x"
+                        tagJson[tag]["rush"] = True
 
 
             s.close()
@@ -126,7 +131,7 @@ def link_wip():
         dbfuncs.setProdEndTime(cursor, oldWip, oldQty, timestamp)
         dbfuncs.closeDBConnection(conn)
     else:
-        check_for_old_wip(tagId[2:])
+        check_for_old_wip(tagId[2:], data["rush"])
 
     try:
 
@@ -172,7 +177,12 @@ def link_wip():
                 }
     return jsonify(response)
 
-def check_for_old_wip(tagId):
+
+def check_for_old_wip(tagId, isRush):
+    """
+    Function to check if the previous wip wasn't properly set to DISPONIBLE before being used again
+    Function also sets value of Rush
+    """
 
     # check if tag is still considered "In Production" in database
     try:
@@ -189,10 +199,11 @@ def check_for_old_wip(tagId):
             startTimeText = startTimeObj.strftime( "%Y-%m-%d %I:%M %p")
             socketio.emit("tagOverwritten",{'tagId': tagId, 'wip': wipNumber, 'qty': qty, 'startTime': startTimeText},broadcast=True)
         else:
+            # TODO: set tag value to rush
             dbfuncs.closeDBConnection(conn)
     except:
         print("Connection to Database Failed")
-        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
+        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Connection Failed"}, broadcast=True)
 
 
 

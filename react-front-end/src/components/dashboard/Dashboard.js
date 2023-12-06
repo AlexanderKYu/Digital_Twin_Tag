@@ -31,6 +31,7 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
     const [filterTagData, setFilterTagData] = useState(tagData);
     const [filters, setFilters] = useState({
       "inactive": false,
+      "rush": false,
     });
 
     //filter and sort tags
@@ -38,6 +39,11 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
       if(filters["inactive"]){
         tags = Object.keys(tags).reduce(function(acc, val) {
           if(tags[val]["inactive"] === true)  acc[val] = tags[val];
+        return acc;
+        }, {});
+      } else if(filters["rush"]){
+        tags = Object.keys(tags).reduce(function(acc, val) {
+          if(tags[val]["rush"] === true)  acc[val] = tags[val];
         return acc;
         }, {});
       }
