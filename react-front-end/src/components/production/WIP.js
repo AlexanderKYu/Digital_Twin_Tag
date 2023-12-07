@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Input,
@@ -21,9 +21,14 @@ export default function WIP() {
   const [wip, setWip] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [connectedTags, setConnectedTags] = useState([]);
+  const [filterConnectedTags, setFilterConnectedTags] = useState([]);
   const [lowBatt, setlowBatt] = useState("");
   const [status, setStatus] = useState(false);
   const [rushCheckbox, setRushCheckbox] = useState(false);
+
+  useEffect(() => {
+    setFilterConnectedTags(connectedTags);
+  }, [connectedTags])
 
   const tagChange = (e) => {
     if (e.target.value.length <= 6) {
@@ -145,6 +150,12 @@ export default function WIP() {
 
   const onRushChange = (e) => {
     setRushCheckbox(e.target.checked);
+  }
+
+  const recentTagSearch = (e) => {
+    let val = e.target.value.toLowerCase();
+
+    setFilterConnectedTags(connectedTags.filter(v => (v.alias.toLowerCase().includes(val) || v.number.toLowerCase().includes(val))));
   }
 
   return (
@@ -294,9 +305,9 @@ export default function WIP() {
                 SEARCH / RECHERCHE
               </Text>
               <InputGroup>
-                <Input variant="wipInput" fontFamily="arial" type="" placeholder="" />
+                <Input onChange={recentTagSearch} variant="wipInput" fontFamily="arial" type="" placeholder="" />
               </InputGroup>
-              {connectedTags.map((tagValue) => (
+              {filterConnectedTags.map((tagValue) => (
                 <TagData key={tagValue.number} data={tagValue}></TagData>
               ))}
             </Box>

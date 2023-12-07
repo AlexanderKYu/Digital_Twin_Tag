@@ -8,9 +8,10 @@ import {
   Text,
   Flex,
   Checkbox,
+  Input,
 } from "@chakra-ui/react";
 
-export default function Filter({setFilters}) {
+export default function Filter({setFilters, searchValue, setSearchValue}) {
 
   const handleClick = (e, attribute) => {
     e.preventDefault();
@@ -26,6 +27,10 @@ export default function Filter({setFilters}) {
     
   }
 
+  const searchTags = (e) => {
+    setSearchValue(e.target.value);
+  }
+
 
   return (
     <>
@@ -33,10 +38,13 @@ export default function Filter({setFilters}) {
         <Box flex="1"> 
             
         </Box>
-          <Box flex="8">
+          <Box flex="6" align="right">
             <Text color="white" fontSize="5xl" text-align="inherit">
               TAGS
             </Text>
+          </Box>
+          <Box flex="4" m={2}>
+            <Input onChange={searchTags} value={searchValue} variant="wipInput" fontFamily="arial" type="" placeholder="" />
           </Box>
           <Box flex="1" align="center">
             <Menu variant="filterDrop" closeOnSelect={false}>
@@ -49,6 +57,7 @@ export default function Filter({setFilters}) {
                 />
               </MenuButton>
               <MenuList>
+                <MenuItem><Checkbox colorScheme="blue" onChange={(e) => handleClick(e, "active")}>Active</Checkbox></MenuItem>
                 <MenuItem><Checkbox colorScheme="blue" onChange={(e) => handleClick(e, "inactive")}>Inactive</Checkbox></MenuItem>
                 <MenuItem><Checkbox colorScheme="blue" onChange={(e) => handleClick(e, "rush")}>Rush</Checkbox></MenuItem>
               </MenuList>

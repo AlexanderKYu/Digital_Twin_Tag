@@ -18,6 +18,7 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
         setPassword] = useState('');
     const [isAuthenticated,
         setIsAuthenticated] = useState(false);
+    const [searchValue, setSearchValue] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -30,30 +31,42 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
     
     const [filterTagData, setFilterTagData] = useState(tagData);
     const [filters, setFilters] = useState({
+      "active": false,
       "inactive": false,
       "rush": false,
     });
 
     //filter and sort tags
     const filterTags = (tags) => {
-      if(filters["inactive"]){
+      if(filters["active"] && !filters["inactive"]){
+        tags = Object.keys(tags).reduce(function(acc, val) {
+          if(tags[val]["inactive"] === false)  acc[val] = tags[val];
+        return acc;
+        }, {});
+      } else if(filters["inactive"] && !filters["active"]){
         tags = Object.keys(tags).reduce(function(acc, val) {
           if(tags[val]["inactive"] === true)  acc[val] = tags[val];
         return acc;
         }, {});
-      } 
+      }
       if(filters["rush"]){
         tags = Object.keys(tags).reduce(function(acc, val) {
           if(tags[val]["rush"] === true)  acc[val] = tags[val];
         return acc;
         }, {});
       }
+      if(searchValue){
+        tags = Object.keys(tags).reduce(function(acc, val) {
+          if(tags[val]["alias"].includes(searchValue))  acc[val] = tags[val];
+          return acc;
+        }, {})
+      }
       return tags
     }
 
     useEffect(()=> {
       setFilterTagData(filterTags(tagData))
-    }, [tagData, filters]);
+    }, [tagData, filters, searchValue]);
 
     
 
@@ -153,7 +166,7 @@ export default function Dashboard({tagData, overwrittenWips, setOverwrittenWips}
                 },
               }}
             >
-              <Filter setFilters={setFilters}></Filter>
+              <Filter setFilters={setFilters} searchValue={searchValue} setSearchValue={setSearchValue}></Filter>
               <TagAll tagData={filterTagData}></TagAll>
             </Box>
             {/* WIP TIME */}
