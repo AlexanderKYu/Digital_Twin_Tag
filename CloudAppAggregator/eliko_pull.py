@@ -58,9 +58,6 @@ def dbTagsPush(tagsJson):
             dbfuncs.setWIPInProd(cursor, lastWip, lastQty, False)
             dbfuncs.setProdEndTime(cursor, lastWip, lastQty, timestamp)
             continue
-        if (dbfuncs.checkIfNewWIP(cursor, wip, qty)):
-            zoneName = dbfuncs.getZoneName(cursor, zoneID)
-            dbfuncs.dbPushTblOrders(cursor, wip, qty, tagID, True, timestamp, 0, 0, 0, zoneID, zoneName)
         
         dbfuncs.dbPushTblRawLocations(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
         dbfuncs.dbUpdateWipStatus(cursor, wip, qty, tagID, timestamp, x, y, zoneID)
