@@ -581,7 +581,7 @@ def getRushTags(cursor):
     """
 
     db_query = f"""SELECT * FROM tblOrders
-    WHERE rush = true"""
+    WHERE rush = true AND inprod = true"""
 
     cursor.execute(db_query)
     data = cursor.fetchall()
@@ -592,7 +592,7 @@ def getNonRushTags(cursor):
     Function to get all non-rush tags
     """
     db_query = f"""SELECT * FROM tblOrders
-    WHERE rush = false"""
+    WHERE rush = false AND inprod = true"""
 
     cursor.execute(db_query)
     data = cursor.fetchall()
