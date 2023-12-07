@@ -68,7 +68,7 @@ def emit_tag_data():
                     if tag[2:] == inactiveTag[0]: #have to cut out first 2 letters of tag because we have to remove the "0x"
                         tagJson[tag]["inactive"] = True
                 for rushTag in rushTags:
-                    if tag[2:] == rushTag[0]: #have to cut out first 2 letters of tag because we have to remove the "0x"
+                    if tag[2:] == rushTag[2]: #have to cut out first 2 letters of tag because we have to remove the "0x"
                         tagJson[tag]["rush"] = True
 
 
@@ -142,7 +142,9 @@ def link_wip():
 
             zoneInfo = dbfuncs.getActiveTagZones(cursor, tempTag["x"], tempTag["y"])
 
-            dbfuncs.dbPushTblOrders(cursor, data["wipNumber"][:-2], data["wipNumber"][-2:], tagId, True, startTime, 0, 0, 0, zoneInfo[0], zoneInfo[1], data["rush"] )
+            parsedWip = data["wipNumber"].split(".")
+
+            dbfuncs.dbPushTblOrders(cursor, parsedWip[0], parsedWip[1], tagId[2:], True, startTime, 0, 0, 0, zoneInfo[0], zoneInfo[1], data["rush"] )
             dbfuncs.closeDBConnection(conn)
         except:
             dbfuncs.closeDBConnection(conn)
