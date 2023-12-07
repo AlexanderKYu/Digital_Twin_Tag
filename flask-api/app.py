@@ -50,7 +50,7 @@ def emit_tag_data():
                 conn, cursor = dbfuncs.db_connection()
 
                 inactiveTags = dbfuncs.getInactiveInProdTags(cursor)
-                rushTags = {} #TODO: put query to get rush tags here
+                rushTags = dbfuncs.getRushTags(cursor)
 
                 dbfuncs.closeDBConnection(conn)
 
@@ -119,6 +119,7 @@ def link_wip():
     # get eliko data that will be used differently depending on the situation
     tagList = JSON_eliko_call.getTags(s)
     tagList = json.loads(tagList)
+
         
     # check if tag is set to disponible
     if data["wipNumber"] == "DISPONIBLE":
@@ -131,7 +132,22 @@ def link_wip():
         dbfuncs.setProdEndTime(cursor, oldWip, oldQty, timestamp)
         dbfuncs.closeDBConnection(conn)
     else:
-        check_for_old_wip(tagId[2:], data["rush"])
+        check_for_old_wip(tagId[2:])
+        try:
+            #adding new tag to database
+            conn, cursor = dbfuncs.db_connection()
+
+            tempTag = tagList.get(tagId, {"timestamp": 0})
+            startTime = tempTag["timestamp"]
+
+            zoneInfo = dbfuncs.getActiveTagZones(cursor, tempTag["x"], tempTag["y"])
+
+            dbfuncs.dbPushTblOrders(cursor, data["wipNumber"][:-2], data["wipNumber"][-2:], tagId, True, startTime, 0, 0, 0, zoneInfo[0], zoneInfo[1], data["rush"] )
+            dbfuncs.closeDBConnection(conn)
+        except:
+            dbfuncs.closeDBConnection(conn)
+            
+
 
     try:
 
@@ -178,7 +194,7 @@ def link_wip():
     return jsonify(response)
 
 
-def check_for_old_wip(tagId, isRush):
+def check_for_old_wip(tagId):
     """
     Function to check if the previous wip wasn't properly set to DISPONIBLE before being used again
     Function also sets value of Rush
@@ -199,7 +215,6 @@ def check_for_old_wip(tagId, isRush):
             startTimeText = startTimeObj.strftime( "%Y-%m-%d %I:%M %p")
             socketio.emit("tagOverwritten",{'tagId': tagId, 'wip': wipNumber, 'qty': qty, 'startTime': startTimeText},broadcast=True)
         else:
-            # TODO: set tag value to rush
             dbfuncs.closeDBConnection(conn)
     except:
         print("Connection to Database Failed")
