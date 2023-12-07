@@ -38,15 +38,18 @@ export default function Filter({setFilters, searchValue, setSearchValue}) {
         <Box flex="1"> 
             
         </Box>
-          <Box flex="6" align="right">
+          <Box flex="6" align="right" >
             <Text color="white" fontSize="5xl" text-align="inherit">
               TAGS
             </Text>
           </Box>
-          <Box flex="4" m={2}>
-            <Input onChange={searchTags} value={searchValue} variant="wipInput" fontFamily="arial" type="" placeholder="" />
+          <Box flex="2"> 
+            
+        </Box>
+          <Box flex="1" align="center" mt={1} mr={-2} height="50px">
+            <Input onChange={searchTags} value={searchValue} width= "110px" variant="wipInput" size="sm" fontSize="15px" fontFamily="arial" type="" placeholder="Search" />
           </Box>
-          <Box flex="1" align="center">
+          <Box flex="1" align="center" >
             <Menu variant="filterDrop" closeOnSelect={false}>
               <MenuButton>
                 <Image
