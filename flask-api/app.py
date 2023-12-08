@@ -69,7 +69,7 @@ def emit_tag_data():
                     if tag[2:] == inactiveTag[0]: #have to cut out first 2 letters of tag because we have to remove the "0x"
                         tagJson[tag]["inactive"] = True
                 for dbTag in dbTags:
-                    if tag[2:] == dbTag[0]:
+                    if tag[2:] == dbTag[2]:
                         tagJson[tag]["zone"] = dbTag[9]
                         tagJson[tag]["rush"] = dbTag[10]
                             
