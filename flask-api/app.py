@@ -50,6 +50,7 @@ def emit_tag_data():
                 conn, cursor = dbfuncs.db_connection()
 
                 inactiveTags = dbfuncs.getInactiveInProdTags(cursor)
+                dbTags = dbfuncs.getInProdTags(cursor)
 
                 dbfuncs.closeDBConnection(conn)
 
@@ -62,9 +63,16 @@ def emit_tag_data():
                 if(batteryJson[tag]):
                     tagJson[tag].update(batteryJson[tag])
                 tagJson[tag]["inactive"] = False
+                tagJson[tag]["rush"] = False
+                tagJson[tag]["zone"] = "Not Found"
                 for inactiveTag in inactiveTags:
                     if tag[2:] == inactiveTag[0]: #have to cut out first 2 letters of tag because we have to remove the "0x"
                         tagJson[tag]["inactive"] = True
+                for dbTag in dbTags:
+                    if tag[2:] == dbTag[2]:
+                        tagJson[tag]["zone"] = dbTag[9]
+                        tagJson[tag]["rush"] = dbTag[10]
+                            
 
 
             s.close()
@@ -114,6 +122,7 @@ def link_wip():
     # get eliko data that will be used differently depending on the situation
     tagList = JSON_eliko_call.getTags(s)
     tagList = json.loads(tagList)
+
         
     # check if tag is set to disponible
     if data["wipNumber"] == "DISPONIBLE":
@@ -127,6 +136,29 @@ def link_wip():
         dbfuncs.closeDBConnection(conn)
     else:
         check_for_old_wip(tagId[2:])
+        try:
+            #adding new tag to database
+            conn, cursor = dbfuncs.db_connection()
+
+            tempTag = tagList.get(tagId, {"timestamp": 0})
+            startTime = tempTag["timestamp"]
+
+            zoneInfo = dbfuncs.getActiveTagZones(cursor, tempTag["x"], tempTag["y"])
+
+            parsedWip = data["wipNumber"].split(".")
+
+            dbfuncs.dbPushTblOrders(cursor, parsedWip[0], parsedWip[1], tagId[2:], True, startTime, 0, 0, 0, zoneInfo[0], zoneInfo[1], data["rush"] )
+            dbfuncs.closeDBConnection(conn)
+        except:
+            dbfuncs.closeDBConnection(conn)
+            response = {
+                    'data':"Lien non réussi en raison d'une erreur dans la base de données | Linking Unsuccessful Due to Database Error", 
+                    'success':False, 
+                    'tagData': {} 
+                }
+            return jsonify(response)
+            
+
 
     try:
 
@@ -172,7 +204,12 @@ def link_wip():
                 }
     return jsonify(response)
 
+
 def check_for_old_wip(tagId):
+    """
+    Function to check if the previous wip wasn't properly set to DISPONIBLE before being used again
+    Function also sets value of Rush
+    """
 
     # check if tag is still considered "In Production" in database
     try:
@@ -192,7 +229,7 @@ def check_for_old_wip(tagId):
             dbfuncs.closeDBConnection(conn)
     except:
         print("Connection to Database Failed")
-        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
+        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Connection Failed"}, broadcast=True)
 
 
 

@@ -1,10 +1,8 @@
 import "./App.css";
 import React from 'react';
 import { io } from "socket.io-client";
-import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { ChakraProvider } from '@chakra-ui/react'
-import chakraTheme from '@chakra-ui/theme'
 import '@fontsource/antonio/500.css'
 import theme from "./components/theme/Theme"
 import Nav from "./components/Nav";
@@ -15,7 +13,6 @@ import {
   Alert,
   AlertIcon,
   Box,
-  AlertTitle,
   AlertDescription,
   CloseButton,
 } from '@chakra-ui/react'
@@ -23,8 +20,6 @@ import {
 let socket;
 
 function App() {
-
-  const {loginWithPopup, loginWithRedirect, logout, user, isAuthenticated} = useAuth0()
 
   const [errorMessages, setErrorMessages] = useState([]);
   const [tagData, setTagData] = useState({});
