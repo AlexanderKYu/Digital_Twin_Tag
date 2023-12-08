@@ -12,6 +12,9 @@ const theme = extendTheme({
 
   colors: {
     primary: "#f6db79",
+    lime: {
+      50: '#f2ffde',
+    },
   },
 
   components: {
