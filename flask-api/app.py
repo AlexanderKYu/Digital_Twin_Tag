@@ -50,7 +50,7 @@ def emit_tag_data():
                 conn, cursor = dbfuncs.db_connection()
 
                 inactiveTags = dbfuncs.getInactiveInProdTags(cursor)
-                rushTags = dbfuncs.getRushTags(cursor)
+                dbTags = dbfuncs.getInProdTags(cursor)
 
                 dbfuncs.closeDBConnection(conn)
 
@@ -64,12 +64,15 @@ def emit_tag_data():
                     tagJson[tag].update(batteryJson[tag])
                 tagJson[tag]["inactive"] = False
                 tagJson[tag]["rush"] = False
+                tagJson[tag]["zone"] = "Not Found"
                 for inactiveTag in inactiveTags:
                     if tag[2:] == inactiveTag[0]: #have to cut out first 2 letters of tag because we have to remove the "0x"
                         tagJson[tag]["inactive"] = True
-                for rushTag in rushTags:
-                    if tag[2:] == rushTag[2]: #have to cut out first 2 letters of tag because we have to remove the "0x"
-                        tagJson[tag]["rush"] = True
+                for dbTag in dbTags:
+                    if tag[2:] == dbTag[0]:
+                        tagJson[tag]["zone"] = dbTag[9]
+                        tagJson[tag]["rush"] = dbTag[10]
+                            
 
 
             s.close()
@@ -148,6 +151,12 @@ def link_wip():
             dbfuncs.closeDBConnection(conn)
         except:
             dbfuncs.closeDBConnection(conn)
+            response = {
+                    'data':"Lien non réussi en raison d'une erreur dans la base de données | Linking Unsuccessful Due to Database Error", 
+                    'success':False, 
+                    'tagData': {} 
+                }
+            return jsonify(response)
             
 
 

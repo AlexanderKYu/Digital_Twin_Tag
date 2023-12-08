@@ -598,6 +598,18 @@ def getNonRushTags(cursor):
     data = cursor.fetchall()
     return data
 
+def getInProdTags(cursor):
+    """
+    Function to get all inprod tags
+    """
+
+    db_query = f"""SELECT * FROM tblorders
+    WHERE inprod = True"""
+
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
+
 """
 ----------------
 CHECK/DATA FUNCTIONS
