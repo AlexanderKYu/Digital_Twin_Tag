@@ -2,7 +2,7 @@
   "name": "react-front-end",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://192.168.0.10:5000/",
+  "proxy": "http://192.168.0.10:80/",
   "dependencies": {
     "@auth0/auth0-react": "^2.0.1",
     "@chakra-ui/icons": "^2.0.17",
