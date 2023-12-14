@@ -31,6 +31,11 @@ socketio = SocketIO(cors_allowed_origins="*")
 
 socketio.init_app(app)
 
+@socketio.on_error_default
+def default_error_handler(e):
+    print(request.event["message"]) # "my error event"
+    print(request.event["args"])    # (data,)
+    
 
 @app.route('/healthcheck')
 def healthcheck():
