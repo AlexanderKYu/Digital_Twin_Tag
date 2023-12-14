@@ -34,7 +34,8 @@ socketio.init_app(app)
 
 @app.route('/healthcheck')
 def healthcheck():
-    return 'API is healthy!'
+    TCP_IP = environ.get('TCP_IP')
+    return TCP_IP
 
 
 def emit_tag_data():
