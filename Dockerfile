@@ -1,9 +1,6 @@
 FROM python:3.11
 # flask-API dockerfile but needed to be run in the main repo because the flask is dependant on other module and they could not be access within the flask-api folder
 
-
-EXPOSE 5000/tcp
-
 WORKDIR .
 
 # copy the requirements first so if the rest of the dockerfile changes when building it will cache the requirements so the build time is faster
