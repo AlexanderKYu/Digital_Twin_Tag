@@ -27,9 +27,7 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 
 #CORS(app,resources={r"/*":{"origins":"*"}})
-socketio = SocketIO(cors_allowed_origins="*")
-
-socketio.init_app(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @socketio.on_error_default
 def default_error_handler(e):
