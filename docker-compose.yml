@@ -5,11 +5,12 @@ services:
     restart: always
     environment:
       - APP_NAME=MyFlaskApp
-    expose:
-      - 5000
+    ports:
+      - "5000:5000"
+      - "5001:5001"
   nginx:
     build: ./nginx
     container_name: nginx
     restart: always
     ports:
-      - "5000:80"
+      - "80:80"
