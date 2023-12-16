@@ -7,9 +7,16 @@ services:
       - APP_NAME=MyFlaskApp
     ports:
       - "5000:5000"
+    networks:
+      - my_network
   nginx:
     build: ./nginx
     container_name: nginx
     restart: always
     ports:
       - "80:80"
+    networks:
+      - my_network
+networks:
+  my_network:
+    driver: bridge
