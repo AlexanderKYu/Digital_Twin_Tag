@@ -7,7 +7,6 @@ services:
       - APP_NAME=MyFlaskApp
     ports:
       - "5000:5000"
-      - "5001:5001"
   nginx:
     build: ./nginx
     container_name: nginx
