@@ -27,18 +27,14 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 
 CORS(app,resources={r"/*":{"origins":"*"}})
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(cors_allowed_origins="*")
 
-@socketio.on_error_default
-def default_error_handler(e):
-    print(request.event["message"]) # "my error event"
-    print(request.event["args"])    # (data,)
-    
+socketio.init_app(app)
+
 
 @app.route('/healthcheck')
 def healthcheck():
-    TCP_IP = environ.get('TCP_IP')
-    return TCP_IP
+    return 'API is healthy!'
 
 
 def emit_tag_data():
@@ -287,6 +283,6 @@ def disconnected():
 
 
 if __name__ == '__main__':
-    # socketio.run(app, debug=True,port=5000)
-    socketio.run(app)
-    #socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+     # socketio.run(app, debug=True,port=5000)
+    # socketio.run(app)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
