@@ -4,6 +4,30 @@
 
 Prerequisite: pgadmin4, AWS RDS database connection info
 
+Follow the steps below to establish a database connection via pgadmin
+
+![welcome page](./imgs/welcome.png)
+
+When pgadmin is launch you are greeted with a similar welcome page. First click into "Add New Server"
+
+![server config page](./imgs/serverName.png)
+
+Next a form will appear. You can name the database (it does not matter as this name will just be on your local machine to help define this database and any other databases you may have locally)
+
+![AWS specifications page](./imgs/AWSSpecs.png)
+
+Next click into the "Connection" tab where you will add the host name, port number, username and password (you can toggle on the save password as to not require a database user password prompt on every connection)
+
+***Note: Please reach out to the appropriate people if you need the AWS connection information (host name, port, username, password)***
+
+![Directory tool](./imgs/Directory.png)
+
+Once you click save you should now have access to the database and can navigate to the different tables by following this directory structure.
+
+![query tool](./imgs/queryTool.png)
+
+You are able to query for information using the tool shown here once you right click into a table. For more specific queries you can use the "Query Tool" just above the "Properties..." to type specific SQL queries.
+
 ## File dbfuncs
 
 Has all functions related to management of the database
