@@ -13,36 +13,53 @@ ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
 
 export default function FloorMap(props) {
 
-  const [mapCoords, setMapCoords] = useState([]);
+  const [activeMapCoords, setActiveMapCoords] = useState([]);
+  const [inactiveMapCoords, setInactiveMapCoords] = useState([]);
 
   const image = new Image();
   image.src = '/floorImg.png';
 
   useEffect(() => {
     let allTags = Object.keys(props.tagData);
-    let tempCoords = []
+    let activeCoords = [];
+    let inactiveCoords = [];
     allTags.forEach((tag) => {
       let tempObject = {};
       tempObject.x = props.tagData[tag].x;
       tempObject.y = props.tagData[tag].y;
       tempObject.tag = props.tagData[tag].alias;
       //setMapCoords( arr => [...arr, tempObject]);
-      tempCoords.push(tempObject);
+      if(props.tagData[tag].inactive){
+        inactiveCoords.push(tempObject)
+      } else {
+        activeCoords.push(tempObject);
+      }
       
     });
-    setMapCoords(tempCoords);
+    setInactiveMapCoords(inactiveCoords);
+    setActiveMapCoords(activeCoords);
   }, [props.tagData]);
   
 
   const data = {
     datasets: [
       {
-        label: "Tags",
-        data: mapCoords,
-        color: "#FFFFFF",
+        label: "Active Tags",
+        data: activeMapCoords,
+        color: "#000000",
         backgroundColor: 'rgba(50, 180, 100, 1)',
         pointRadius: 6,
         pointHoverRadius: 10,
+        pointBorderColor: '#000000',
+      },
+      {
+        label: "Inactive Tags",
+        data: inactiveMapCoords,
+        color: "white",
+        backgroundColor: 'rgba(163,21,47,1)',
+        pointRadius: 6,
+        pointHoverRadius: 10,
+        pointBorderColor: '#000000',
       },
     ],
   };
@@ -71,14 +88,14 @@ export default function FloorMap(props) {
     scales: {
       x: {
         ticks: {
-          color: 'black'
+          color: 'white'
         },
         min: -10,
         max: 30,
       },
       y: {
         ticks: {
-          color: 'black'
+          color: 'white'
         },
         
         min: -10,
@@ -87,6 +104,12 @@ export default function FloorMap(props) {
     },
     plugins:
       {
+        legend: {
+          labels: {
+            color: "white",  // not 'fontColor:' anymore
+            // fontSize: 18  // not 'fontSize:' anymore
+          }
+        },
       tooltip: {
         callbacks: {
           label: (context) => {

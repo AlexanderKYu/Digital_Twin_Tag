@@ -68,7 +68,8 @@ def db_init(cursor):
     time_on_floor FLOAT,
     build_time FLOAT,
     LastZone INT,
-    ZoneName VARCHAR(50)
+    ZoneName VARCHAR(50),
+    Rush BOOLEAN
     )"""
 
     cursor.execute(db_query)
@@ -306,6 +307,7 @@ INSERT FUNCTIONS
 ----------------
 """
 
+
 def dbPushTblWipDistances(cursor, WIP, QTY, x, y, distance):
     db_query = f"""INSERT INTO tblwipdistances (WIP, QTY, lastX, lastY, distance)
     VALUES ({WIP}, {QTY}, {x}, {y}, {distance});"""
@@ -313,15 +315,19 @@ def dbPushTblWipDistances(cursor, WIP, QTY, x, y, distance):
     cursor.execute(db_query)
 
 
-def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName):
+
+def dbPushTblOrders(cursor, WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName, rush):
     """
     Function to push data into tblOrders
     """
-
-    db_query = f"""INSERT INTO tblOrders (WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName)
-    VALUES ({WIP}, {QTY}, '{tagID}', {inProd}, {t_start}, {t_end}, {time_on_floor}, {build_time}, {lastZone}, '{zoneName}' 
-    );"""
-    cursor.execute(db_query)
+    try:
+        db_query = f"""INSERT INTO tblOrders (WIP, QTY, tagID, inProd, t_start, t_end, time_on_floor, build_time, lastZone, zoneName, rush)
+        VALUES ({WIP}, {QTY}, '{tagID}', {inProd}, {t_start}, {t_end}, {time_on_floor}, {build_time}, {lastZone}, '{zoneName}', {rush} 
+        );"""
+        cursor.execute(db_query)
+    except:
+        return False
+    return True
 
 def dbPushTblPaths(cursor, WIP, QTY, tagID, zoneID, zoneName, time):
     """
@@ -595,6 +601,40 @@ def getInactiveInProdTags(cursor):
     return data
 
 
+def getRushTags(cursor):
+    """
+    Function to get all rush tags
+    """
+
+    db_query = f"""SELECT * FROM tblOrders
+    WHERE rush = true AND inprod = true"""
+
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
+
+def getNonRushTags(cursor):
+    """
+    Function to get all non-rush tags
+    """
+    db_query = f"""SELECT * FROM tblOrders
+    WHERE rush = false AND inprod = true"""
+
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
+
+def getInProdTags(cursor):
+    """
+    Function to get all inprod tags
+    """
+
+    db_query = f"""SELECT * FROM tblorders
+    WHERE inprod = True"""
+
+    cursor.execute(db_query)
+    data = cursor.fetchall()
+    return data
 
 """
 ----------------

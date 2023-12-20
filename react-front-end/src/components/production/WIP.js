@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Input,
@@ -10,7 +10,8 @@ import {
   InputRightElement,
   AlertIcon,
   AlertDescription,
-  CloseButton
+  CloseButton,
+  Checkbox,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import TagData from "./WipRow.js";
@@ -20,8 +21,14 @@ export default function WIP() {
   const [wip, setWip] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [connectedTags, setConnectedTags] = useState([]);
+  const [filterConnectedTags, setFilterConnectedTags] = useState([]);
   const [lowBatt, setlowBatt] = useState("");
   const [status, setStatus] = useState(false);
+  const [rushCheckbox, setRushCheckbox] = useState(false);
+
+  useEffect(() => {
+    setFilterConnectedTags(connectedTags);
+  }, [connectedTags])
 
   const tagChange = (e) => {
     if (e.target.value.length <= 6) {
@@ -68,10 +75,25 @@ export default function WIP() {
   };
 
   const sendAndClear = (e) => {
-    var jsonData = {
-      tagNumber: "0x" + tag,
-      wipNumber: wip,
-    };
+    if(rushCheckbox){
+      //assign tag as rush
+      var jsonData = {
+        tagNumber: "0x" + tag,
+        wipNumber: wip,
+        rush: true,
+      };
+    } else {
+      // don't assign tag as rush
+      var jsonData = {
+        tagNumber: "0x" + tag,
+        wipNumber: wip,
+        rush: false,
+      };
+    }
+    //clear checkbox
+    setRushCheckbox(false);
+
+    
     const aliasData = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -126,52 +148,61 @@ export default function WIP() {
     }
   };
 
+  const onRushChange = (e) => {
+    setRushCheckbox(e.target.checked);
+  }
+
+  const recentTagSearch = (e) => {
+    let val = e.target.value.toLowerCase();
+
+    setFilterConnectedTags(connectedTags.filter(v => (v.alias.toLowerCase().includes(val) || v.number.toLowerCase().includes(val))));
+  }
+
   return (
     <>
       {confirmation && !status && (
         <Alert status="error" variant="solid" fontFamily="Arial" bg="#a3142e">
-        <AlertIcon />
-        <Box>
-          <AlertDescription>
-            {confirmation}
-          </AlertDescription>
-        </Box>
-        <CloseButton
-          alignSelf='end'
-          position='absolute'
-          right={1}
-          top={2}
-          onClick={()=>{
-            setConfirmation('');
-          }}
-        />
-        
-      </Alert>
+          <AlertIcon />
+          <Box>
+            <AlertDescription>{confirmation}</AlertDescription>
+          </Box>
+          <CloseButton
+            alignSelf="end"
+            position="absolute"
+            right={1}
+            top={2}
+            onClick={() => {
+              setConfirmation("");
+            }}
+          />
+        </Alert>
       )}
       {confirmation && status && (
         <Alert status="success" variant="solid" fontFamily="Arial" bg="#009cd9">
-        <AlertIcon />
-        <Box>
-          <AlertDescription>
-            {confirmation}
-          </AlertDescription>
-        </Box>
-        <CloseButton
-          alignSelf='end'
-          position='absolute'
-          right={1}
-          top={2}
-          onClick={()=>{
-            setConfirmation('');
-          }}
-        />
-        
-      </Alert>
+          <AlertIcon />
+          <Box>
+            <AlertDescription>{confirmation}</AlertDescription>
+          </Box>
+          <CloseButton
+            alignSelf="end"
+            position="absolute"
+            right={1}
+            top={2}
+            onClick={() => {
+              setConfirmation("");
+            }}
+          />
+        </Alert>
       )}
       <Flex align="center" mt={0} bg="#0d1117" color="white">
-        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box> {/* left border */}
-        <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="#0d1117"> {/* all middle */}
-          <Flex align="center" mt={0} bg="#0d1117" color="white"> {/* flex for middle */}
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box>{" "}
+        {/* left border */}
+        <Box flex="1" flexGrow="2" minH="100vh" mt={20} bg="#0d1117">
+          {" "}
+          {/* all middle */}
+          <Flex align="center" mt={0} bg="#0d1117" color="white">
+            {" "}
+            {/* flex for middle */}
             <Box
               flex="1"
               flexGrow="0.5"
@@ -185,9 +216,12 @@ export default function WIP() {
               borderRight="solid"
               border-color="white"
               border-width="4px"
-            > {/* left side */}
-              <Text fontSize="5xl" textAlign="center">TAG</Text>
-
+            >
+              {" "}
+              {/* left side */}
+              <Text fontSize="5xl" textAlign="center">
+                TAG
+              </Text>
               <InputGroup>
                 <Input
                   variant="wipInput"
@@ -195,6 +229,7 @@ export default function WIP() {
                   onChange={tagChange}
                   name="tagNumber"
                   onKeyPress={tagKeyPress}
+                  fontFamily="arial"
                   autoFocus
                 />
 
@@ -202,10 +237,12 @@ export default function WIP() {
                   <InputRightElement
                     bg="#009cd9"
                     color="white"
+                    height="8"
                     width="20"
                     mt={3}
                     mr={2}
                     borderRadius="150"
+                    fontFamily="arial"
                   >
                     <Text> {lowBatt}</Text>
                   </InputRightElement>
@@ -215,33 +252,42 @@ export default function WIP() {
                   <InputRightElement
                     bg="#a3142e"
                     color="white"
+                    height="8"
                     width="20"
                     mt={3}
                     mr={2}
                     borderRadius="150"
+                    fontFamily="arial"
                   >
                     <Text> {lowBatt}</Text>
                   </InputRightElement>
                 )}
               </InputGroup>
-              <Text fontSize="5xl" textAlign="center">WIP</Text>
-
+              <Text fontSize="5xl" textAlign="center">
+                WIP
+              </Text>
               <Input
                 variant="wipInput"
                 value={wip}
                 onChange={wipChange}
                 name="wipNumber"
                 onKeyPress={wipKeyPress}
+                fontFamily="arial"
+                mb="3"
               />
-
-              <Button
-                mt={2}
-                onClick={sendAndClear}
-                name="scanBtn"
-                variant="wipBtn"
-              >
-                <ArrowForwardIcon></ArrowForwardIcon>
-              </Button>
+              <Box mb={5}>
+                <Checkbox isChecked={rushCheckbox} onChange={onRushChange} size='md' colorScheme='lime.100' fontFamily="arial" fontWeight="semibold">Créer commande rush / Create rush</Checkbox>
+              </Box>
+              <Box>
+                <Button
+                  mt={10}
+                  onClick={sendAndClear}
+                  name="scanBtn"
+                  variant="wipBtn"
+                >
+                  <ArrowForwardIcon></ArrowForwardIcon>
+                </Button>
+              </Box>
             </Box>
             <Box
               flex="1"
@@ -252,19 +298,24 @@ export default function WIP() {
               pl={20}
               pr={20}
               bg="#0d1117"
-            > {/* right side */}
-              <Text fontSize="5xl" textAlign="center">SEARCH / RECHERCHE</Text>
+            >
+              {" "}
+              {/* right side */}
+              <Text fontSize="5xl" textAlign="center">
+                SEARCH / RECHERCHE
+              </Text>
               <InputGroup>
-                <Input variant="wipInput" type="" placeholder="" />
+                <Input onChange={recentTagSearch} variant="wipInput" fontFamily="arial" type="" placeholder="" />
               </InputGroup>
-              {connectedTags.map((tagValue) => (
+              {filterConnectedTags.map((tagValue) => (
                 <TagData key={tagValue.number} data={tagValue}></TagData>
               ))}
             </Box>
           </Flex>
         </Box>
-        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box> {/* right border */}
+        <Box flex="1" flexGrow="0.2" minH="100vh" mt={20} bg="#0d1117"></Box>{" "}
+        {/* right border */}
       </Flex>
-      </>
+    </>
   );
 }

@@ -164,16 +164,7 @@ export default function TagRow(props) {
                   mb={1.5}
                   fontFamily="arial"
                 >
-                  <Text>X &nbsp; {props.tag.x}</Text>
-                </Box>
-                <Box
-                  borderWidth={0.2}
-                  borderRadius={50}
-                  letterSpacing="1px"
-                  p={1.5}
-                  fontFamily="arial"
-                >
-                  <Text>Y &nbsp; {props.tag.y}</Text>
+                  <Text>{props.tag.zone}</Text>
                 </Box>
               </Box>
               {/* battery */}
