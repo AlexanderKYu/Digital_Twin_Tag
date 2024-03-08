@@ -8,6 +8,8 @@ import json
 import time
 import atexit
 import datetime
+from flask_mail import Mail, Message
+import mail
 
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -19,6 +21,7 @@ from CloudAppAggregator import eliko_pull
 from database import dbfuncs
 
 clients = 0
+db_error_counter = 0
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -26,6 +29,7 @@ app.config.from_pyfile('config.py')
 CORS(app,resources={r"/*":{"origins":"*"}})
 socketio = SocketIO(cors_allowed_origins="*")
 
+mailInstance = Mail(app)
 socketio.init_app(app)
 
 
@@ -82,12 +86,19 @@ def emit_tag_data():
         
 
 def invoke_eliko_pull_api():
-    print("cloud aggregator pulled")
+    global db_error_counter
     try:
         eliko_pull.main("push_info.pkl", "samples.pkl")
         socketio.emit("serverDown", {'id': 2, 'down': False, 'message': ""}, broadcast=True)
+        print("cloud aggregator pulled")
+        db_error_counter = 0 # RESET ERROR COUNTER IF PUSH SUCCEEDS
+        
     except:
+        db_error_counter +=1
+        if db_error_counter == 6: # IF THE DATABASE HAS NOT BEEN PUSHED TO IN 30 MINUTES THEN ERROR
+            mail.databaseError(app, mailInstance)
         socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
+
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=20, id="emit_tag_data")
@@ -319,6 +330,7 @@ def connected():
     print("client has connected")
     scheduler.print_jobs()
     scheduler.resume_job("emit_tag_data")
+    invoke_eliko_pull_api()
 
     if clients > 1:
         emit_tag_data()
