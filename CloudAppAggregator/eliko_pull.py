@@ -36,6 +36,7 @@ def dbTagsPush(tagsJson):
     tagsJson = json.loads(tagsJson)
     conn, cursor = dbfuncs.db_connection()
     dbfuncs.clearAllInactive(cursor)
+    dbfuncs.flushRawData(cursor, (curr_unix_timestamp - (262800 * 60)))
     for key, values in tagsJson.items():
         tagID = key.replace("0x", "")
         timestamp = values['timestamp']

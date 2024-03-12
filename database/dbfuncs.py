@@ -1,3 +1,4 @@
+import datetime
 import psycopg2
 from os import environ, path
 from dotenv import load_dotenv
@@ -299,6 +300,16 @@ def clearAllInactive(cursor):
     Function to clear all inavtive tags
     """
     db_query = f"""DELETE FROM inactiveTags"""
+    cursor.execute(db_query)
+
+def flushRawData(cursor, minTime):
+    """
+    Function to flush all data prior
+    to the minTime stamp in 
+    tblRawLocations
+    """
+    db_query = f"""DELETE FROM tblRawLocations
+    WHERE timestamp < {minTime}"""
     cursor.execute(db_query)
 
 """
