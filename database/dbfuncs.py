@@ -301,6 +301,16 @@ def clearAllInactive(cursor):
     db_query = f"""DELETE FROM inactiveTags"""
     cursor.execute(db_query)
 
+def flushRawData(cursor, minTime):
+    """
+    Function to flush all data prior
+    to the minTime stamp in 
+    tblRawLocations
+    """
+    db_query = f"""DELETE FROM tblRawLocations
+    WHERE timestamp < {minTime}"""
+    cursor.execute(db_query)
+
 """
 ----------------
 INSERT FUNCTIONS

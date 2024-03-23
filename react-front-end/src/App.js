@@ -29,7 +29,7 @@ function App() {
   useEffect(() => {
 
       // create websocket/connect
-      socket = io();
+      socket = io("http://127.0.0.1:5000");
 
       socket.on("getTags", (data) => {
         //set newly recieved tag data to tagData state variable
