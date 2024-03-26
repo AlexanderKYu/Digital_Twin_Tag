@@ -11,6 +11,7 @@ import {
   TableContainer,
   Input,
 } from "@chakra-ui/react";
+import { API_URL } from "../../config";
 
 
 export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
@@ -29,7 +30,8 @@ export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
   }
 
   useEffect(() => {
-    fetch("/get-overwritten-wips")
+    console.log(API_URL + "/get-overwritten-wips")
+    fetch(API_URL + "/get-overwritten-wips")
         .then((res) => res.json())
         .then((data) => {
           if(data.status){
@@ -55,7 +57,7 @@ export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(jsonData),
     };
-    fetch("/update-tend", aliasData)
+    fetch(API_URL + "/update-tend", aliasData)
         .then((res) => res.json())
         .then((data) => {
           // TODO: confirmation banner when t-end is successful

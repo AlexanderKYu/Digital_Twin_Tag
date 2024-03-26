@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import TagData from "./WipRow.js";
+import { API_URL } from "../../config.js";
 
 export default function WIP() {
   const [tag, setTag] = useState("");
@@ -46,7 +47,7 @@ export default function WIP() {
         body: JSON.stringify(jsonData),
       };
 
-      fetch("/link-battery", aliasData)
+      fetch(API_URL + "/link-battery", aliasData)
         .then((res) => res.json())
         .then((data) => {
           setlowBatt(data.status);
@@ -100,7 +101,7 @@ export default function WIP() {
       body: JSON.stringify(jsonData),
     };
 
-    fetch("/link-wip", aliasData)
+    fetch(API_URL + "/link-wip", aliasData)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
