@@ -16,6 +16,7 @@ import {
   AlertDescription,
   CloseButton,
 } from '@chakra-ui/react'
+import { API_URL } from "./config.js";
 
 let socket;
 
@@ -27,9 +28,9 @@ function App() {
 
   
   useEffect(() => {
-
+    
       // create websocket/connect
-      socket = io("http://127.0.0.1:5000");
+      socket = io(API_URL);
 
       socket.on("getTags", (data) => {
         //set newly recieved tag data to tagData state variable
