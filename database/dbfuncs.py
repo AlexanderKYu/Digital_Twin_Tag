@@ -389,6 +389,12 @@ def addWIPOverrideIntoQueue(cursor, WIP, QTY):
 
     cursor.execute(db_query)
 
+    
+    db_query = f"""UPDATE tblorders SET inprod = False
+    WHERE WIP = {WIP} AND QTY = {QTY} AND inprod = True"""
+
+    cursor.execute(db_query)
+
 """
 ----------------
 UPDATE FUNCTIONS
