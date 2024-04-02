@@ -232,10 +232,8 @@ def connected():
     print(request.sid)
     print("client has connected")
     scheduler.print_jobs()
-    scheduler.resume_job("emit_tag_data")
-
     if clients > 1:
-        emit_tag_data(app)
+        emit_tag_data(app, socketio)
 
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
@@ -246,12 +244,13 @@ def disconnected():
     clients-=1
     if(clients == 0):
         print("Last User Disconnected")
-        scheduler.pause_job("emit_tag_data")
     print("user disconnected")
     emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
 
 
 
-
+print("test")
 if __name__ == '__main__':
+    print("test2")
     socketio.run(app, debug=True,port=5000)
+    print("test3")
