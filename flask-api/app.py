@@ -249,8 +249,5 @@ def disconnected():
 
 
 
-print("test")
 if __name__ == '__main__':
-    print("test2")
-    socketio.run(app, debug=True,port=5000)
-    print("test3")
+    socketio.run(app, host='0.0.0.0',port=5000)
