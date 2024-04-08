@@ -1,4 +1,4 @@
-from flask import Flask, request,jsonify, current_app
+from flask import Flask, request,jsonify
 from flask_socketio import SocketIO,emit
 from flask_cors import CORS
 from os import environ
@@ -7,8 +7,10 @@ import sys
 import json
 import atexit
 import datetime
+import logging
 from flask_mail import Mail
 import mail
+from logging.handlers import RotatingFileHandler
 from flaskFuncs import emit_tag_data, invoke_eliko_pull_api, check_for_old_wip
 
 
@@ -20,9 +22,35 @@ from Eliko import JSON_eliko_call
 from database import dbfuncs
 
 clients = 0
-db_error_counter = 0
 
 app = Flask(__name__)
+
+# Create a logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Create a handler for general logs (all levels)
+record_handler = RotatingFileHandler('record.log', maxBytes=10000, backupCount=1)
+record_handler.setLevel(logging.DEBUG)
+
+# Create a handler for error logs (warning, error, and critical)
+error_handler = RotatingFileHandler('error.log', maxBytes=10000, backupCount=1)
+error_handler.setLevel(logging.WARNING)
+
+# Create formatters
+record_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+error_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+
+# Set formatters for handlers
+record_handler.setFormatter(record_formatter)
+error_handler.setFormatter(error_formatter)
+
+# Add handlers to the logger
+logger.addHandler(record_handler)
+logger.addHandler(error_handler)
+
+
+
 app.config.from_pyfile('config.py')
 
 CORS(app,resources={r"/*":{"origins":"*"}})
@@ -34,7 +62,7 @@ socketio.init_app(app)
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=20, id="emit_tag_data", args=[app, socketio])
-scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=5, args=[app, socketio, mailInstance])
+scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=5, args=[app, socketio, mailInstance, logger])
 
 if(not(scheduler.running)):
     scheduler.start()
@@ -250,4 +278,4 @@ def disconnected():
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0',port=5000)
+    socketio.run(app, debug=False, host='0.0.0.0',port=5000)

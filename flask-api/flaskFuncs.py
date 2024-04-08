@@ -11,6 +11,8 @@ from Eliko import JSON_eliko_call
 from CloudAppAggregator import eliko_pull
 from database import dbfuncs
 
+db_error_counter = 0
+
 def emit_tag_data(app, socketio):
     with app.test_request_context('/'):
         try:
@@ -62,7 +64,7 @@ def emit_tag_data(app, socketio):
             socketio.emit("serverDown", {'id': 1, 'down': True, 'message': "Eliko inaccessible / Eliko Unreachable"}, broadcast=True)
         
 
-def invoke_eliko_pull_api(app, socketio, mailInstance):
+def invoke_eliko_pull_api(app, socketio, mailInstance, logger):
     global db_error_counter
     try:
         eliko_pull.main("push_info.pkl", "samples.pkl")
@@ -70,7 +72,8 @@ def invoke_eliko_pull_api(app, socketio, mailInstance):
         print("cloud aggregator pulled")
         db_error_counter = 0 # RESET ERROR COUNTER IF PUSH SUCCEEDS
         
-    except:
+    except Exception as e:
+        logger.error('Database has failed ' + db_error_counter + ' times since the last success because of ' + e)
         db_error_counter +=1
         if db_error_counter == 6: # IF THE DATABASE HAS NOT BEEN PUSHED TO IN 30 MINUTES THEN ERROR
             mail.databaseError(app, mailInstance)
