@@ -1,15 +1,17 @@
-from flask import Flask, request,jsonify, current_app
+from flask import Flask, request,jsonify
 from flask_socketio import SocketIO,emit
 from flask_cors import CORS
 from os import environ
 import socket
 import sys
 import json
-import time
 import atexit
 import datetime
-from flask_mail import Mail, Message
+import logging
+from flask_mail import Mail
 import mail
+from logging.handlers import RotatingFileHandler
+from flaskFuncs import emit_tag_data, invoke_eliko_pull_api, check_for_old_wip
 
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -17,13 +19,38 @@ from apscheduler.schedulers.background import BackgroundScheduler
 sys.path.append('..')
 
 from Eliko import JSON_eliko_call
-from CloudAppAggregator import eliko_pull
 from database import dbfuncs
 
 clients = 0
-db_error_counter = 0
 
 app = Flask(__name__)
+
+# Create a logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Create a handler for general logs (all levels)
+record_handler = RotatingFileHandler('record.log', maxBytes=10000, backupCount=1)
+record_handler.setLevel(logging.DEBUG)
+
+# Create a handler for error logs (warning, error, and critical)
+error_handler = RotatingFileHandler('error.log', maxBytes=10000, backupCount=1)
+error_handler.setLevel(logging.WARNING)
+
+# Create formatters
+record_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+error_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+
+# Set formatters for handlers
+record_handler.setFormatter(record_formatter)
+error_handler.setFormatter(error_formatter)
+
+# Add handlers to the logger
+logger.addHandler(record_handler)
+logger.addHandler(error_handler)
+
+
+
 app.config.from_pyfile('config.py')
 
 CORS(app,resources={r"/*":{"origins":"*"}})
@@ -33,76 +60,9 @@ mailInstance = Mail(app)
 socketio.init_app(app)
 
 
-
-def emit_tag_data():
-    with app.test_request_context('/'):
-        try:
-            TCP_IP = environ.get('TCP_IP')
-            TCP_PORT = int(environ.get('TCP_PORT'))
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(3)
-
-            s.connect((TCP_IP, TCP_PORT))
-
-            #getting battery status of tag
-            tagJson = JSON_eliko_call.getTags(s)
-            tagJson = json.loads(tagJson)
-            batteryJson = JSON_eliko_call.getBattery(s)
-            batteryJson = json.loads(batteryJson)
-
-            try:
-                conn, cursor = dbfuncs.db_connection()
-
-                inactiveTags = dbfuncs.getInactiveInProdTags(cursor)
-                dbTags = dbfuncs.getInProdTags(cursor)
-
-                dbfuncs.closeDBConnection(conn)
-
-            except:
-                print("Connection to Database Failed")
-                socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
-
-
-            for tag in tagJson:
-                if(batteryJson[tag]):
-                    tagJson[tag].update(batteryJson[tag])
-                tagJson[tag]["inactive"] = False
-                tagJson[tag]["rush"] = False
-                tagJson[tag]["zone"] = "Not Found"
-                for inactiveTag in inactiveTags:
-                    if tag[2:] == inactiveTag[0]: #have to cut out first 2 letters of tag because we have to remove the "0x"
-                        tagJson[tag]["inactive"] = True
-                for dbTag in dbTags:
-                    if tag[2:] == dbTag[2]:
-                        tagJson[tag]["zone"] = dbTag[9]
-                        tagJson[tag]["rush"] = dbTag[10]
-                            
-
-
-            s.close()
-            socketio.emit("getTags",tagJson,broadcast=True)
-        except:
-            socketio.emit("serverDown", {'id': 1, 'down': True, 'message': "Eliko inaccessible / Eliko Unreachable"}, broadcast=True)
-        
-
-def invoke_eliko_pull_api():
-    global db_error_counter
-    try:
-        eliko_pull.main("push_info.pkl", "samples.pkl")
-        socketio.emit("serverDown", {'id': 2, 'down': False, 'message': ""}, broadcast=True)
-        print("cloud aggregator pulled")
-        db_error_counter = 0 # RESET ERROR COUNTER IF PUSH SUCCEEDS
-        
-    except:
-        db_error_counter +=1
-        if db_error_counter == 6: # IF THE DATABASE HAS NOT BEEN PUSHED TO IN 30 MINUTES THEN ERROR
-            mail.databaseError(app, mailInstance)
-        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Unreachable"}, broadcast=True)
-
-
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=20, id="emit_tag_data")
-scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=5)
+scheduler.add_job(func=emit_tag_data, trigger="interval", seconds=20, id="emit_tag_data", args=[app, socketio])
+scheduler.add_job(func=invoke_eliko_pull_api, trigger="interval", minutes=5, args=[app, socketio, mailInstance, logger])
 
 if(not(scheduler.running)):
     scheduler.start()
@@ -117,7 +77,6 @@ def link_wip():
     resString = ""
     success = False
     status = -1
-
     
     #call eliko api
     #connected through router
@@ -146,7 +105,7 @@ def link_wip():
         dbfuncs.setProdEndTime(cursor, oldWip, oldQty, timestamp)
         dbfuncs.closeDBConnection(conn)
     else:
-        check_for_old_wip(tagId[2:])
+        check_for_old_wip(socketio, tagId[2:])
         try:
             #adding new tag to database
             conn, cursor = dbfuncs.db_connection()
@@ -167,8 +126,7 @@ def link_wip():
                     'success':False, 
                     'tagData': {} 
                 }
-            return jsonify(response)
-            
+            return jsonify(response)     
 
 
     try:
@@ -214,34 +172,6 @@ def link_wip():
                     } 
                 }
     return jsonify(response)
-
-
-def check_for_old_wip(tagId):
-    """
-    Function to check if the previous wip wasn't properly set to DISPONIBLE before being used again
-    Function also sets value of Rush
-    """
-
-    # check if tag is still considered "In Production" in database
-    try:
-        conn, cursor = dbfuncs.db_connection()
-
-        wipNumber, qty, startTime = dbfuncs.getLastInProdBasedOnTagIdExt(cursor, tagId)
-
-
-        if wipNumber != 0:
-            dbfuncs.addWIPOverrideIntoQueue(cursor, wipNumber, qty)
-            dbfuncs.closeDBConnection(conn)
-            # send tag information to front end so that the supervisor can add an end time
-            startTimeObj = datetime.datetime.fromtimestamp(int(startTime))
-            startTimeText = startTimeObj.strftime( "%Y-%m-%d %I:%M %p")
-            socketio.emit("tagOverwritten",{'tagId': tagId, 'wip': wipNumber, 'qty': qty, 'startTime': startTimeText},broadcast=True)
-        else:
-            dbfuncs.closeDBConnection(conn)
-    except:
-        print("Connection to Database Failed")
-        socketio.emit("serverDown", {'id': 2, 'down': True, 'message': "Base de données inaccessible / Database Connection Failed"}, broadcast=True)
-
 
 
 @app.route("/link-battery", methods=['POST'])
@@ -299,11 +229,12 @@ def update_tend():
 def get_overwritten_wips():
     
     wips = []
+    wipObjects = []
+    
     try:
         conn, cursor = dbfuncs.db_connection()
         wips = dbfuncs.getAllWIPOverride(cursor)
         dbfuncs.closeDBConnection(conn)
-        wipObjects = []
         for wip in wips:
             wipObjects.append({
                 'wip': wip[0],
@@ -329,11 +260,8 @@ def connected():
     print(request.sid)
     print("client has connected")
     scheduler.print_jobs()
-    scheduler.resume_job("emit_tag_data")
-    invoke_eliko_pull_api()
-
     if clients > 1:
-        emit_tag_data()
+        emit_tag_data(app, socketio)
 
     emit("connect",{"data":f"id: {request.sid} is connected"})
 
@@ -344,12 +272,10 @@ def disconnected():
     clients-=1
     if(clients == 0):
         print("Last User Disconnected")
-        scheduler.pause_job("emit_tag_data")
     print("user disconnected")
     emit("disconnect",f"user {request.sid} disconnected",broadcast=True)
 
 
 
-
 if __name__ == '__main__':
-    socketio.run(app, debug=True,port=5000)
+    socketio.run(app, debug=False, host='0.0.0.0',port=5000)

@@ -30,7 +30,6 @@ export default function WipTimeRow({overwrittenWips, setOverwrittenWips}) {
   }
 
   useEffect(() => {
-    console.log(API_URL + "/get-overwritten-wips")
     fetch(API_URL + "/get-overwritten-wips")
         .then((res) => res.json())
         .then((data) => {
